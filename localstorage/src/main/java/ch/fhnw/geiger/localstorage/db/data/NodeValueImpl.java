@@ -7,6 +7,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Vector;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * <p>This abstract class defines the common attributes for all NodeValueObjects.</p>
@@ -52,9 +54,6 @@ public class NodeValueImpl implements NodeValue {
    */
   public NodeValueImpl(String key, String value) {
     this(key, value, null, null, 0);
-    if (key == null || value == null) {
-      throw new NullPointerException();
-    }
   }
 
   /**
@@ -101,6 +100,11 @@ public class NodeValueImpl implements NodeValue {
   }
 
   @Override
+  public Map<Locale, String> getAllValueTranslations() {
+    return new HashMap<>(value);
+  }
+
+  @Override
   public void setValue(String value, Locale locale) throws MissingResourceException {
     setLocalizedString(this.value, value, locale);
     updateLastmodified();
@@ -132,6 +136,11 @@ public class NodeValueImpl implements NodeValue {
   @Override
   public String getDescription(String languageRange) {
     return getLocalizedString(description, languageRange);
+  }
+
+  @Override
+  public Map<Locale, String> getAllDescriptionTranslations() {
+    return new HashMap<>(description);
   }
 
   private static Locale lookupLocale(Map<Locale, String> map, String languageRange) {

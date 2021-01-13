@@ -1,6 +1,7 @@
 package ch.fhnw.geiger.localstorage.db.data;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 
 /**
@@ -30,6 +31,13 @@ public interface NodeValue {
    * @return the string representation of the value
    */
   String getValue(String languageRange);
+
+  /**
+   * <p>Gets all translations of the value.</p>
+   *
+   * @return a Map containing all translations for the value and their locale
+   */
+  Map<Locale, String> getAllValueTranslations();
 
   /**
    * <p>Sets the string representation of the value.</p>
@@ -81,6 +89,13 @@ public interface NodeValue {
    * @return the string of the currently set description
    */
   String getDescription(String languageRange);
+
+  /**
+   * <p>Gets all translations of the description of the value.</p>
+   *
+   * @return a Map containing all translations for the description and their locale
+   */
+  Map<Locale, String> getAllDescriptionTranslations();
 
   /**
    * <p>Sets the description of the value.</p>
