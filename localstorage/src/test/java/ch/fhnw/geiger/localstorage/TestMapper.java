@@ -35,7 +35,7 @@ public class TestMapper {
   public static void setupClass() {
     // First test impplementation on dummy mapper
     mapperList.add(new DummyMapper());
-    mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
+    //mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
   }
 
   /**

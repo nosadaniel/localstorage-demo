@@ -74,5 +74,6 @@ local.properties
 /testdb.trace.db
 /localstorage/build/
 /.gradle/
+/build/
 
 /localstorage/testdb.trace.db

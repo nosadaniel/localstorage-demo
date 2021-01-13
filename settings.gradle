@@ -1,2 +1,4 @@
-rootProject.name = 'localStorage'
-include('localstorage')
+rootProject.name = 'toolbox-storage'
+include 'localstorage'
+
+
