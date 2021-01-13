@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+	options {
+		buildDiscarder(logRotator(numToKeepStr:'50'))
+		disableConcurrentBuilds()
+	}
+	
+	stages {
+        stage('Clone sources') {
+            steps {
+                git url: 'git@gitlab.fhnw.ch:sacha.leemann1/geiger-localstorage.git',credentialsId: 'GEIGER_deployment', branch: env.BRANCH_NAME
+            }
+        }
+
+        stage('Gradle build') {
+            steps {
+                sh './gradlew clean build jar javadoc --no-daemon' 
+            }
+        }
+
+        stage('Main test') {
+            steps {
+				script{
+					try {
+						sh './gradlew test checkstyleMain --no-daemon' //run a gradle task
+					} finally {
+						junit '**/build/test-results/test/*.xml' 
+					}
+                }
+            }
+        }
+
+        
+    }
+    post {
+        always {
+          publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'localstorage/build/reports/tests/test/', reportFiles: 'index.html', reportName: 'GEIGER localstorage Report', reportTitles: 'GEIGER-localstorage'])
+        }
+        success {
+            archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
+			step([$class: 'JavadocArchiver', javadocDir: 'localstorage/build/docs/javadoc', keepAll: false])
+            updateGitlabCommitStatus(name: 'build', state: 'success')
+        }
+        failure {
+          updateGitlabCommitStatus(name: 'build', state: 'failed')
+        }
+    }
+}

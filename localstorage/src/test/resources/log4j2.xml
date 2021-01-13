@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+
+    <Properties>
+        <Property name="loggingPattern">%date{YYYY-MM-dd HH:mm:ss.SSS} %maxLength{%-6level}{3} %12replace{%1MDC{mySession}}{\s+}{-           } t%-5T %-40.40logger{1.1} %msg{nolookups}%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${loggingPattern}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="WARN">
+            <AppenderRef ref="Console" level="ALL"/>
+        </Root>
+    </Loggers>
+</Configuration>
