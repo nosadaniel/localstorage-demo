@@ -234,13 +234,13 @@ public class TestMapper {
     for (StorageMapper mapper : mapperList) {
       System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
       }).getClass().getEnclosingMethod().getName());
-      Node node = new NodeImpl("testNode1", "");
-      Node childNode = new NodeImpl("testNode1a", ":testNode1");
       NodeValue nv = new NodeValueImpl("key", "value", "type", "description", 1);
       nv.setDescription("Deutsche Beschreibung", Locale.GERMAN);
       nv.setDescription("Schwiizertüütschi Beschriibig", new Locale("de", "ch"));
       nv.setValue("Wert", Locale.GERMAN);
       nv.setValue("Au ä Wert", new Locale("de", "ch"));
+      Node node = new NodeImpl("testNode1", "");
+      Node childNode = new NodeImpl("testNode1a", ":testNode1");
       node.addChild(childNode);
       node.addValue(nv);
       System.out.println("## Stored " + node);
