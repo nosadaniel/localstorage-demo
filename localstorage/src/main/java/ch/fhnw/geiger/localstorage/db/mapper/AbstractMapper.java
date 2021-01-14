@@ -27,7 +27,7 @@ public abstract class AbstractMapper implements StorageMapper {
     if (":".equals(path)) {
       return;
     }
-    if (!path.matches("(" + GenericController.PATH_DELIMITER + "[a-zA-Z0-9]+)*")) {
+    if (!path.matches("(" + GenericController.PATH_DELIMITER + "[a-zA-Z0-9\\-]+)*")) {
       throw new StorageException("illegal path detected in \"" + path + "\"");
     }
   }

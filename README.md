@@ -25,9 +25,10 @@ The GEIGER project aims to create a solution for small businesses to protect the
 More information can be found under [https://project.cyber-geiger.eu/](https://project.cyber-geiger.eu/)
 
 ## Get binaries
-Precompiled binaries of the latest DEVELOPMENT build are available [here](https://project.cyber-geiger.eu/jenkins/job/localstorage/job/integration/lastSuccessfulBuild/artifact/localstorage/build/libs/localstorage-0.0.2-SNAPSHOT.jar).
 
 Precompiled binaries of the latest PRODUCTION build are available [here](https://project.cyber-geiger.eu/jenkins/job/localstorage/job/main/lastSuccessfulBuild/artifact/localstorage/build/libs/localstorage-0.0.2-SNAPSHOT.jar).
+
+Precompiled binaries of the latest INTEGRATION build are available [here](https://project.cyber-geiger.eu/jenkins/job/localstorage/job/integration/lastSuccessfulBuild/artifact/localstorage/build/libs/localstorage-0.0.2-SNAPSHOT.jar) (use only if instructed to do so or if you feel lucky).
 
 ## Quick start
 ### Create an ephemeral storage with a controller for testing puposes 
