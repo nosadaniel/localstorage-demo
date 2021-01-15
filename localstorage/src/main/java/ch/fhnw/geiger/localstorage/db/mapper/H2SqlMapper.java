@@ -10,7 +10,6 @@ import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValue;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,7 +18,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
 
 /**
  * <p>This class maps the DBInterface functions to an H2SQL database.</p>
@@ -28,26 +29,39 @@ import java.util.Map;
  */
 public class H2SqlMapper extends AbstractMapper {
 
+  private static final int MAXFIELDSIZE = 1024;
+
   private static final String initString = ""
       + "CREATE TABLE storage_node (\n"
-      + "path VARCHAR(1024) NULL PRIMARY KEY,\n"
+      + "path VARCHAR(" + MAXFIELDSIZE + ") NULL PRIMARY KEY,\n"
       + "owner VARCHAR(40),\n"
       + "name VARCHAR(40) NOT NULL,\n"
       + "visibility ENUM('RED', 'AMBER', 'GREEN', 'WHITE') NOT NULL,\n"
-      + "children VARCHAR(1024) NULL\n"
+      + "children VARCHAR(" + MAXFIELDSIZE + ") NULL\n"
       + ");\n"
       + "\n"
       + "CREATE TABLE node_value (\n"
-      + "path VARCHAR(1024) NOT NULL,\n"
+      + "path VARCHAR(" + MAXFIELDSIZE + ") NOT NULL,\n"
       + "key VARCHAR(40) NOT NULL,\n"
       + "value VARCHAR(16384),\n"
       + "type VARCHAR(40),\n"
-      + "description varchar(1024),\n"
+      + "locale VARCHAR(10) NOT NULL,\n"
       + "last_modified VARCHAR(20) NOT NULL\n"
+      + ");\n"
+      + "\n"
+      + "CREATE TABLE translation (\n"
+      + "path VARCHAR(" + MAXFIELDSIZE + ") NOT NULL,\n"
+      + "key VARCHAR(40) NOT NULL,\n"
+      + "identifier ENUM('VALUE', 'DESCRIPTION') NOT NULL,\n"
+      + "locale VARCHAR(10) NOT NULL,\n"
+      + "translation VARCHAR(" + MAXFIELDSIZE + ") NOT NULL\n"
       + ");\n"
       + "\n"
       + "ALTER TABLE node_value ADD CONSTRAINT node_value_pk PRIMARY KEY(path,key);\n"
       + "ALTER TABLE node_value ADD FOREIGN KEY(path) REFERENCES storage_node(path);\n"
+      + "ALTER TABLE translation ADD CONSTRAINT translation_pk "
+      + "PRIMARY KEY(path, key, identifier, locale);\n"
+      + "ALTER TABLE translation ADD FOREIGN KEY(path, key) REFERENCES node_value(path,key);\n"
       + "";
 
   private Connection conn;
@@ -107,7 +121,7 @@ public class H2SqlMapper extends AbstractMapper {
   public NodeImpl get(String path) throws StorageException {
     checkPath(path);
     getSanity(path);
-    NodeImpl res = null;
+    NodeImpl res;
     String sqlStatement = "SELECT path, owner, name, visibility, children "
         + "FROM storage_node WHERE path = ?";
     try {
@@ -137,22 +151,48 @@ public class H2SqlMapper extends AbstractMapper {
     }
 
     // get all values and add to node
-    sqlStatement = "SELECT path,key,value,type,description,last_modified "
+    sqlStatement = "SELECT path,key,value,type,locale,last_modified "
         + "FROM node_value WHERE path = ?";
+    String key;
     try {
       PreparedStatement ps = conn.prepareStatement(sqlStatement);
       ps.setString(1, path);
       ResultSet rs = ps.executeQuery();
       while (rs.next()) {
-        NodeValue value = new NodeValueImpl(rs.getString("key"), rs.getString("value"),
-            rs.getString("type"), rs.getString("description"),
-            Long.valueOf(rs.getString("last_modified")));
+        key = rs.getString("key");
+        NodeValue value = new NodeValueImpl(key, rs.getString("value"),
+            rs.getString("type"), "",
+            Long.parseLong(rs.getString("last_modified")));
+
+        // get translations and add to node_value
+        String sqlStatementTranslations = "SELECT path,key,identifier,locale,translation "
+                + "FROM translation WHERE (path = ? AND key = ?)";
+        try {
+          PreparedStatement psTranslations = conn.prepareStatement(sqlStatementTranslations);
+          psTranslations.setString(1, path);
+          psTranslations.setString(2, key);
+          ResultSet rsTranslations = psTranslations.executeQuery();
+          while (rsTranslations.next()) {
+            String identifier = rsTranslations.getString("identifier");
+            if (Identifier.valueOf(identifier).equals(Identifier.VALUE)) {
+              // the translation is for a value
+              value.setValue(rsTranslations.getString("translation"),
+                      java.util.Locale.forLanguageTag(rsTranslations.getString("locale")));
+            } else if (Identifier.valueOf(identifier).equals(Identifier.DESCRIPTION)) {
+              // the translation is for a description
+              value.setDescription(rsTranslations.getString("translation"),
+                      java.util.Locale.forLanguageTag(rsTranslations.getString("locale")));
+            }
+          }
+        } catch (SQLException e) {
+          throw new StorageException("Could not retrieve description for node \"" + path
+                  + "\" and key \"" + key + "\"", e);
+        }
         res.addValue(value);
       }
     } catch (SQLException e) {
       throw new StorageException("Could not retrieve values for node \"" + path + "\"", e);
     }
-
     return res;
   }
 
@@ -221,7 +261,6 @@ public class H2SqlMapper extends AbstractMapper {
           addValue(node.getPath(), entry.getValue());
         } else {
           updateValue(node.getPath(), entry.getValue());
-          ;
         }
       }
     } catch (SQLException e) {
@@ -266,7 +305,7 @@ public class H2SqlMapper extends AbstractMapper {
     if (getValue(path, value.getKey()) != null) {
       throw new StorageException("Value already exists");
     }
-    String sqlStatement = "INSERT INTO node_value (path, key, value, type, description, "
+    String sqlStatement = "INSERT INTO node_value (path, key, value, type, locale, "
         + "last_modified) VALUES (?,?,?,?,?,?)";
     try {
       PreparedStatement ps = conn.prepareStatement(sqlStatement);
@@ -274,13 +313,48 @@ public class H2SqlMapper extends AbstractMapper {
       ps.setString(2, value.getKey());
       ps.setString(3, value.getValue());
       ps.setString(4, value.getType());
-      Clob clob = conn.createClob();
-      clob.setString(1, value.getDescription());
-      ps.setClob(5, clob);
+      ps.setString(5, java.util.Locale.ENGLISH.toLanguageTag()); // set default to english
       ps.setString(6, String.valueOf(value.getLastModified()));
       ps.execute();
     } catch (SQLException e) {
       throw new StorageException("Could not create value \"" + value.getKey() + "\"", e);
+    }
+
+    // insert translations for value
+    String sqlStatementTrl = "INSERT INTO translation (path, key, identifier, locale, translation)"
+            + " VALUES (?,?,?,?,?)";
+    Map<java.util.Locale, String> valueMap = value.getAllValueTranslations();
+    for (Map.Entry<java.util.Locale, String> entry : valueMap.entrySet()) {
+      try {
+        PreparedStatement psTranslation = conn.prepareStatement(sqlStatementTrl);
+        psTranslation.setString(1, path);
+        psTranslation.setString(2, value.getKey());
+        psTranslation.setInt(3, Identifier.VALUE.ordinal());
+        psTranslation.setString(4, entry.getKey().toLanguageTag());
+        psTranslation.setString(5, entry.getValue());
+        psTranslation.execute();
+      } catch (SQLException e) {
+        throw new StorageException("Could not create translation \""
+                + entry.getKey().toLanguageTag() + "\" for value \"" + value.getKey() + "\"", e);
+      }
+    }
+
+    // insert translations for description
+    Map<Locale, String> descriptionMap = value.getAllDescriptionTranslations();
+    for (Map.Entry<Locale, String> entry : descriptionMap.entrySet()) {
+      try {
+        PreparedStatement psTranslation = conn.prepareStatement(sqlStatementTrl);
+        psTranslation.setString(1, path);
+        psTranslation.setString(2, value.getKey());
+        psTranslation.setInt(3, Identifier.DESCRIPTION.ordinal());
+        psTranslation.setString(4, entry.getKey().toLanguageTag());
+        psTranslation.setString(5, entry.getValue());
+        psTranslation.execute();
+      } catch (SQLException e) {
+        throw new StorageException("Could not create translation \""
+                + entry.getKey().toLanguageTag() + "\" for description in value \""
+                + value.getKey() + "\"", e);
+      }
     }
   }
 
@@ -295,6 +369,18 @@ public class H2SqlMapper extends AbstractMapper {
     if (value == null) {
       throw new StorageException("Key \"" + key + "\" does not exist");
     }
+    // remove translations
+    String sqlDeleteStatementTranslations = "DELETE FROM translation WHERE (path = ? AND key = ?)";
+    try {
+      PreparedStatement psDeleteTranslation = conn.prepareStatement(sqlDeleteStatementTranslations);
+      psDeleteTranslation.setString(1, path);
+      psDeleteTranslation.setString(2, key);
+      psDeleteTranslation.execute();
+    } catch (SQLException e) {
+      throw new StorageException("Could not delete translations for key \"" + key + "\" in node \""
+              + path + "\"", e);
+    }
+
     // remove value
     String sqlDeleteStatement = "DELETE FROM node_value WHERE (path = ? AND key = ?)";
     try {
@@ -303,9 +389,10 @@ public class H2SqlMapper extends AbstractMapper {
       psDelete.setString(2, key);
       psDelete.execute();
     } catch (SQLException e) {
-      e.printStackTrace();
-      throw new StorageException("Could not delete value");
+      throw new StorageException("Could not delete value for key \"" + key + "\" in node \""
+              + path + "\"", e);
     }
+
     return value;
   }
 
@@ -363,7 +450,7 @@ public class H2SqlMapper extends AbstractMapper {
     checkPath(path);
     get(path); // check if node exists
 
-    String sqlSelectStatement = "SELECT path,key,value,type,description,last_modified "
+    String sqlSelectStatement = "SELECT path,key,value,type,locale,last_modified "
         + "FROM node_value WHERE (path = ? and key = ?)";
     NodeValue value = null;
     try {
@@ -378,12 +465,37 @@ public class H2SqlMapper extends AbstractMapper {
 
       // add properties
       value = new NodeValueImpl(rs.getString("key"), rs.getString("value"),
-          rs.getString("type"), rs.getString("description"),
+          rs.getString("type"), "",
           rs.getLong("last_modified"));
 
     } catch (SQLException e) {
       throw new StorageException(
           "Something went wrong while trying to retrieve the value " + key + " from " + path, e);
+    }
+
+    // add translations
+    String sqlStatementTranslations = "SELECT path,key,identifier,locale,translation "
+            + "FROM translation WHERE (path = ? AND key = ?)";
+    try {
+      PreparedStatement psTranslations = conn.prepareStatement(sqlStatementTranslations);
+      psTranslations.setString(1, path);
+      psTranslations.setString(2, key);
+      ResultSet rsTranslations = psTranslations.executeQuery();
+      while (rsTranslations.next()) {
+        String identifier = rsTranslations.getString("identifier");
+        if (Identifier.valueOf(identifier).equals(Identifier.VALUE)) {
+          // the translation is for a value
+          value.setValue(rsTranslations.getString("translation"),
+                  Locale.forLanguageTag(rsTranslations.getString("locale")));
+        } else if (Identifier.valueOf(identifier).equals(Identifier.DESCRIPTION)) {
+          // the translation is for a description
+          value.setDescription(rsTranslations.getString("translation"),
+                  Locale.forLanguageTag(rsTranslations.getString("locale")));
+        }
+      }
+    } catch (SQLException e) {
+      throw new StorageException("Could not retrieve description for node \"" + path
+              + "\" and key \"" + key + "\"", e);
     }
     return value;
   }
@@ -392,11 +504,11 @@ public class H2SqlMapper extends AbstractMapper {
   public List<Node> search(SearchCriteria criteria) {
     String sqlNodeSearch = "SELECT path,owner,name,visibility,children FROM storage_node "
         + "WHERE (path = ? and owner = ? and name = ? and visibility = ?)";
-    String sqlValueSearch = "SELECT path,key,value,type,description,last_modified "
+    String sqlValueSearch = "SELECT path,key,value,type,locale,last_modified "
         + "FROM node_value WHERE (path = ? and key = ? and value = ? and type = ? "
         + "and last_modified = ?)";
-    Map<String, NodeImpl> nodes = new HashMap<String, NodeImpl>();
-    Map<String, NodeValue> values = new HashMap<String, NodeValue>();
+    Map<String, NodeImpl> nodes = new HashMap<>();
+    Map<String, NodeValue> values = new HashMap<>();
     try {
       // get nodes
       PreparedStatement psSelect = conn.prepareStatement(sqlNodeSearch);
@@ -443,14 +555,14 @@ public class H2SqlMapper extends AbstractMapper {
     // Currently all missing Nodes (if any) for values get added to the list in
     // order to include the values.
     for (String path : values.keySet()) {
-      if (!nodes.keySet().contains(path)) {
+      if (!nodes.containsKey(path)) {
         // get missing node
         nodes.put(path, get(path));
       }
       // add value to existing node
       nodes.get(path).addValue(values.get(path));
     }
-    return new ArrayList<Node>(nodes.values());
+    return new ArrayList<>(nodes.values());
   }
 
   @Override
@@ -471,14 +583,23 @@ public class H2SqlMapper extends AbstractMapper {
   @Override
   public void zap() {
     // Usually Truncate would be used, but it does not work with referenced tables
-    String sqlStatement1 = "DELETE FROM node_value";
-    String sqlStatement2 = "DELETE FROM storage_node";
+    String sqlStatement1 = "DELETE FROM storage_node";
+    String sqlStatement2 = "DELETE FROM node_value";
+    String sqlStatement3 = "DELETE FROM translation";
     try {
-      (conn.createStatement()).execute(sqlStatement1);
+      (conn.createStatement()).execute(sqlStatement3);
       (conn.createStatement()).execute(sqlStatement2);
+      (conn.createStatement()).execute(sqlStatement1);
     } catch (SQLException e) {
       throw new StorageException("Something went wrong while trying to truncate the database", e);
     }
   }
 
+  /**
+   * <p>Used to define what a translation is used for.</p>
+   */
+  public enum Identifier {
+    VALUE,
+    DESCRIPTION
+  }
 }

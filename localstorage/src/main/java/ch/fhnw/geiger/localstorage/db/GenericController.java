@@ -9,9 +9,11 @@ import ch.fhnw.geiger.localstorage.StorageListener;
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValue;
+import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Vector;
 
 /**
@@ -61,7 +63,7 @@ public class GenericController implements StorageController, ChangeRegistrar {
 
   private void initMapper() throws StorageException {
     final String[] baseNodes = new String[]{
-        "", ":device", ":user", ":enterprise", ":keys", ":global"
+        "", ":Devices", ":Users", ":Enterprise", ":Keys", ":Global", ":Local"
       };
     for (String nodeName : baseNodes) {
       try {
@@ -71,6 +73,43 @@ public class GenericController implements StorageController, ChangeRegistrar {
         mapper.add(new NodeImpl(nodeName));
       }
     }
+
+    // check if current user exists
+    Node localNode = mapper.get(":Local");
+    NodeValue uuid = localNode.getValue("currentUser");
+    if (uuid == null) {
+      // create new default user
+      uuid = new NodeValueImpl("currentUser", UUID.randomUUID().toString());
+      localNode.addValue(uuid);
+      mapper.update(localNode);
+    }
+
+    // check if current user node exists
+    String userNodeName = ":Users:" + uuid.getValue();
+    try {
+      mapper.get(userNodeName);
+    } catch (StorageException se) {
+      mapper.add(new NodeImpl(userNodeName));
+    }
+
+    // check if current user exists
+    localNode = mapper.get(":Local");
+    uuid = localNode.getValue("currentDevice");
+    if (uuid == null) {
+      // create new default user
+      uuid = new NodeValueImpl("currentDevice", UUID.randomUUID().toString());
+      localNode.addValue(uuid);
+      mapper.update(localNode);
+    }
+
+    // check if current user node exists
+    String deviceNodeName = ":Devices:" + uuid.getValue();
+    try {
+      mapper.get(deviceNodeName);
+    } catch (StorageException se) {
+      mapper.add(new NodeImpl(deviceNodeName));
+    }
+
   }
 
   @Override

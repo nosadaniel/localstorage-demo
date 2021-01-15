@@ -1,7 +1,7 @@
 package ch.fhnw.geiger.localstorage;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import ch.fhnw.geiger.localstorage.db.StorageMapper;
@@ -35,7 +35,7 @@ public class TestMapper {
   public static void setupClass() {
     // First test impplementation on dummy mapper
     mapperList.add(new DummyMapper());
-    //mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
+    mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
   }
 
   /**
@@ -216,10 +216,10 @@ public class TestMapper {
       Node storedNode = mapper.get(":testNode1");
       Node storedChildNode = mapper.get(":testNode1:testNode1a");
       Node storedNode2 = mapper.get(":testNode2");
-      assertTrue("Node :testNode1 may not be a skeleton if fetched", !storedNode.isSkeleton());
-      assertTrue("Node :testNode1:testNode1a may not be a skeleton if fetched",
-          !storedChildNode.isSkeleton());
-      assertTrue("Node :testNode2 may not be a skeleton if fetched", !storedNode2.isSkeleton());
+      assertFalse("Node :testNode1 may not be a skeleton if fetched", storedNode.isSkeleton());
+      assertFalse("Node :testNode1:testNode1a may not be a skeleton if fetched",
+          storedChildNode.isSkeleton());
+      assertFalse("Node :testNode2 may not be a skeleton if fetched", storedNode2.isSkeleton());
 
       // compare data
       assertEquals("comparing parent node", node, storedNode);
@@ -234,6 +234,7 @@ public class TestMapper {
     for (StorageMapper mapper : mapperList) {
       System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
       }).getClass().getEnclosingMethod().getName());
+
       NodeValue nv = new NodeValueImpl("key", "value", "type", "description", 1);
       nv.setDescription("Deutsche Beschreibung", Locale.GERMAN);
       nv.setDescription("Schwiizertüütschi Beschriibig", new Locale("de", "ch"));
@@ -255,10 +256,10 @@ public class TestMapper {
       Node storedNode = mapper.get(":testNode1");
       Node storedChildNode = mapper.get(":testNode1:testNode1a");
       Node storedNode2 = mapper.get(":testNode2");
-      assertTrue("Node :testNode1 may not be a skeleton if fetched", !storedNode.isSkeleton());
-      assertTrue("Node :testNode1:testNode1a may not be a skeleton if fetched",
-          !storedChildNode.isSkeleton());
-      assertTrue("Node :testNode2 may not be a skeleton if fetched", !storedNode2.isSkeleton());
+      assertFalse("Node :testNode1 may not be a skeleton if fetched", storedNode.isSkeleton());
+      assertFalse("Node :testNode1:testNode1a may not be a skeleton if fetched",
+          storedChildNode.isSkeleton());
+      assertFalse("Node :testNode2 may not be a skeleton if fetched", storedNode2.isSkeleton());
       System.out.println("## got    " + storedNode);
 
       // compare data

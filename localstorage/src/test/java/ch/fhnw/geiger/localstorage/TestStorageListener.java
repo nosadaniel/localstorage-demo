@@ -138,8 +138,8 @@ public class TestStorageListener {
   @Test
   public void testListenerForCreateRemoveSubNode()
       throws ClassNotFoundException, InterruptedException {
-    final String testPath1 = ":device:testDevice1";
-    final String testPath2 = ":device:testDevice2";
+    final String testPath1 = ":Devices:testDevice1";
+    final String testPath2 = ":Devices:testDevice2";
     final Object notifier = new Object();
 
     final Node on = new NodeImpl(":null");
@@ -165,7 +165,7 @@ public class TestStorageListener {
 
     //create a dummy search criteria
     SearchCriteria sc = new SearchCriteria();
-    sc.setNodePath(":device");
+    sc.setNodePath(":Devices");
 
     // register the listener
     controller.registerChangeListener(sl, sc);
