@@ -29,9 +29,11 @@ Precompiled binaries of the latest PRODUCTION build are available [here](https:/
 
 Precompiled binaries of the latest integration build are available [here](https://project.cyber-geiger.eu/jenkins/job/localstorage/job/integration/lastSuccessfulBuild/artifact/localstorage/build/libs/localstorage-0.0.2-SNAPSHOT.jar).
 
-![Build of PRODUCTION](https://github.com/cyber-geiger/toolbox-storage/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=main)
-![Build of integration](https://github.com/cyber-geiger/toolbox-storage/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=integration)
-![Build of devlopment](https://github.com/cyber-geiger/toolbox-storage/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=development)
+|Stage       | Build status                            |
+|------------|-----------------------------------------|
+|PROD:       | ![PRODUCTION](https://github.com/cyber-geiger/toolbox-storage/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=main)|
+|integration:| ![integration](https://github.com/cyber-geiger/toolbox-storage/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=integration)|
+|development:| ![devlopment](https://github.com/cyber-geiger/toolbox-storage/workflows/Java%20CI%20with%20Gradle/badge.svg?branch=development)|
 
 ## Quick start
 ### Create an ephemeral storage with a controller for testing puposes 
