@@ -269,6 +269,4 @@ public class TestMapper {
       assertEquals("checking for child node count", 1, storedNode.getChildren().size());
     }
   }
-
-
 }

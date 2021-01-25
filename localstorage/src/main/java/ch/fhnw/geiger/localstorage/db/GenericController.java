@@ -166,8 +166,13 @@ public class GenericController implements StorageController, ChangeRegistrar {
   }
 
   @Override
-  public void rename(String oldPath, String newPath) throws StorageException {
+  public void rename(String oldPath, String newPathOrName) throws StorageException {
     NodeImpl oldNode = (NodeImpl) mapper.get(oldPath);
+    String newPath = newPathOrName;
+    if (!newPathOrName.startsWith(PATH_DELIMITER)) {
+      // create path from name
+      newPath = oldNode.getParentPath() + PATH_DELIMITER + newPathOrName;
+    }
     mapper.rename(oldPath, newPath);
     NodeImpl newNode = (NodeImpl) mapper.get(newPath);
     checkListeners(EventType.RENAME, oldNode, newNode, null, null);
@@ -235,7 +240,7 @@ public class GenericController implements StorageController, ChangeRegistrar {
 
   private void checkListeners(final EventType event, final Node oldNode, final Node newNode,
                               NodeValue oldValue, NodeValue newValue) {
-    if (oldNode == null || newNode == null || !oldNode.equals(newNode)) {
+    if (oldNode == null || !oldNode.equals(newNode)) {
       synchronized (listeners) {
         for (Map.Entry<SearchCriteria, StorageListener> e : listeners.entrySet()) {
           if (
