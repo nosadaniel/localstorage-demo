@@ -47,7 +47,7 @@ public class TestController {
     assertEquals("testOwner", storedNode.getOwner());
     assertEquals("testNode1", storedNode.getName());
     assertEquals(":testNode1", storedNode.getPath());
-    assertSame(RED ,storedNode.getVisibility());
+    assertSame(RED, storedNode.getVisibility());
   }
 
   @Test
@@ -62,7 +62,7 @@ public class TestController {
     assertEquals("testOwner", storedNode.getOwner());
     assertEquals("name2", storedNode.getName());
     assertEquals(":parent1:name2", storedNode.getPath());
-    assertSame(RED ,storedNode.getVisibility());
+    assertSame(RED, storedNode.getVisibility());
   }
 
   /**
