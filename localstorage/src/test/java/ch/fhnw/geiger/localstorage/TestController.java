@@ -106,7 +106,7 @@ public class TestController {
     NodeImpl[] n = new NodeImpl[]{
         new NodeImpl("parent1"),
         new NodeImpl("testNode1", ":parent1")
-      };
+    };
     for (NodeImpl tn : n) {
       System.out.println("## creating new node " + tn.getPath() + " (parent of "
           + tn.getParentPath() + ")");
@@ -183,7 +183,7 @@ public class TestController {
         new NodeImpl("name2", ":renameTests"),
         new NodeImpl("name21", ":renameTests:name2"),
         new NodeImpl("name3", ":renameTests")
-      };
+    };
     for (NodeImpl n : nodes) {
       controller.add(n);
     }
@@ -207,5 +207,22 @@ public class TestController {
     assertTrue("renaming node seems unsuccessful (sub-node path wrong)",
         ":renameTests:name2a:name21".equals(
             controller.get(":renameTests:name2a:name21").getPath()));
+  }
+
+  @Test
+  public void ingysTestcase() {
+    String nodename = ":testNodeNewName";
+    // write node to storage without value
+    Node childNode = new NodeImpl(nodename);
+    controller.update(childNode);
+
+    // update value in storage
+    NodeValue newChildKeyVal = new NodeValueImpl("childK", "newChildVal");
+    controller.updateValue(nodename, newChildKeyVal);
+
+    //to check the val
+    NodeValue newVal = childNode.getValue("childK");
+
+
   }
 }

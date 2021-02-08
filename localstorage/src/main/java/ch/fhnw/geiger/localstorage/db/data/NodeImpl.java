@@ -502,21 +502,24 @@ public class NodeImpl implements Node {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getPath() + "[" + getOwner() + "/" + getVisibility() + "/"
-        + ordinals.get(Field.LAST_MODIFIED) + "](");
+    sb.append(getPath());
+    sb.append("[");
+    sb.append("owner=" + getOwner());
+    sb.append(";vis=" + getVisibility());
+    sb.append("]{" + System.lineSeparator());
     int i = 0;
     if (values != null) {
       for (Map.Entry<String, NodeValue> e : values.entrySet()) {
         if (i > 0) {
-          sb.append(", ");
+          sb.append(", " + System.lineSeparator());
         }
-        sb.append(e.getValue().toString());
+        sb.append(e.getValue().toString("  "));
         i++;
       }
+      sb.append(System.lineSeparator() + "}");
     } else {
-      sb.append("()");
+      sb.append("{}");
     }
-    sb.append(")");
     return sb.toString();
   }
 

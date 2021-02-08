@@ -140,4 +140,13 @@ public interface NodeValue {
    * @return a copy of the current node value
    */
   NodeValue deepClone();
-}
+
+  /***
+   * <p>prints a space prefixed representation of the NodeValue.</p>
+   *
+   * @param prefix a prefix (typically a series of spaces
+   * @return the string representation
+   */
+  String toString(String prefix);
+
+  }

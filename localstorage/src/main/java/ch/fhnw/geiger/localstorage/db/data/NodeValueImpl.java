@@ -240,7 +240,41 @@ public class NodeValueImpl implements NodeValue {
 
   @Override
   public String toString() {
-    return "(" + type + ")" + key + "=" + value;
+    return toString("");
+  }
+
+  /***
+   * <p>prints a space prefixed representation of the NodeValue.</p>
+   *
+   * @param prefix a prefix (typically a series of spaces
+   * @return the string representation
+   */
+  public String toString(String prefix) {
+    StringBuilder sb = new StringBuilder();
+    // build head of value
+    sb.append(prefix+getKey());
+    if( getType()!=null) {
+      sb.append(":"+getType());
+    }
+    // build values
+    sb.append("={");
+    if(value.size()==1) {
+      sb.append(DEFAULT_LOCALE+"=>\""+value.get(DEFAULT_LOCALE)+"\"}");
+    } else {
+      sb.append(System.lineSeparator());
+      int i=0;
+      for(Map.Entry<Locale,String> e:value.entrySet()) {
+        if(i>0) {
+          sb.append(","+System.lineSeparator());
+        }
+        sb.append(prefix+"  "+DEFAULT_LOCALE+"=>\""+value.get(DEFAULT_LOCALE)+"\"}");
+        i++;
+      }
+      sb.append(System.lineSeparator()+prefix+"}");
+      // build description
+
+    }
+    return sb.toString();
   }
 
   @Override
