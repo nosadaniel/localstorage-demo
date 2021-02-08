@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import ch.fhnw.geiger.localstorage.db.GenericController;
@@ -98,8 +97,6 @@ public class TestController {
 
   @Test
   public void testValueUpdate() throws StorageException {
-    // add value
-    NodeValue value = new NodeValueImpl("key1", "valueFirst");
     try {
       controller.add(new NodeImpl("testNode1", ":parent1"));
       fail("Should raise an exception as parent node does not exist");
@@ -108,8 +105,7 @@ public class TestController {
     }
     NodeImpl[] n = new NodeImpl[]{
         new NodeImpl("parent1"),
-        new NodeImpl("testNode1", ":parent1")
-    };
+        new NodeImpl("testNode1", ":parent1")};
     for (NodeImpl tn : n) {
       System.out.println("## creating new node " + tn.getPath() + " (parent of "
           + tn.getParentPath() + ")");
@@ -118,7 +114,7 @@ public class TestController {
 
     // add a value
     System.out.println("## adding value");
-    controller.addValue(":parent1:testNode1", new NodeValueImpl("key1", "valuefirst"));
+    controller.addValue(":parent1:testNode1", new NodeValueImpl("key1", "valueFirst"));
 
     // update value
     System.out.println("## updating value");
@@ -135,9 +131,9 @@ public class TestController {
       System.out.println("## testing removal of node with child nodes ("
           + n[n.length - 1].getPath() + ")");
       controller.delete(n[0].getPath());
-      fail("shoud raise an exception as child classes exist");
+      fail("should raise an exception as child classes exist");
     } catch (StorageException e) {
-      // this is expected as the node has subnodes
+      // this is expected as the node has sub-nodes
     }
 
     Collections.reverse(Arrays.asList(n));
@@ -205,8 +201,7 @@ public class TestController {
         new NodeImpl("name11", ":renameTests:name1"),
         new NodeImpl("name2", ":renameTests"),
         new NodeImpl("name21", ":renameTests:name2"),
-        new NodeImpl("name3", ":renameTests")
-    };
+        new NodeImpl("name3", ":renameTests")};
     for (NodeImpl n : nodes) {
       controller.add(n);
     }
