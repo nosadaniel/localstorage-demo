@@ -1,4 +1,7 @@
 pipeline {
+    triggers {
+        pollSCM('') // Enabling being build on Push
+    }
     agent any
 	options {
 		buildDiscarder(logRotator(numToKeepStr:'50'))
@@ -8,7 +11,7 @@ pipeline {
 	stages {
         stage('Clone sources') {
             steps {
-                git url: 'git@gitlab.fhnw.ch:sacha.leemann1/geiger-localstorage.git',credentialsId: 'GEIGER_deployment', branch: env.BRANCH_NAME
+                git url: 'git@github.com:cyber-geiger/toolbox-storage.git',credentialsId: 'GEIGER_deployment', branch: env.BRANCH_NAME
             }
         }
 
