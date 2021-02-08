@@ -326,20 +326,4 @@ public class TestController {
             () -> controller.getValue(":renameTests:name2:name21", "key21"));
   }
 
-  @Test
-  public void ingysTestcase() {
-    String nodename = ":testNodeNewName";
-    // write node to storage without value
-    Node childNode = new NodeImpl(nodename);
-    controller.update(childNode);
-
-    // update value in storage
-    NodeValue newChildKeyVal = new NodeValueImpl("childK", "newChildVal");
-    controller.updateValue(nodename, newChildKeyVal);
-
-    //to check the val
-    NodeValue newVal = childNode.getValue("childK");
-
-
-  }
 }

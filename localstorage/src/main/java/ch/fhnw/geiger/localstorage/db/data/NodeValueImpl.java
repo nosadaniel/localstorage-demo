@@ -7,8 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Vector;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 /**
  * <p>This abstract class defines the common attributes for all NodeValueObjects.</p>
@@ -252,25 +250,25 @@ public class NodeValueImpl implements NodeValue {
   public String toString(String prefix) {
     StringBuilder sb = new StringBuilder();
     // build head of value
-    sb.append(prefix+getKey());
-    if( getType()!=null) {
-      sb.append(":"+getType());
+    sb.append(prefix + getKey());
+    if (getType() != null) {
+      sb.append(":" + getType());
     }
     // build values
     sb.append("={");
-    if(value.size()==1) {
-      sb.append(DEFAULT_LOCALE+"=>\""+value.get(DEFAULT_LOCALE)+"\"}");
+    if (value.size() == 1) {
+      sb.append(DEFAULT_LOCALE + "=>\"" + value.get(DEFAULT_LOCALE) + "\"}");
     } else {
       sb.append(System.lineSeparator());
-      int i=0;
-      for(Map.Entry<Locale,String> e:value.entrySet()) {
-        if(i>0) {
-          sb.append(","+System.lineSeparator());
+      int i = 0;
+      for (Map.Entry<Locale, String> e : value.entrySet()) {
+        if (i > 0) {
+          sb.append("," + System.lineSeparator());
         }
-        sb.append(prefix+"  "+DEFAULT_LOCALE+"=>\""+value.get(DEFAULT_LOCALE)+"\"}");
+        sb.append(prefix + "  " + DEFAULT_LOCALE + "=>\"" + value.get(DEFAULT_LOCALE) + "\"}");
         i++;
       }
-      sb.append(System.lineSeparator()+prefix+"}");
+      sb.append(System.lineSeparator() + prefix + "}");
       // build description
 
     }
