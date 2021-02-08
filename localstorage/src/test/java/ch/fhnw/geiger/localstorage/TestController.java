@@ -2,6 +2,9 @@ package ch.fhnw.geiger.localstorage;
 
 import static ch.fhnw.geiger.localstorage.Visibility.RED;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -44,7 +47,7 @@ public class TestController {
     assertEquals("testOwner", storedNode.getOwner());
     assertEquals("testNode1", storedNode.getName());
     assertEquals(":testNode1", storedNode.getPath());
-    assertTrue(RED == storedNode.getVisibility());
+    assertSame(RED, storedNode.getVisibility());
   }
 
   @Test
@@ -59,7 +62,7 @@ public class TestController {
     assertEquals("testOwner", storedNode.getOwner());
     assertEquals("name2", storedNode.getName());
     assertEquals(":parent1:name2", storedNode.getPath());
-    assertTrue(RED == storedNode.getVisibility());
+    assertSame(RED, storedNode.getVisibility());
   }
 
   /**
@@ -90,7 +93,7 @@ public class TestController {
     assertEquals("testNode1", storedNode.getName());
     assertEquals(":parent1:testNode1", storedNode.getPath());
     assertEquals("testChild1", storedNode.getChildNodesCsv());
-    assertTrue("Visibility is incorrect", Visibility.RED == storedNode.getVisibility());
+    assertSame(RED, storedNode.getVisibility());
   }
 
   @Test
@@ -125,9 +128,8 @@ public class TestController {
     // get the record
     System.out.println("## testing updated value");
     Node n2 = controller.get(":parent1:testNode1");
-    assertTrue("stored value \"" + n2.getValue(value2.getKey()).getValue()
-            + "\" does not match \"" + value2.getValue() + "\"",
-        value2.getValue().equals(n2.getValue(value2.getKey()).getValue()));
+    assertEquals("stored values do not match", value2.getValue(),
+            n2.getValue(value2.getKey()).getValue());
 
     try {
       System.out.println("## testing removal of node with child nodes ("
@@ -150,14 +152,34 @@ public class TestController {
   public void testStorageNodeRemove() throws StorageException {
     controller.add(new NodeImpl("parent1", ""));
     NodeImpl node = new NodeImpl("name1", ":parent1");
+    NodeValue nv = new NodeValueImpl("key", "value");
+    node.addValue(nv);
     controller.add(node);
     Node removed = controller.delete(":parent1:name1");
 
-    // check results
-    assertEquals(node.getOwner(), removed.getOwner());
-    assertEquals(node.getName(), removed.getName());
-    assertEquals(node.getPath(), removed.getPath());
-    assertTrue(RED == node.getVisibility());
+    // check nodes
+    assertEquals(node, removed);
+    assertThrows(StorageException.class, () -> controller.get(removed.getPath()));
+
+    // check values
+    assertEquals(nv, removed.getValue("key"));
+    assertThrows(NullPointerException.class, () -> controller.getValue(removed.getPath(), "key"));
+  }
+
+  @Test
+  public void testStorageNodeRemoveWithChild() throws StorageException {
+    controller.add(new NodeImpl("parent1", ""));
+    NodeImpl node = new NodeImpl("name1", ":parent1");
+    // add child
+    NodeImpl childNode = new NodeImpl("child1", ":parent1:name1");
+    node.addChild(childNode);
+    controller.add(node);
+    controller.add(childNode);
+
+    assertThrows(StorageException.class, () -> controller.delete(":parent1:name1"));
+
+    // check if node still exists
+    assertEquals(node, controller.get(":parent1:name1"));
   }
 
   @Test
@@ -180,6 +202,7 @@ public class TestController {
     NodeImpl[] nodes = new NodeImpl[]{
         new NodeImpl("renameTests"),
         new NodeImpl("name1", ":renameTests"),
+        new NodeImpl("name11", ":renameTests:name1"),
         new NodeImpl("name2", ":renameTests"),
         new NodeImpl("name21", ":renameTests:name2"),
         new NodeImpl("name3", ":renameTests")
@@ -187,26 +210,120 @@ public class TestController {
     for (NodeImpl n : nodes) {
       controller.add(n);
     }
+    // rename by name
+    controller.rename(":renameTests:name1", "name1a");
+    // rename by path
     controller.rename(":renameTests:name2", ":renameTests:name2a");
-    try {
-      controller.get(":renameTests:name2");
-      fail("renaming node seems unsuccessful (old node still exists)");
-    } catch (StorageException e) {
-      // this is expected to happen
+
+    // check old nodes
+    assertThrows(StorageException.class, () -> controller.get(":renameTests:name1"));
+    assertThrows(StorageException.class, () -> controller.get(":renameTests:name2"));
+
+    // check new nodes
+    assertNotNull("renaming node seems unsuccessful (new node missing)",
+            controller.get(":renameTests:name1a"));
+    assertNotNull("renaming node seems unsuccessful (new node missing)",
+        controller.get(":renameTests:name2a"));
+
+    // check name
+    assertEquals("renaming node seems unsuccessful (new node name wrong)",
+            "name1a", controller.get(":renameTests:name1a").getName());
+    assertEquals("renaming node seems unsuccessful (new node name wrong)",
+        "name2a", controller.get(":renameTests:name2a").getName());
+
+    // check path
+    assertEquals("renaming node seems unsuccessful (new node path wrong)",
+            ":renameTests:name1a", controller.get(":renameTests:name1a").getPath());
+    assertEquals("renaming node seems unsuccessful (new node path wrong)",
+        ":renameTests:name2a", controller.get(":renameTests:name2a").getPath());
+
+    // check child nodes
+    assertNotNull("renaming node seems unsuccessful (sub-node missing)",
+            controller.get(":renameTests:name1a:name11"));
+    assertNotNull("renaming node seems unsuccessful (sub-node missing)",
+        controller.get(":renameTests:name2a:name21"));
+
+    // check child node name
+    assertEquals("renaming node seems unsuccessful (sub-node name wrong)",
+            "name11", controller.get(":renameTests:name1a:name11").getName());
+    assertEquals("renaming node seems unsuccessful (sub-node name wrong)",
+        "name21", controller.get(":renameTests:name2a:name21").getName());
+
+    // check child node path
+    assertEquals("renaming node seems unsuccessful (sub-node path wrong)",
+            ":renameTests:name1a:name11", controller.get(":renameTests:name1a:name11").getPath());
+    assertEquals("renaming node seems unsuccessful (sub-node path wrong)",
+        ":renameTests:name2a:name21", controller.get(":renameTests:name2a:name21").getPath());
+
+    // test rename of non existing nodes
+    assertThrows(StorageException.class,
+            () -> controller.rename(":renameTests:name4", ":renameTests:name4a"));
+    assertThrows(StorageException.class,
+            () -> controller.rename(":renameTests:name4", "name4a"));
+
+    // test rename to an existing node
+    assertThrows(StorageException.class,
+            () -> controller.rename(":renameTests:name2a", ":renameTests:name3"));
+    assertThrows(StorageException.class,
+            () -> controller.rename(":renameTests:name2a", "name3"));
+  }
+
+  @Test
+  public void testRenameNodeWithValues() throws StorageException {
+    NodeImpl[] nodes = new NodeImpl[]{
+        new NodeImpl("renameTests"),
+        new NodeImpl("name1", ":renameTests"),
+        new NodeImpl("name2", ":renameTests"),
+        new NodeImpl("name21", ":renameTests:name2"),
+        new NodeImpl("name3", ":renameTests")
+      };
+
+    NodeValue nv = new NodeValueImpl("key", "value");
+    NodeValue nv1 = new NodeValueImpl("key1", "value1");
+    NodeValue nv2 = new NodeValueImpl("key2", "value2");
+    NodeValue nv21 = new NodeValueImpl("key21", "value21");
+
+    nodes[0].addValue(nv);
+    nodes[1].addValue(nv1);
+    nodes[2].addValue(nv2);
+    nodes[3].addValue(nv21);
+
+    for (NodeImpl n : nodes) {
+      controller.add(n);
     }
-    assertTrue("renaming node seems unsuccessful (new node missing)",
-        controller.get(":renameTests:name2a") != null);
-    assertTrue("renaming node seems unsuccessful (new node name wrong)",
-        "name2a".equals(controller.get(":renameTests:name2a").getName()));
-    assertTrue("renaming node seems unsuccessful (new node path wrong)",
-        ":renameTests:name2a".equals(controller.get(":renameTests:name2a").getPath()));
-    assertTrue("renaming node seems unsuccessful (sub-node missing)",
-        controller.get(":renameTests:name2a:name21") != null);
-    assertTrue("renaming node seems unsuccessful (sub-node name wrong)",
-        "name21".equals(controller.get(":renameTests:name2a:name21").getName()));
-    assertTrue("renaming node seems unsuccessful (sub-node path wrong)",
-        ":renameTests:name2a:name21".equals(
-            controller.get(":renameTests:name2a:name21").getPath()));
+    controller.rename(":renameTests:name2", ":renameTests:name2a");
+
+    // check old node
+    assertThrows(StorageException.class, () -> controller.get(":renameTests:name2"));
+
+    assertNotNull("renaming node seems unsuccessful (new node missing)",
+            controller.get(":renameTests:name2a"));
+    assertEquals("renaming node seems unsuccessful (new node name wrong)",
+            "name2a", controller.get(":renameTests:name2a").getName());
+    assertEquals("renaming node seems unsuccessful (new node path wrong)",
+            ":renameTests:name2a", controller.get(":renameTests:name2a").getPath());
+    assertNotNull("renaming node seems unsuccessful (sub-node missing)",
+            controller.get(":renameTests:name2a:name21"));
+    assertEquals("renaming node seems unsuccessful (sub-node name wrong)",
+            "name21", controller.get(":renameTests:name2a:name21").getName());
+    assertEquals("renaming node seems unsuccessful (sub-node path wrong)",
+            ":renameTests:name2a:name21", controller.get(":renameTests:name2a:name21").getPath());
+
+    // check values
+    assertEquals("value lost on parent", nv,
+            controller.get(":renameTests").getValue("key"));
+    assertEquals("value lost on sibling", nv1,
+            controller.get(":renameTests:name1").getValue("key1"));
+    assertEquals("value lost moved node", nv2,
+            controller.get(":renameTests:name2a").getValue("key2"));
+    assertEquals("value lost on sub-node", nv21,
+            controller.get(":renameTests:name2a:name21").getValue("key21"));
+
+    // check old values
+    assertThrows(NullPointerException.class,
+            () -> controller.getValue(":renameTests:name2", "key2"));
+    assertThrows(NullPointerException.class,
+            () -> controller.getValue(":renameTests:name2:name21", "key21"));
   }
 
   @Test

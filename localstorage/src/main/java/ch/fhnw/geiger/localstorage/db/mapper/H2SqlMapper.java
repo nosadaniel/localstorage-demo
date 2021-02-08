@@ -274,11 +274,12 @@ public class H2SqlMapper extends AbstractMapper {
     checkPath(newPath);
     NodeImpl oldNode = get(oldPath);
     NodeImpl newNode = new NodeImpl(newPath);
+
     // set missing properties
     newNode.setOwner(oldNode.getOwner());
     newNode.setVisibility(oldNode.getVisibility());
 
-    // add values
+    // copy values
     for (NodeValue nv : oldNode.getValues().values()) {
       newNode.addValue(nv);
     }
