@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'eu.cyber-geiger'
-version = '0.2.0'
+version = '0.3.0'
 description = 'localStorage'
 sourceCompatibility = '1.8'
 
@@ -120,9 +120,7 @@ publishing {
 
             def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
             def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            // You only need this if you want to publish snapshots, otherwise just set the URL
-            // to the release repo directly
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            url = gitBranch() == "main" ? releasesRepoUrl : snapshotsRepoUrl
 
             credentials {
                 username ossrhUsername
@@ -134,6 +132,9 @@ publishing {
         mavenJava(MavenPublication) {
             artifactId = 'toolbox-storage'
             from components.java
+
+            version = gitBranch() == "main" ? version : version + '-SNAPSHOT'
+
             versionMapping {
                 usage('java-api') {
                     fromResolutionOf('runtimeClasspath')
