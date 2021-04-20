@@ -4,6 +4,10 @@ import ch.fhnw.geiger.localstorage.StorageController;
 import ch.fhnw.geiger.localstorage.StorageException;
 import ch.fhnw.geiger.localstorage.Visibility;
 import ch.fhnw.geiger.localstorage.db.GenericController;
+import ch.fhnw.geiger.serialization.SerializerHelper;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * automatically if their data is accessed.</p>
  */
 public class NodeImpl implements Node {
+
+  private static final long serialversionUID = 11239348938L;
 
   /* an indicator whether the current object is a skeleton */
   private final SwitchableBoolean skeleton = new SwitchableBoolean(false);
@@ -521,6 +527,108 @@ public class NodeImpl implements Node {
       sb.append("{}");
     }
     return sb.toString();
+  }
+
+  @Override
+  public void toByteArrayStream(ByteArrayOutputStream out) throws IOException {
+    // write object identifier
+    SerializerHelper.writeLong(out, serialversionUID);
+
+    // write skeleton flag
+    SerializerHelper.writeInt(out, skeleton.get() ? 1 : 0);
+
+    // write path
+    SerializerHelper.writeString(out, getPath());
+
+    // controller
+    // Hint: We do not save the controller
+
+    // all ordinals except path
+    SerializerHelper.writeInt(out, ordinals.size() - 1);
+    synchronized (ordinals) {
+      for (Map.Entry<Field, String> e : ordinals.entrySet()) {
+        if (e.getKey() != Field.PATH) {
+          SerializerHelper.writeString(out, e.getKey().toString());
+          SerializerHelper.writeString(out, e.getValue());
+        }
+      }
+    }
+
+    if (!isSkeleton()) {
+
+      // values
+      SerializerHelper.writeInt(out, values.size());
+      synchronized (values) {
+        for (Map.Entry<String, NodeValue> e : values.entrySet()) {
+          SerializerHelper.writeString(out, e.getKey());
+          e.getValue().toByteArrayStream(out);
+        }
+      }
+
+      // childNodes
+      SerializerHelper.writeInt(out, childNodes.size());
+      synchronized (childNodes) {
+        for (Map.Entry<String, Node> e : childNodes.entrySet()) {
+          SerializerHelper.writeString(out, e.getKey());
+          e.getValue().toByteArrayStream(out);
+        }
+      }
+    }
+
+    // write object identifier as end tag
+    SerializerHelper.writeLong(out, serialversionUID);
+  }
+
+  /**
+   * <p>Deserializes a NodeValue from a byteStream.</p>
+   *
+   * @param in the stream to be read
+   * @return the deserialized NodeValue
+   * @throws IOException if an exception happens deserializing the stream
+   */
+  public static NodeImpl fromByteArrayStream(ByteArrayInputStream in) throws IOException {
+    // read object identifier
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse NodeImpl (bad stream?)");
+    }
+
+    // read skeleton
+    boolean skel = SerializerHelper.readInt(in) == 1;
+
+    //  get path
+    NodeImpl n = new NodeImpl(SerializerHelper.readString(in));
+
+    // restore a sensible controller
+    if (skel) {
+      // we always assume that a controller was already created
+      n.controller = GenericController.getDefault();
+    }
+    // restore ordinals
+    int counter = SerializerHelper.readInt(in);
+    for (int i = 0; i < counter; i++) {
+      n.ordinals.put(Field.valueOf(SerializerHelper.readString(in)),
+          SerializerHelper.readString(in));
+    }
+
+    if (!skel) {
+      // read values
+      counter = SerializerHelper.readInt(in);
+      for (int i = 0; i < counter; i++) {
+        n.values.put(SerializerHelper.readString(in), NodeValueImpl.fromByteArrayStream(in));
+      }
+
+      // read childNodes
+      counter = SerializerHelper.readInt(in);
+      for (int i = 0; i < counter; i++) {
+        n.childNodes.put(SerializerHelper.readString(in), NodeImpl.fromByteArrayStream(in));
+      }
+    }
+
+    // read object end tag (identifier)
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse NodeImpl (bad stream end?)");
+    }
+    return n;
   }
 
 }

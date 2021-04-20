@@ -3,12 +3,13 @@ package ch.fhnw.geiger.localstorage.db.data;
 import ch.fhnw.geiger.localstorage.StorageController;
 import ch.fhnw.geiger.localstorage.StorageException;
 import ch.fhnw.geiger.localstorage.Visibility;
+import ch.fhnw.geiger.serialization.Serializer;
 import java.util.Map;
 
 /**
  * <p>Interface representing a single node in the storage.</p>
  */
-public interface Node {
+public interface Node extends Serializer {
 
   /**
    * <p>Gets the name of the current node.</p>
