@@ -1,5 +1,6 @@
 package ch.fhnw.geiger.localstorage.db.data;
 
+import ch.fhnw.geiger.serialization.Serializer;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -9,7 +10,8 @@ import java.util.MissingResourceException;
  *
  * <p>All values supporting locales must have at least an english (@see Locale.ENGLISH) locale.</p>
  */
-public interface NodeValue {
+public interface NodeValue extends Serializer {
+
   /**
    * <p>Gets the key of the K/V tuple.</p>
    *
@@ -42,9 +44,8 @@ public interface NodeValue {
   /**
    * <p>Sets the string representation of the value.</p>
    *
-   * @param value the string representation of the value
+   * @param value  the string representation of the value
    * @param locale the locale to be fetched
-   *
    * @throws MissingResourceException if the text for the default locale (ENGLISH) is missing
    */
   void setValue(String value, Locale locale) throws MissingResourceException;
@@ -103,9 +104,8 @@ public interface NodeValue {
    * <p>This description is used when asking for the users consent to share this data.</p>
    *
    * @param description the description to be set
-   * @param locale the locale to be written
+   * @param locale      the locale to be written
    * @return the string of the previously set description.
-   *
    * @throws MissingResourceException if the default locale is missing
    */
   String setDescription(String description, Locale locale) throws MissingResourceException;

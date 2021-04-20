@@ -1,5 +1,9 @@
 package ch.fhnw.geiger.localstorage.db.data;
 
+import ch.fhnw.geiger.serialization.SerializerHelper;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +19,8 @@ import java.util.Vector;
  * @version 0.1
  */
 public class NodeValueImpl implements NodeValue {
+
+  private static final long serialversionUID = 871283188L;
 
   private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
@@ -265,7 +271,7 @@ public class NodeValueImpl implements NodeValue {
         if (i > 0) {
           sb.append("," + System.lineSeparator());
         }
-        sb.append(prefix + "  " + DEFAULT_LOCALE + "=>\"" + value.get(DEFAULT_LOCALE) + "\"}");
+        sb.append(prefix + "  " + e.getKey().toLanguageTag() + "=>\"" + e.getValue() + "\"");
         i++;
       }
       sb.append(System.lineSeparator() + prefix + "}");
@@ -315,5 +321,85 @@ public class NodeValueImpl implements NodeValue {
       }
     }
     return true;
+  }
+
+  @Override
+  public void toByteArrayStream(ByteArrayOutputStream out) throws IOException {
+    // write object identifier
+    SerializerHelper.writeLong(out, serialversionUID);
+
+    // write key
+    SerializerHelper.writeString(out, key);
+
+    // value
+    SerializerHelper.writeInt(out, value.size());
+    synchronized (value) {
+      for (Map.Entry<Locale, String> e : value.entrySet()) {
+        SerializerHelper.writeString(out, e.getKey().toLanguageTag());
+        SerializerHelper.writeString(out, e.getValue());
+      }
+    }
+
+    // type
+    SerializerHelper.writeString(out, type);
+
+    // lastModified
+    SerializerHelper.writeLong(out, lastModified);
+
+    // description
+    SerializerHelper.writeInt(out, description.size());
+    synchronized (description) {
+      for (Map.Entry<Locale, String> e : description.entrySet()) {
+        SerializerHelper.writeString(out, e.getKey().toLanguageTag());
+        SerializerHelper.writeString(out, e.getValue());
+      }
+    }
+
+    // write object identifier as end tag
+    SerializerHelper.writeLong(out, serialversionUID);
+
+  }
+
+  /**
+   * <p>Deserializes a NodeValue from a byteStream.</p>
+   *
+   * @param in the stream to be read
+   * @return the deserialized NodeValue
+   * @throws IOException if an exception happens deserializing the stream
+   */
+  public static NodeValueImpl fromByteArrayStream(ByteArrayInputStream in) throws IOException {
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse NodeValueImpl (bad stream?)");
+    }
+
+    // read key
+    NodeValueImpl nv = new NodeValueImpl(SerializerHelper.readString(in), "");
+
+    // restore values
+    int counter = SerializerHelper.readInt(in);
+    nv.value.clear();
+    for (int i = 0; i < counter; i++) {
+      nv.value.put(Locale.forLanguageTag(SerializerHelper.readString(in)),
+          SerializerHelper.readString(in));
+    }
+
+    // restore type
+    nv.type = SerializerHelper.readString(in);
+
+    // restore lastModified
+    nv.lastModified = SerializerHelper.readLong(in);
+
+    // restore description
+    counter = SerializerHelper.readInt(in);
+    for (int i = 0; i < counter; i++) {
+      nv.description.put(Locale.forLanguageTag(SerializerHelper.readString(in)),
+          SerializerHelper.readString(in));
+    }
+
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse NodeValueImpl (bad stream end?)");
+    }
+
+    return nv;
   }
 }

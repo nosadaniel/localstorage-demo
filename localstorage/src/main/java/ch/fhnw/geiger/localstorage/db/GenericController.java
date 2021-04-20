@@ -28,6 +28,8 @@ import java.util.Vector;
  */
 public class GenericController implements StorageController, ChangeRegistrar {
 
+  private static StorageController defaultController = null;
+
   /**
    * the path delimiter.
    */
@@ -59,6 +61,16 @@ public class GenericController implements StorageController, ChangeRegistrar {
     this.mapper = mapper;
     this.mapper.setController(this);
     initMapper();
+    defaultController = this;
+  }
+
+  /**
+   * <p>Returns the latest created controller within the JVM.</p>
+   *
+   * @return a valid storage controller
+   */
+  public static StorageController getDefault() {
+    return defaultController;
   }
 
   private void initMapper() throws StorageException {
