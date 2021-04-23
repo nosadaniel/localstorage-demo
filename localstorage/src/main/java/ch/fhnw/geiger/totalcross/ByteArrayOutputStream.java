@@ -11,9 +11,9 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
 
   private abstract class AbstractWrapper implements TcByteArrayOutputStream {
 
-    void write(Object o, byte[] buf) {
+    void write(Object o, String methodName, byte[] buf) {
       try {
-        Method m = o.getClass().getMethod("write", new Class[]{byte[].class, int.class, int.class});
+        Method m = o.getClass().getMethod(methodName, new Class[]{byte[].class, int.class, int.class});
         m.invoke(o, buf, 0, buf.length);
       } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
         // FIXME insert proper logging/error handling (but should not be called
@@ -42,9 +42,9 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     public TcWrapper() {
       try {
         Class cls = Class.forName("totalcross.io.ByteArrayStream");
-        Class partypes[] = new Class[]{};
+        Class partypes[] = new Class[]{int.class};
         Constructor ct = cls.getConstructor(partypes);
-        Object arglist[] = new Object[]{};
+        Object arglist[] = new Object[]{0};
         o = ct.newInstance(arglist);
       } catch (Exception e) {
         // FIXME insert proper logging/error handling (but should not be called
@@ -53,7 +53,7 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     }
 
     public void write(byte[] buf) {
-      write(o, buf);
+      write(o, "writeBytes", buf);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
 
     @Override
     public void write(byte[] buf) {
-      write(o, buf);
+      write(o, "write", buf);
     }
 
     @Override

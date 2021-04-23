@@ -18,3 +18,11 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+task totalcrossMavenBuild(type: Exec) {
+    // executes mvn package -Dmaven.test.skip=true
+    // as the tests already run in gradle there is no need to rerun in maven
+    workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage"
+    commandLine 'cmd', '/c', 'mvn package -Dmaven.test.skip=true'
+//    commandLine 'mvn', 'package -Dmaven.test.skip=true'
+}

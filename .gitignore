@@ -79,3 +79,4 @@ local.properties
 /localstorage/testdb.trace.db
 /settings.gradle
 /localstorage/gradle.properties
+/localstorage/target
