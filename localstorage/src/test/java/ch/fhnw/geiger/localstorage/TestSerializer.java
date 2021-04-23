@@ -5,8 +5,8 @@ import static org.junit.Assert.assertEquals;
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.util.Locale;
 import org.junit.Test;
 

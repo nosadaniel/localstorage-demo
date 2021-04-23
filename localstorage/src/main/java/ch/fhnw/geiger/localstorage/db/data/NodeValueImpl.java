@@ -1,8 +1,8 @@
 package ch.fhnw.geiger.localstorage.db.data;
 
 import ch.fhnw.geiger.serialization.SerializerHelper;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;

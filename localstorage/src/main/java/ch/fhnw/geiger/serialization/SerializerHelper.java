@@ -1,7 +1,7 @@
 package ch.fhnw.geiger.serialization;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

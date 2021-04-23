@@ -1,7 +1,7 @@
 package ch.fhnw.geiger.serialization;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -23,9 +23,10 @@ public interface Serializer {
   }
 
   /**
-   * <p>Writes the current oject to the output stream.</p>
+   * <p>Writes the current object to the output stream.</p>
    *
    * @param out the output stream receiving the object
+   * @throws IOException if  an exception occurs while writing to the stream
    */
   void toByteArrayStream(ByteArrayOutputStream out) throws IOException;
 
