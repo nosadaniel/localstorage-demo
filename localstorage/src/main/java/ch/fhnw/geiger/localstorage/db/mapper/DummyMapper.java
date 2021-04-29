@@ -98,12 +98,12 @@ public class DummyMapper extends AbstractMapper {
       }
 
       // remove old node
-      remove(oldNode.getPath());
+      delete(oldNode.getPath());
     }
   }
 
   @Override
-  public Node remove(String nodeName) throws StorageException {
+  public Node delete(String nodeName) throws StorageException {
     synchronized (nodes) {
       if (nodes.get(nodeName) == null) {
         throw new StorageException("Node does not exist");

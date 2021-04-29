@@ -61,7 +61,7 @@ public interface StorageMapper {
    * @throws StorageException if the node does not exist, the node contains at least one child,
    *                          or an error happened on the backend
    */
-  Node remove(String path) throws StorageException;
+  Node delete(String path) throws StorageException;
 
   /**
    * <p>Fetch a value from a node.</p>

@@ -44,7 +44,7 @@ public interface StorageController {
    * <p>Rename a node identified by a path.</p>
    *
    * <p>This call renames a node. The new name may be a name only or a fully qualified path.
-   * The later operation noves the node and all child objects.</p>
+   * The later operation moves the node and all child objects.</p>
    *
    * @param oldPath the old path of the node
    * @param newName the new name or new path of the node
@@ -56,7 +56,7 @@ public interface StorageController {
    *
    * @param path the path of the node to add the value
    * @param key  the key of the value to be retrieved
-   * @return true if value was added, false otherwise
+   * @return a representation of the node value
    * @throws StorageException if the node or the object does not exist or
    *                          the storage backend encounters an error
    */
@@ -94,7 +94,7 @@ public interface StorageController {
    * @param key  the key to be removed from the value
    * @return the removed node value
    */
-  NodeValue removeValue(String path, String key) throws StorageException;
+  NodeValue deleteValue(String path, String key) throws StorageException;
 
   /**
    *<p> Search for nodes that meet the criteria.</p>

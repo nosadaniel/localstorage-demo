@@ -4,6 +4,10 @@ import ch.fhnw.geiger.localstorage.db.data.Field;
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValue;
+import ch.fhnw.geiger.serialization.SerializerHelper;
+import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +20,9 @@ import java.util.Map;
  *
  * <p>TODO: add recursion support</p>
  */
-public class SearchCriteria {
+public class SearchCriteria { //extends Serializer {
+
+  private static final long serialversionUID = 87128319541L; // TODO generate serialversionUID
 
   /**
    * <p>Defines the type of comparator to be used when accessing an ordinal.</p>
@@ -154,6 +160,33 @@ public class SearchCriteria {
       return true;
     }
     return regex.matches(value);
+  }
+
+  /**
+   * <p>Serialize a SearchCriteria.</p>
+   *
+   * @param out the ByteArrayOutputStream to write to
+   * @throws IOException if it cannot be serialized
+   */
+  //@Override
+  public void toByteArrayStream(ByteArrayOutputStream out) throws IOException {
+    // TODO
+    // write object identifier
+    SerializerHelper.writeLong(out, serialversionUID);
+
+    // TODO serialize searchcriterias
+  }
+
+  /**
+   * <p>Deserializes a NodeValue from a byteStream.</p>
+   *
+   * @param in the stream to be read
+   * @return the deserialized NodeValue
+   * @throws IOException if an exception happens deserializing the stream
+   */
+  public static SearchCriteria fromByteArrayStream(ByteArrayInputStream in) throws IOException {
+    // TODO
+    return null;
   }
 
 }

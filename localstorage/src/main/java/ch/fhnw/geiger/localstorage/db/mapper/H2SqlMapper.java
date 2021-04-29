@@ -293,7 +293,7 @@ public class H2SqlMapper extends AbstractMapper {
     }
 
     // remove old node
-    remove(oldPath);
+    delete(oldPath);
   }
 
   private void addValue(String path, NodeValue value) {
@@ -359,7 +359,7 @@ public class H2SqlMapper extends AbstractMapper {
     }
   }
 
-  private NodeValue removeValue(String path, String key) {
+  private NodeValue deleteValue(String path, String key) {
     if (key == null || "".equals(path)) {
       throw new NullPointerException();
     }
@@ -408,12 +408,12 @@ public class H2SqlMapper extends AbstractMapper {
     if (getValue(path, value.getKey()) == null) {
       throw new StorageException("Key \"" + value.getKey() + "\" does not exist");
     }
-    removeValue(path, value.getKey());
+    deleteValue(path, value.getKey());
     addValue(path, value);
   }
 
   @Override
-  public NodeImpl remove(String path) {
+  public NodeImpl delete(String path) {
     NodeImpl oldNode = get(path);
     if (!"".equals(oldNode.getChildNodesCsv())) {
       throw new StorageException("Node does have childs... cannot remove " + oldNode.getName());
@@ -421,7 +421,7 @@ public class H2SqlMapper extends AbstractMapper {
 
     // remove values
     for (NodeValue nv : oldNode.getValues().values()) {
-      removeValue(path, nv.getKey());
+      deleteValue(path, nv.getKey());
     }
 
     // remove the node

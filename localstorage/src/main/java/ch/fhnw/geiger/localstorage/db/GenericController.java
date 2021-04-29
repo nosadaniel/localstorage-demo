@@ -172,7 +172,7 @@ public class GenericController implements StorageController, ChangeRegistrar {
 
   @Override
   public Node delete(String path) throws StorageException {
-    Node ret = mapper.remove(path);
+    Node ret = mapper.delete(path);
     checkListeners(EventType.DELETE, ret, null, null, null);
     return ret;
   }
@@ -223,7 +223,7 @@ public class GenericController implements StorageController, ChangeRegistrar {
   }
 
   @Override
-  public NodeValue removeValue(String nodeName, String key) throws StorageException {
+  public NodeValue deleteValue(String nodeName, String key) throws StorageException {
     Node oldNode = mapper.get(nodeName);
     NodeValue oldValue = oldNode.getValue(key);
     if (oldValue == null) {

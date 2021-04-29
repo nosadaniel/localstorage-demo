@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * Compatibility class running under total cross and
+ * Compatibility class running under total cross and java.
  */
 public class ByteArrayOutputStream implements TcByteArrayOutputStream {
 
@@ -13,7 +13,8 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
 
     void write(Object o, String methodName, byte[] buf) {
       try {
-        Method m = o.getClass().getMethod(methodName, new Class[]{byte[].class, int.class, int.class});
+        Method m = o.getClass().getMethod(methodName,
+            new Class[]{byte[].class, int.class, int.class});
         m.invoke(o, buf, 0, buf.length);
       } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
         // FIXME insert proper logging/error handling (but should not be called
@@ -24,7 +25,7 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     byte[] toByteArray(Object o) {
       try {
         Method m = o.getClass().getMethod("toByteArray", new Class[]{});
-        byte[] buf = (byte[])m.invoke(o);
+        byte[] buf = (byte[]) m.invoke(o);
         return buf;
       } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
         // FIXME insert proper logging/error handling (but should not be called
@@ -37,15 +38,15 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
 
   private class TcWrapper extends AbstractWrapper {
 
-    Object o;
+    Object obj;
 
     public TcWrapper() {
       try {
         Class cls = Class.forName("totalcross.io.ByteArrayStream");
-        Class partypes[] = new Class[]{int.class};
+        Class[] partypes = new Class[]{int.class};
         Constructor ct = cls.getConstructor(partypes);
-        Object arglist[] = new Object[]{0};
-        o = ct.newInstance(arglist);
+        Object[] arglist = new Object[]{0};
+        obj = ct.newInstance(arglist);
       } catch (Exception e) {
         // FIXME insert proper logging/error handling (but should not be called
         e.printStackTrace();
@@ -53,27 +54,27 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     }
 
     public void write(byte[] buf) {
-      write(o, "writeBytes", buf);
+      write(obj, "writeBytes", buf);
     }
 
     @Override
     public byte[] toByteArray() {
-      return toByteArray(o);
+      return toByteArray(obj);
     }
   }
 
 
   private class JavaWrapper extends AbstractWrapper {
 
-    Object o;
+    Object obj;
 
     public JavaWrapper() {
       try {
         Class cls = Class.forName("java.io.ByteArrayOutputStream");
-        Class partypes[] = new Class[]{};
+        Class[] partypes = new Class[]{};
         Constructor ct = cls.getConstructor(partypes);
-        Object arglist[] = new Object[]{};
-        o = ct.newInstance(arglist);
+        Object[] arglist = new Object[]{};
+        obj = ct.newInstance(arglist);
       } catch (Exception e) {
         // FIXME insert proper logging/error handling (but should not be called
         e.printStackTrace();
@@ -82,17 +83,20 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
 
     @Override
     public void write(byte[] buf) {
-      write(o, "write", buf);
+      write(obj, "write", buf);
     }
 
     @Override
     public byte[] toByteArray() {
-      return toByteArray(o);
+      return toByteArray(obj);
     }
   }
 
   TcByteArrayOutputStream is;
 
+  /**
+   * Creates either a TotalCross-wrapper or a Java-wrapper.
+   */
   public ByteArrayOutputStream() {
     if (isTotalCross()) {
       is = new TcWrapper();
@@ -111,6 +115,11 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     return is.toByteArray();
   }
 
+  /**
+   * Checks if it runs inside a TotalCross environment.
+   *
+   * @return true if it is a TotalCross environment, false otherwise
+   */
   public static boolean isTotalCross() {
     try {
       Class.forName("totalcross.io.ByteArrayStream");
