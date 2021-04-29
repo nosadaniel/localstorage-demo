@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'eu.cyber-geiger'
-version '0.1-SNAPSHOT'
+version '0.3.2-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -24,5 +24,10 @@ task totalcrossMavenBuild(type: Exec) {
     // as the tests already run in gradle there is no need to rerun in maven
     workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage"
     commandLine 'cmd', '/c', 'mvn package -Dmaven.test.skip=true'
-//    commandLine 'mvn', 'package -Dmaven.test.skip=true'
 }
+
+task totalcrossMavenTest(type: Exec) {
+    workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage"
+    commandLine 'cmd', '/c', 'mvn test'
+}
+
