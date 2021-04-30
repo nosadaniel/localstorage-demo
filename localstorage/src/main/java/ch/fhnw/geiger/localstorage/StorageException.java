@@ -1,16 +1,154 @@
 package ch.fhnw.geiger.localstorage;
 
+import ch.fhnw.geiger.serialization.Serializer;
+import ch.fhnw.geiger.serialization.SerializerHelper;
+import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
+import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
+
 /**
  * <p>Exception to be raised on any problems related to the local storage.</p>
  */
-public class StorageException extends IllegalStateException {
+public class StorageException extends IllegalStateException implements Serializer {
+
+
+  private static class SerializedException extends Throwable implements Serializer {
+
+    private static final long serialversionUID = 721364991234L;
+
+    private String exceptionName;
+    private String message;
+
+    public SerializedException(Throwable t) {
+      super(t.getCause());
+      this.message = t.getMessage();
+      this.exceptionName = t.getClass().getName();
+      setStackTrace(t.getStackTrace());
+    }
+
+    public SerializedException(String exceptionName, String message, StackTraceElement[] stacktrace, Throwable cause) {
+      super(message,cause);
+      this.exceptionName = exceptionName;
+      this.message = message;
+      setStackTrace(stacktrace);
+    }
+
+    @Override
+    public void toByteArrayStream(ByteArrayOutputStream out) throws IOException {
+      SerializerHelper.writeLong(out, serialversionUID);
+      SerializerHelper.writeString(out, exceptionName);
+      SerializerHelper.writeString(out, message);
+      SerializerHelper.writeStackTraces(out, getStackTrace());
+      if (getCause() != null) {
+        SerializerHelper.writeInt(out, 1);
+        if (getCause() instanceof SerializedException) {
+          ((SerializedException) (getCause())).toByteArrayStream(out);
+        } else {
+          new SerializedException(getCause()).toByteArrayStream(out);
+        }
+      } else {
+        SerializerHelper.writeInt(out, 0);
+      }
+      SerializerHelper.writeLong(out, serialversionUID);
+    }
+
+    public static SerializedException fromByteArrayStream(ByteArrayInputStream in) throws IOException {
+      if (SerializerHelper.readLong(in) != serialversionUID) {
+        throw new IOException("failed to parse StorageException (bad stream?)");
+      }
+
+      // read exception text
+      String name = SerializerHelper.readString(in);
+
+      // read exception message
+      String message = SerializerHelper.readString(in);
+
+      // read stack trace
+      StackTraceElement[] ste = SerializerHelper.readStackTraces(in);
+
+      // read cause (if any)
+      SerializedException cause = null;
+      if (SerializerHelper.readInt(in) == 1) {
+        cause = SerializedException.fromByteArrayStream(in);
+      }
+
+      // read object end tag (identifier)
+      if (SerializerHelper.readLong(in) != serialversionUID) {
+        throw new IOException("failed to parse NodeImpl (bad stream end?)");
+      }
+      return new SerializedException(name, message, ste, cause);
+    }
+  }
+
+  private static final long serialversionUID = 178324938L;
+
+  public StorageException(String txt, Throwable e, StackTraceElement[] ste) {
+    super(txt, e);
+    if (ste != null) {
+      setStackTrace(ste);
+    }
+  }
 
   public StorageException(String txt, Throwable e) {
-    super(txt, e);
+    this(txt, e, null);
   }
 
   public StorageException(String txt) {
-    this(txt, null);
+    this(txt, null, null);
   }
 
+  @Override
+  public void toByteArrayStream(ByteArrayOutputStream out) throws IOException {
+    SerializerHelper.writeLong(out, serialversionUID);
+    SerializerHelper.writeString(out, getMessage());
+
+    // serialize stack trace
+    SerializerHelper.writeStackTraces(out, getStackTrace());
+
+    // serializing cause
+    SerializedException cause = null;
+    if (getCause() == null) {
+      // empty cause
+    } else if (getCause() instanceof SerializedException) {
+      cause = (SerializedException) getCause();
+    } else {
+      cause = new SerializedException(getCause());
+    }
+    if (cause != null) {
+      SerializerHelper.writeInt(out, 1);
+      cause.toByteArrayStream(out);
+    } else {
+      SerializerHelper.writeInt(out, 0);
+    }
+
+    SerializerHelper.writeLong(out, serialversionUID);
+  }
+
+  public static StorageException fromByteArrayStream(ByteArrayInputStream in) throws IOException {
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse StorageException (bad stream?)");
+    }
+
+    // read exception text
+    String txt = SerializerHelper.readString(in);
+
+    // deserialize stacktrace
+    StackTraceElement[] ste = SerializerHelper.readStackTraces(in);
+
+    // deserialize Throwable
+    List<Throwable> tv = new Vector<>();
+    Throwable t = null;
+
+    if (SerializerHelper.readInt(in) == 1) {
+      t = SerializedException.fromByteArrayStream(in);
+    }
+
+    // read object end tag (identifier)
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse NodeImpl (bad stream end?)");
+    }
+    return new StorageException(txt, t, ste);
+  }
 }

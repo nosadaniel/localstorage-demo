@@ -5,6 +5,7 @@ import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Stack;
 
 /**
  * <p>Helper class for serialization serializes important java primitives.</p>
@@ -14,6 +15,7 @@ public class SerializerHelper {
   private static final long STRING_UID = 123798371293L;
   private static final long LONG_UID = 1221312393L;
   private static final long INT_UID = 122134568793L;
+  private static final long STACKTRACES_UID = 9012350123956L;
 
   private static void writeIntLong(ByteArrayOutputStream out, Long l) throws IOException {
     ByteBuffer b = ByteBuffer.allocate(Long.BYTES);
@@ -134,6 +136,51 @@ public class SerializerHelper {
       byte[] arr = new byte[length];
       in.read(arr);
       return new String(arr, StandardCharsets.UTF_8);
+    }
+  }
+
+  /**
+   * <p>Serialize an array of StackTraces.</p>
+   *
+   * @param out the stream to be read
+   * @param ste   the value to be deserialized
+   * @throws IOException if an exception occurs while writing to the stream
+   */
+  public static void writeStackTraces(ByteArrayOutputStream out, StackTraceElement[] ste) throws IOException {
+    writeIntLong(out, STACKTRACES_UID);
+    if (ste == null) {
+      writeIntInt(out, -1);
+    } else {
+      writeIntInt(out, ste.length);
+      for(StackTraceElement st:ste) {
+        writeString(out,st.getClassName());
+        writeString(out,st.getMethodName());
+        writeString(out,st.getFileName());
+        writeInt(out,st.getLineNumber());
+      }
+    }
+  }
+
+  /**
+   * <p>Deserialize an array of StackTraceElement variable.</p>
+   *
+   * @param in the stream to be read
+   * @return the deserialized array
+   * @throws IOException if an exception occurs while writing to the stream
+   */
+  public static StackTraceElement[] readStackTraces(ByteArrayInputStream in) throws IOException {
+    if (readIntLong(in) != STACKTRACES_UID) {
+      throw new ClassCastException();
+    }
+    int length = readIntInt(in);
+    if (length == -1) {
+      return null;
+    } else {
+      StackTraceElement[] arr = new StackTraceElement[length];
+      for(int i=0; i<length;i++) {
+        arr[i]=new StackTraceElement(readString(in),readString(in),readString(in),readInt(in));
+      }
+      return arr;
     }
   }
 

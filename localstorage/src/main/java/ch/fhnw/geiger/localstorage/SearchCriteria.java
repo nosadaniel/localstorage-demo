@@ -4,6 +4,7 @@ import ch.fhnw.geiger.localstorage.db.data.Field;
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValue;
+import ch.fhnw.geiger.serialization.Serializer;
 import ch.fhnw.geiger.serialization.SerializerHelper;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
@@ -20,7 +21,7 @@ import java.util.Map;
  *
  * <p>TODO: add recursion support</p>
  */
-public class SearchCriteria { //extends Serializer {
+public class SearchCriteria implements Serializer {
 
   private static final long serialversionUID = 87128319541L; // TODO generate serialversionUID
 
@@ -162,31 +163,48 @@ public class SearchCriteria { //extends Serializer {
     return regex.matches(value);
   }
 
-  /**
-   * <p>Serialize a SearchCriteria.</p>
-   *
-   * @param out the ByteArrayOutputStream to write to
-   * @throws IOException if it cannot be serialized
-   */
-  //@Override
+  @Override
   public void toByteArrayStream(ByteArrayOutputStream out) throws IOException {
-    // TODO
     // write object identifier
     SerializerHelper.writeLong(out, serialversionUID);
 
-    // TODO serialize searchcriterias
+    // serializing values
+    SerializerHelper.writeInt(out, values.size());
+    for(Map.Entry<Field,String> e:values.entrySet()) {
+      SerializerHelper.writeString(out,e.getKey().name());
+      SerializerHelper.writeString(out,e.getValue());
+    }
+
+    // write object identifier (end)
+    SerializerHelper.writeLong(out, serialversionUID);
   }
 
-  /**
-   * <p>Deserializes a NodeValue from a byteStream.</p>
-   *
-   * @param in the stream to be read
-   * @return the deserialized NodeValue
-   * @throws IOException if an exception happens deserializing the stream
-   */
   public static SearchCriteria fromByteArrayStream(ByteArrayInputStream in) throws IOException {
-    // TODO
-    return null;
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse StorageException (bad stream?)");
+    }
+
+    SearchCriteria s =new SearchCriteria();
+
+    int size=SerializerHelper.readInt(in);
+    for(int i=0;i<size;i++) {
+      s.values.put(Field.valueOf(SerializerHelper.readString(in)),SerializerHelper.readString(in));
+    }
+
+    if (SerializerHelper.readLong(in) != serialversionUID) {
+      throw new IOException("failed to parse StorageException (bad stream end?)");
+    }
+    return s;
+  }
+
+  public String toString() {
+    StringBuilder sb= new StringBuilder();
+    sb.append("{").append(System.lineSeparator());
+    for (Map.Entry<Field,String> e:values.entrySet()) {
+      sb.append("  ").append(e.getKey()).append('=').append(e.getValue()).append(System.lineSeparator());
+    }
+    sb.append("}").append(System.lineSeparator());
+    return sb.toString();
   }
 
 }
