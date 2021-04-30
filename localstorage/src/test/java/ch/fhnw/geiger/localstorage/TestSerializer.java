@@ -38,19 +38,23 @@ public class TestSerializer {
     StorageException se = new StorageException("bla", null);
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     se.toByteArrayStream(out);
-    StorageException se2 = StorageException.fromByteArrayStream(new ByteArrayInputStream(out.toByteArray()));
+    StorageException se2 = StorageException.fromByteArrayStream(
+        new ByteArrayInputStream(out.toByteArray()));
     assertEquals(se.getMessage(), se2.getMessage());
     assertArrayEquals(se.getStackTrace(), se2.getStackTrace());
-    System.out.println("= Serialized Stacktrace Output ======================================================");
+    System.out.println("= Serialized Stacktrace Output ===================="
+        + "==================================");
     se2.printStackTrace();
   }
 
   @Test
   public void testNestedExceptionSerialization() throws Exception {
-    StorageException se = new StorageException("bla", new StorageException("Test", new IOException("test2")));
+    StorageException se = new StorageException("bla", new StorageException("Test",
+        new IOException("test2")));
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     se.toByteArrayStream(out);
-    StorageException se2 = StorageException.fromByteArrayStream(new ByteArrayInputStream(out.toByteArray()));
+    StorageException se2 = StorageException.fromByteArrayStream(
+        new ByteArrayInputStream(out.toByteArray()));
     assertEquals("verifying exception message",
         se.getMessage(),
         se2.getMessage());
@@ -73,7 +77,8 @@ public class TestSerializer {
         se2.getCause().getCause().getStackTrace());
     // testing last cause empty
     assertNull("empty last cause of chain", se2.getCause().getCause().getCause());
-    System.out.println("= Serialized Stacktrace Output ======================================================");
+    System.out.println("= Serialized Stacktrace Output ===================="
+        + "==================================");
     se2.printStackTrace();
   }
 
@@ -84,7 +89,8 @@ public class TestSerializer {
     sc.setNodeValueType("bla");
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     sc.toByteArrayStream(out);
-    SearchCriteria sc2 = SearchCriteria.fromByteArrayStream(new ByteArrayInputStream(out.toByteArray()));
+    SearchCriteria sc2 = SearchCriteria.fromByteArrayStream(
+        new ByteArrayInputStream(out.toByteArray()));
     assertEquals("verifying criteria equivalence", sc.toString(), sc2.toString());
   }
 }

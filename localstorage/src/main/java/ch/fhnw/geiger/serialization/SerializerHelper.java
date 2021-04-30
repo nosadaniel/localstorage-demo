@@ -5,7 +5,6 @@ import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Stack;
 
 /**
  * <p>Helper class for serialization serializes important java primitives.</p>
@@ -143,20 +142,21 @@ public class SerializerHelper {
    * <p>Serialize an array of StackTraces.</p>
    *
    * @param out the stream to be read
-   * @param ste   the value to be deserialized
+   * @param ste the value to be deserialized
    * @throws IOException if an exception occurs while writing to the stream
    */
-  public static void writeStackTraces(ByteArrayOutputStream out, StackTraceElement[] ste) throws IOException {
+  public static void writeStackTraces(ByteArrayOutputStream out, StackTraceElement[] ste)
+      throws IOException {
     writeIntLong(out, STACKTRACES_UID);
     if (ste == null) {
       writeIntInt(out, -1);
     } else {
       writeIntInt(out, ste.length);
-      for(StackTraceElement st:ste) {
-        writeString(out,st.getClassName());
-        writeString(out,st.getMethodName());
-        writeString(out,st.getFileName());
-        writeInt(out,st.getLineNumber());
+      for (StackTraceElement st : ste) {
+        writeString(out, st.getClassName());
+        writeString(out, st.getMethodName());
+        writeString(out, st.getFileName());
+        writeInt(out, st.getLineNumber());
       }
     }
   }
@@ -177,8 +177,8 @@ public class SerializerHelper {
       return null;
     } else {
       StackTraceElement[] arr = new StackTraceElement[length];
-      for(int i=0; i<length;i++) {
-        arr[i]=new StackTraceElement(readString(in),readString(in),readString(in),readInt(in));
+      for (int i = 0; i < length; i++) {
+        arr[i] = new StackTraceElement(readString(in), readString(in), readString(in), readInt(in));
       }
       return arr;
     }

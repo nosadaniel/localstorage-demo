@@ -170,25 +170,34 @@ public class SearchCriteria implements Serializer {
 
     // serializing values
     SerializerHelper.writeInt(out, values.size());
-    for(Map.Entry<Field,String> e:values.entrySet()) {
-      SerializerHelper.writeString(out,e.getKey().name());
-      SerializerHelper.writeString(out,e.getValue());
+    for (Map.Entry<Field, String> e : values.entrySet()) {
+      SerializerHelper.writeString(out, e.getKey().name());
+      SerializerHelper.writeString(out, e.getValue());
     }
 
     // write object identifier (end)
     SerializerHelper.writeLong(out, serialversionUID);
   }
 
+  /**
+   * <p>Static deserializer.</p>
+   *
+   * <p>creates  a search criteria from a ByteArrayStream</p>
+   *
+   * @param in The input byte stream to be used
+   * @return the object parsed from the input stream by the respective class
+   * @throws IOException if not overridden or reached unexpectedly the end of stream
+   */
   public static SearchCriteria fromByteArrayStream(ByteArrayInputStream in) throws IOException {
     if (SerializerHelper.readLong(in) != serialversionUID) {
       throw new IOException("failed to parse StorageException (bad stream?)");
     }
 
-    SearchCriteria s =new SearchCriteria();
+    SearchCriteria s = new SearchCriteria();
 
-    int size=SerializerHelper.readInt(in);
-    for(int i=0;i<size;i++) {
-      s.values.put(Field.valueOf(SerializerHelper.readString(in)),SerializerHelper.readString(in));
+    int size = SerializerHelper.readInt(in);
+    for (int i = 0; i < size; i++) {
+      s.values.put(Field.valueOf(SerializerHelper.readString(in)), SerializerHelper.readString(in));
     }
 
     if (SerializerHelper.readLong(in) != serialversionUID) {
@@ -197,11 +206,13 @@ public class SearchCriteria implements Serializer {
     return s;
   }
 
+  @Override
   public String toString() {
-    StringBuilder sb= new StringBuilder();
+    StringBuilder sb = new StringBuilder();
     sb.append("{").append(System.lineSeparator());
-    for (Map.Entry<Field,String> e:values.entrySet()) {
-      sb.append("  ").append(e.getKey()).append('=').append(e.getValue()).append(System.lineSeparator());
+    for (Map.Entry<Field, String> e : values.entrySet()) {
+      sb.append("  ").append(e.getKey()).append('=').append(e.getValue())
+          .append(System.lineSeparator());
     }
     sb.append("}").append(System.lineSeparator());
     return sb.toString();

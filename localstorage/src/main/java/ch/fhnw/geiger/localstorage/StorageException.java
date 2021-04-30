@@ -28,8 +28,9 @@ public class StorageException extends IllegalStateException implements Serialize
       setStackTrace(t.getStackTrace());
     }
 
-    public SerializedException(String exceptionName, String message, StackTraceElement[] stacktrace, Throwable cause) {
-      super(message,cause);
+    public SerializedException(String exceptionName, String message, StackTraceElement[] stacktrace,
+                               Throwable cause) {
+      super(message, cause);
       this.exceptionName = exceptionName;
       this.message = message;
       setStackTrace(stacktrace);
@@ -54,7 +55,8 @@ public class StorageException extends IllegalStateException implements Serialize
       SerializerHelper.writeLong(out, serialversionUID);
     }
 
-    public static SerializedException fromByteArrayStream(ByteArrayInputStream in) throws IOException {
+    public static SerializedException fromByteArrayStream(ByteArrayInputStream in)
+        throws IOException {
       if (SerializerHelper.readLong(in) != serialversionUID) {
         throw new IOException("failed to parse StorageException (bad stream?)");
       }
@@ -84,13 +86,19 @@ public class StorageException extends IllegalStateException implements Serialize
 
   private static final long serialversionUID = 178324938L;
 
-  public StorageException(String txt, Throwable e, StackTraceElement[] ste) {
+  private StorageException(String txt, Throwable e, StackTraceElement[] ste) {
     super(txt, e);
     if (ste != null) {
       setStackTrace(ste);
     }
   }
 
+  /**
+   * <p>Creates a StorageException with message and root cause.</p>
+   *
+   * @param txt the message
+   * @param e the root cause
+   */
   public StorageException(String txt, Throwable e) {
     this(txt, e, null);
   }
@@ -126,6 +134,15 @@ public class StorageException extends IllegalStateException implements Serialize
     SerializerHelper.writeLong(out, serialversionUID);
   }
 
+  /**
+   * <p>Static deserializer.</p>
+   *
+   * <p>CReates a storage exception from the stream.</p>
+   *
+   * @param in The input byte stream to be used
+   * @return the object parsed from the input stream by the respective class
+   * @throws IOException if not overridden or reached unexpectedly the end of stream
+   */
   public static StorageException fromByteArrayStream(ByteArrayInputStream in) throws IOException {
     if (SerializerHelper.readLong(in) != serialversionUID) {
       throw new IOException("failed to parse StorageException (bad stream?)");
