@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'eu.cyber-geiger'
-version = '0.3.1'
+version = '0.3.3'
 description = 'localStorage'
 sourceCompatibility = '1.8'
 
@@ -120,7 +120,7 @@ publishing {
 
             def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
             def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            url = gitBranch() == "main" ? releasesRepoUrl : snapshotsRepoUrl
+            url = (gitBranch() == "main") ? releasesRepoUrl : snapshotsRepoUrl
 
             credentials {
                 username ossrhUsername

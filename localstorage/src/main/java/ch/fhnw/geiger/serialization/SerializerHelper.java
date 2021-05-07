@@ -184,4 +184,33 @@ public class SerializerHelper {
     }
   }
 
+  public static Object readObject(ByteArrayInputStream in) throws IOException {
+    switch(""+readIntLong(in)) {
+      case ""+STRING_UID:
+        byte[] arr = new byte[readIntInt(in)];
+        in.read(arr);
+        return new String(arr, StandardCharsets.UTF_8);
+      case ""+LONG_UID:
+        return readIntLong(in);
+      default:
+        throw new ClassCastException();
+    }
+  }
+
+  public static void writeObject(ByteArrayOutputStream out,Object o) throws IOException {
+    switch(o.getClass().getName()) {
+      case "String":
+        writeString(out,(String)(o));
+        break;
+      case "Long":
+        writeLong(out,(Long)(o));
+        break;
+      case "Integer":
+        writeInt(out,(Integer)(o));
+        break;
+      default:
+        throw new ClassCastException();
+    }
+  }
+
 }
