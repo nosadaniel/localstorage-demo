@@ -4,6 +4,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'maven-publish'
     id 'signing'
+    id "com.github.dkorotych.gradle-maven-exec" version "2.2.1"
 }
 
 group = 'eu.cyber-geiger'
@@ -181,5 +182,27 @@ publishing {
 signing {
     sign publishing.publications.mavenJava
 }
+
+task packageTotalcross {
+    doLast {
+        mavenexec {
+            workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross"
+            goals '-DskipTests', 'package'
+        }
+    }
+}
+
+jar.dependsOn packageTotalcross
+
+task testTotalcross {
+    doLast {
+        mavenexec {
+            workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross"
+            goals 'test'
+        }
+    }
+}
+
+check.dependsOn testTotalcross
 
 

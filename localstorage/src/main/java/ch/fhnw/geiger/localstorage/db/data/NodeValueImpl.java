@@ -265,16 +265,16 @@ public class NodeValueImpl implements NodeValue {
     if (value.size() == 1) {
       sb.append(DEFAULT_LOCALE + "=>\"" + value.get(DEFAULT_LOCALE) + "\"}");
     } else {
-      sb.append(System.lineSeparator());
+      sb.append(NodeImpl.getLineSeparator());
       int i = 0;
       for (Map.Entry<Locale, String> e : value.entrySet()) {
         if (i > 0) {
-          sb.append("," + System.lineSeparator());
+          sb.append("," + NodeImpl.getLineSeparator());
         }
         sb.append(prefix + "  " + e.getKey().toLanguageTag() + "=>\"" + e.getValue() + "\"");
         i++;
       }
-      sb.append(System.lineSeparator() + prefix + "}");
+      sb.append(NodeImpl.getLineSeparator() + prefix + "}");
       // build description
 
     }

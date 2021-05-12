@@ -39,7 +39,8 @@ public class NodeImpl implements Node {
 
   /* Holds all child nodes as tuples, where the name is used as a key and
      the value is of type StorageNode */
-  private final Map<String, Node> childNodes = new ConcurrentHashMap<>();
+  // TODO concurrency
+  private final Map<String, Node> childNodes = new HashMap<>();
 
   /**
    * <p>Constructor creating a skeleton node.</p>
@@ -373,7 +374,13 @@ public class NodeImpl implements Node {
     if (childNodes.size() == 0) {
       return "";
     }
-    return String.join(",", childNodes.keySet());
+    String csv = "";
+    for(String s: childNodes.keySet()) {
+      csv = csv.concat(s);
+      csv = csv.concat(",");
+    }
+    // return String.join(",", childNodes.keySet());
+    return csv.substring(0, csv.length() - 1);
   }
 
   @Override
@@ -512,17 +519,17 @@ public class NodeImpl implements Node {
     sb.append("[");
     sb.append("owner=" + getOwner());
     sb.append(";vis=" + getVisibility());
-    sb.append("]{" + System.lineSeparator());
+    sb.append("]{" + getLineSeparator());
     int i = 0;
     if (values != null) {
       for (Map.Entry<String, NodeValue> e : values.entrySet()) {
         if (i > 0) {
-          sb.append(", " + System.lineSeparator());
+          sb.append(", " + getLineSeparator());
         }
         sb.append(e.getValue().toString("  "));
         i++;
       }
-      sb.append(System.lineSeparator() + "}");
+      sb.append(getLineSeparator() + "}");
     } else {
       sb.append("{}");
     }
@@ -629,6 +636,16 @@ public class NodeImpl implements Node {
       throw new IOException("failed to parse NodeImpl (bad stream end?)");
     }
     return n;
+  }
+
+  public static String getLineSeparator() {
+    // TODO implement without using System class
+    String os = System.getProperty("os.name");
+    if (os.contains("win")) {
+      return "\r\n";
+    } else {
+      return "\n";
+    }
   }
 
 }
