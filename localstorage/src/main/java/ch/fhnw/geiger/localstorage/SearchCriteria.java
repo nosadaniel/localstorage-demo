@@ -8,9 +8,12 @@ import ch.fhnw.geiger.serialization.Serializer;
 import ch.fhnw.geiger.serialization.SerializerHelper;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.System;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * <p>An object that can hold all possible search criteria.</p>
@@ -21,7 +24,7 @@ import java.util.Map;
  *
  * <p>TODO: add recursion support</p>
  */
-public class SearchCriteria implements Serializer {
+public class SearchCriteria implements Serializer,Comparable<SearchCriteria> {
 
   private static final long serialversionUID = 87128319541L; // TODO generate serialversionUID
 
@@ -210,12 +213,64 @@ public class SearchCriteria implements Serializer {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{").append(System.lineSeparator());
-    for (Map.Entry<Field, String> e : values.entrySet()) {
-      sb.append("  ").append(e.getKey()).append('=').append(e.getValue())
+    Set<String> tmp = new TreeSet<>();
+    for (Field f: values.keySet()) {
+      tmp.add(f.toString());
+    }
+    for (String f: new TreeSet<>(tmp)) {
+      sb.append("  ").append(f).append('=').append(values.get(Field.valueOf(f)))
           .append(System.lineSeparator());
     }
     sb.append("}").append(System.lineSeparator());
     return sb.toString();
+  }
+
+  /**
+   * <p>Wrapper function to simplify serialization.</p>
+   *
+   * @return the serializer object as byte array
+   */
+  public byte[] toByteArray() {
+    try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      toByteArrayStream(out);
+      return out.toByteArray();
+    } catch (IOException e) {
+      return null;
+    }
+  }
+
+  /**
+   * <p>Wrapper function to simplify deserialization</p>
+   *
+   * @param buf the buffer to be read
+   * @return the deserialized object
+   */
+  public static SearchCriteria fromByteArray(byte[] buf) {
+    return (SearchCriteria) (fromByteArrayInt(buf));
+  }
+
+  private static Serializer fromByteArrayInt(byte[] buf) {
+    try {
+      ByteArrayInputStream in = new ByteArrayInputStream(buf);
+      return fromByteArrayStream(in);
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+      return null;
+    }
+  }
+
+  @Override
+  public int compareTo(SearchCriteria o) {
+    return toString().compareTo(o.toString());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(!(o instanceof SearchCriteria)) {
+      return false;
+    }
+    return toString().equals(((SearchCriteria)(o)).toString());
   }
 
 }

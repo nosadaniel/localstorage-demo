@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'eu.cyber-geiger'
-version = '0.3.3'
+version = '0.3.3a'
 description = 'localStorage'
 sourceCompatibility = '1.8'
 

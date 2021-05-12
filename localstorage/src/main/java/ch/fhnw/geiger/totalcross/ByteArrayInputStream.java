@@ -79,7 +79,7 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
    * @param buf the byte buffer to be used for the inputstrema
    */
   public ByteArrayInputStream(byte[] buf) {
-    if (isTotalCross()) {
+    if (TcHelper.isTotalCross()) {
       is = new TcWrapper(buf);
     } else {
       is = new JavaWrapper(buf);
@@ -89,20 +89,6 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
   @Override
   public int read(byte[] buf) {
     return is.read(buf);
-  }
-
-  /**
-   * Checks if it runs inside a TotalCross environment.
-   *
-   * @return true if it is a TotalCross environment, false otherwise
-   */
-  public static boolean isTotalCross() {
-    try {
-      Class.forName("totalcross.io.ByteArrayStream");
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
   }
 
 }

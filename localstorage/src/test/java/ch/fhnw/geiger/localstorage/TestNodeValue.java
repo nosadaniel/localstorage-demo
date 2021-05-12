@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import ch.fhnw.geiger.localstorage.db.data.NodeValue;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
-import java.util.Locale;
+import ch.fhnw.geiger.totalcross.Locale;
 import org.junit.Test;
 
 /***

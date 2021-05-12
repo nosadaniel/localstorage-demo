@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'eu.cyber-geiger'
-version '0.3.2a-SNAPSHOT'
+version '0.3.3a-SNAPSHOT'
 
 repositories {
     mavenCentral()

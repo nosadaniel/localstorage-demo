@@ -11,7 +11,7 @@ import java.util.Vector;
 /**
  * <p>Exception to be raised on any problems related to the local storage.</p>
  */
-public class StorageException extends IllegalStateException implements Serializer {
+public class StorageException extends RuntimeException implements Serializer {
 
 
   private static class SerializedException extends Throwable implements Serializer {

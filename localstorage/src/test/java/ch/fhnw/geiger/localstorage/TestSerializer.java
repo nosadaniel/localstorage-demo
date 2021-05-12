@@ -9,8 +9,8 @@ import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.Locale;
 import java.io.IOException;
-import java.util.Locale;
 import org.junit.Test;
 
 /**
@@ -93,4 +93,16 @@ public class TestSerializer {
         new ByteArrayInputStream(out.toByteArray()));
     assertEquals("verifying criteria equivalence", sc.toString(), sc2.toString());
   }
+
+  @Test
+  public void testByteArrayWrappers() throws Exception {
+    SearchCriteria sc = new SearchCriteria();
+    sc.setNodeName("test");
+    sc.setNodeValueType("bla");
+    SearchCriteria sc2 = SearchCriteria.fromByteArray(sc.toByteArray());
+    assertEquals("verifying criteria equivalence", sc, sc2);
+  }
+
+
+
 }

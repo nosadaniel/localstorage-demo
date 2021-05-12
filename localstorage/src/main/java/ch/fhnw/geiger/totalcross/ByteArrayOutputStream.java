@@ -98,7 +98,7 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
    * Creates either a TotalCross-wrapper or a Java-wrapper.
    */
   public ByteArrayOutputStream() {
-    if (isTotalCross()) {
+    if (TcHelper.isTotalCross()) {
       is = new TcWrapper();
     } else {
       is = new JavaWrapper();
@@ -113,20 +113,6 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
   @Override
   public byte[] toByteArray() {
     return is.toByteArray();
-  }
-
-  /**
-   * Checks if it runs inside a TotalCross environment.
-   *
-   * @return true if it is a TotalCross environment, false otherwise
-   */
-  public static boolean isTotalCross() {
-    try {
-      Class.forName("totalcross.io.ByteArrayStream");
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
   }
 
 }

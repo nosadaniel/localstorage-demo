@@ -10,6 +10,7 @@ import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValue;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
+import ch.fhnw.geiger.totalcross.Locale;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,7 +19,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 
@@ -92,7 +92,6 @@ public class H2SqlMapper extends AbstractMapper {
       conn.prepareStatement("SELECT * FROM node_value LIMIT 1;").executeQuery();
     } catch (SQLException e) {
       // database does not exists it should be created
-      System.out.println("## got exception " + e + "... initializing database");
       initialize();
     }
   }
@@ -166,7 +165,7 @@ public class H2SqlMapper extends AbstractMapper {
 
         // get translations and add to node_value
         String sqlStatementTranslations = "SELECT path,key,identifier,locale,translation "
-                + "FROM translation WHERE (path = ? AND key = ?)";
+            + "FROM translation WHERE (path = ? AND key = ?)";
         try {
           PreparedStatement psTranslations = conn.prepareStatement(sqlStatementTranslations);
           psTranslations.setString(1, path);
@@ -177,16 +176,16 @@ public class H2SqlMapper extends AbstractMapper {
             if (Identifier.valueOf(identifier).equals(Identifier.VALUE)) {
               // the translation is for a value
               value.setValue(rsTranslations.getString("translation"),
-                      java.util.Locale.forLanguageTag(rsTranslations.getString("locale")));
+                  Locale.forLanguageTag(rsTranslations.getString("locale")));
             } else if (Identifier.valueOf(identifier).equals(Identifier.DESCRIPTION)) {
               // the translation is for a description
               value.setDescription(rsTranslations.getString("translation"),
-                      java.util.Locale.forLanguageTag(rsTranslations.getString("locale")));
+                  Locale.forLanguageTag(rsTranslations.getString("locale")));
             }
           }
         } catch (SQLException e) {
           throw new StorageException("Could not retrieve description for node \"" + path
-                  + "\" and key \"" + key + "\"", e);
+              + "\" and key \"" + key + "\"", e);
         }
         res.addValue(value);
       }
@@ -314,7 +313,7 @@ public class H2SqlMapper extends AbstractMapper {
       ps.setString(2, value.getKey());
       ps.setString(3, value.getValue());
       ps.setString(4, value.getType());
-      ps.setString(5, java.util.Locale.ENGLISH.toLanguageTag()); // set default to english
+      ps.setString(5, Locale.ENGLISH.toLanguageTag()); // set default to english
       ps.setString(6, String.valueOf(value.getLastModified()));
       ps.execute();
     } catch (SQLException e) {
@@ -323,9 +322,9 @@ public class H2SqlMapper extends AbstractMapper {
 
     // insert translations for value
     String sqlStatementTrl = "INSERT INTO translation (path, key, identifier, locale, translation)"
-            + " VALUES (?,?,?,?,?)";
-    Map<java.util.Locale, String> valueMap = value.getAllValueTranslations();
-    for (Map.Entry<java.util.Locale, String> entry : valueMap.entrySet()) {
+        + " VALUES (?,?,?,?,?)";
+    Map<Locale, String> valueMap = value.getAllValueTranslations();
+    for (Map.Entry<Locale, String> entry : valueMap.entrySet()) {
       try {
         PreparedStatement psTranslation = conn.prepareStatement(sqlStatementTrl);
         psTranslation.setString(1, path);
@@ -336,7 +335,7 @@ public class H2SqlMapper extends AbstractMapper {
         psTranslation.execute();
       } catch (SQLException e) {
         throw new StorageException("Could not create translation \""
-                + entry.getKey().toLanguageTag() + "\" for value \"" + value.getKey() + "\"", e);
+            + entry.getKey().toLanguageTag() + "\" for value \"" + value.getKey() + "\"", e);
       }
     }
 
@@ -353,8 +352,8 @@ public class H2SqlMapper extends AbstractMapper {
         psTranslation.execute();
       } catch (SQLException e) {
         throw new StorageException("Could not create translation \""
-                + entry.getKey().toLanguageTag() + "\" for description in value \""
-                + value.getKey() + "\"", e);
+            + entry.getKey().toLanguageTag() + "\" for description in value \""
+            + value.getKey() + "\"", e);
       }
     }
   }
@@ -379,7 +378,7 @@ public class H2SqlMapper extends AbstractMapper {
       psDeleteTranslation.execute();
     } catch (SQLException e) {
       throw new StorageException("Could not delete translations for key \"" + key + "\" in node \""
-              + path + "\"", e);
+          + path + "\"", e);
     }
 
     // remove value
@@ -391,7 +390,7 @@ public class H2SqlMapper extends AbstractMapper {
       psDelete.execute();
     } catch (SQLException e) {
       throw new StorageException("Could not delete value for key \"" + key + "\" in node \""
-              + path + "\"", e);
+          + path + "\"", e);
     }
 
     return value;
@@ -476,7 +475,7 @@ public class H2SqlMapper extends AbstractMapper {
 
     // add translations
     String sqlStatementTranslations = "SELECT path,key,identifier,locale,translation "
-            + "FROM translation WHERE (path = ? AND key = ?)";
+        + "FROM translation WHERE (path = ? AND key = ?)";
     try {
       PreparedStatement psTranslations = conn.prepareStatement(sqlStatementTranslations);
       psTranslations.setString(1, path);
@@ -487,16 +486,16 @@ public class H2SqlMapper extends AbstractMapper {
         if (Identifier.valueOf(identifier).equals(Identifier.VALUE)) {
           // the translation is for a value
           value.setValue(rsTranslations.getString("translation"),
-                  Locale.forLanguageTag(rsTranslations.getString("locale")));
+              Locale.forLanguageTag(rsTranslations.getString("locale")));
         } else if (Identifier.valueOf(identifier).equals(Identifier.DESCRIPTION)) {
           // the translation is for a description
           value.setDescription(rsTranslations.getString("translation"),
-                  Locale.forLanguageTag(rsTranslations.getString("locale")));
+              Locale.forLanguageTag(rsTranslations.getString("locale")));
         }
       }
     } catch (SQLException e) {
       throw new StorageException("Could not retrieve description for node \"" + path
-              + "\" and key \"" + key + "\"", e);
+          + "\" and key \"" + key + "\"", e);
     }
     return value;
   }

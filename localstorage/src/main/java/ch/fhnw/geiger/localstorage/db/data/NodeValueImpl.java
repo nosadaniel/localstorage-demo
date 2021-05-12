@@ -3,13 +3,15 @@ package ch.fhnw.geiger.localstorage.db.data;
 import ch.fhnw.geiger.serialization.SerializerHelper;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.Locale;
+import ch.fhnw.geiger.totalcross.MissingResourceException;
+import ch.fhnw.geiger.totalcross.System;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
+import java.util.TreeSet;
 import java.util.Vector;
 
 /**
@@ -149,32 +151,9 @@ public class NodeValueImpl implements NodeValue {
 
   private static Locale lookupLocale(Map<Locale, String> map, String languageRange) {
     // Get Language Range
-    List<Locale.LanguageRange> lr = Locale.LanguageRange.parse(languageRange);
-
-    // extending range list with locale only
-    List<Locale.LanguageRange> al = new Vector<>();
-    for (Locale.LanguageRange r : lr) {
-      String language = (Locale.forLanguageTag(r.getRange())).getLanguage();
-      Locale.LanguageRange lrOnlyLanguage = new Locale.LanguageRange(language, r.getWeight());
-      if (!lr.contains(lrOnlyLanguage)) {
-        al.add(lrOnlyLanguage);
-      }
-    }
-    lr.addAll(al);
-
-    // create a mapping map
-    Map<Locale, Locale> localeMapping = new HashMap<>();
-    for (Locale l : map.keySet()) {
-      localeMapping.put(l, l);
-      Locale ll = new Locale(l.getLanguage());
-      if (!localeMapping.containsKey(ll)) {
-        localeMapping.put(ll, l);
-      }
-    }
-
-    List<Locale> matchingLocales = Locale.filter(lr, localeMapping.keySet());
+    List<Locale> matchingLocales = Locale.filter(Locale.LanguageRange.parse(languageRange), map.keySet());
     if (matchingLocales.size() > 0) {
-      return localeMapping.get(matchingLocales.get(0));
+      return matchingLocales.get(0);
     } else {
       return DEFAULT_LOCALE;
     }
@@ -265,16 +244,16 @@ public class NodeValueImpl implements NodeValue {
     if (value.size() == 1) {
       sb.append(DEFAULT_LOCALE + "=>\"" + value.get(DEFAULT_LOCALE) + "\"}");
     } else {
-      sb.append(NodeImpl.getLineSeparator());
+      sb.append(System.lineSeparator());
       int i = 0;
-      for (Map.Entry<Locale, String> e : value.entrySet()) {
+      for (Locale l : new TreeSet<>(value.keySet())) {
         if (i > 0) {
-          sb.append("," + NodeImpl.getLineSeparator());
+          sb.append("," + System.lineSeparator());
         }
-        sb.append(prefix + "  " + e.getKey().toLanguageTag() + "=>\"" + e.getValue() + "\"");
+        sb.append(prefix + "  " + l.toLanguageTag() + "=>\"" + value.get(l) + "\"");
         i++;
       }
-      sb.append(NodeImpl.getLineSeparator() + prefix + "}");
+      sb.append(System.lineSeparator() + prefix + "}");
       // build description
 
     }
@@ -288,39 +267,7 @@ public class NodeValueImpl implements NodeValue {
     }
     NodeValueImpl nv = (NodeValueImpl) o;
 
-    if (!getKey().equals(nv.getKey())) {
-      return false;
-    }
-    if (getValue() != null && !getValue().equals(nv.getValue())) {
-      return false;
-    }
-    synchronized (value) {
-      if (value.size() != nv.value.size()) {
-        return false;
-      }
-      for (Map.Entry<Locale, String> e : value.entrySet()) {
-        if (!e.getValue().equals(nv.value.get(e.getKey()))) {
-          return false;
-        }
-      }
-    }
-    if (getType() != null && !getType().equals(nv.getType())) {
-      return false;
-    }
-    if (getDescription() != null && !getDescription().equals(nv.getDescription())) {
-      return false;
-    }
-    synchronized (description) {
-      if (description.size() != nv.description.size()) {
-        return false;
-      }
-      for (Map.Entry<Locale, String> e : description.entrySet()) {
-        if (!e.getValue().equals(nv.description.get(e.getKey()))) {
-          return false;
-        }
-      }
-    }
-    return true;
+    return toString().equals(nv.toString());
   }
 
   @Override

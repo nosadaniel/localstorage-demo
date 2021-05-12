@@ -87,7 +87,7 @@ public interface Node extends Serializer {
    * @param value the key to be updated
    * @return the requested value or null if not found
    */
-  NodeValue updateValue(NodeValue value);
+  NodeValue updateValue(NodeValue value) throws StorageException;
 
   /**
    * <p>Removes a value from the node.</p>

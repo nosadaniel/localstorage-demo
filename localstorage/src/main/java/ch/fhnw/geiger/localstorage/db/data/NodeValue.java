@@ -1,7 +1,7 @@
 package ch.fhnw.geiger.localstorage.db.data;
 
 import ch.fhnw.geiger.serialization.Serializer;
-import java.util.Locale;
+import ch.fhnw.geiger.totalcross.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 

@@ -18,7 +18,7 @@ public interface Serializer {
    * @return the object parsed from the input stream by the respective class
    * @throws IOException if not overridden or reached unexpectedly the end of stream
    */
-  static Object fromByteArrayStream(ByteArrayInputStream in) throws IOException {
+  static Serializer fromByteArrayStream(ByteArrayInputStream in) throws IOException {
     throw new IOException("Not implemented... ");
   }
 
@@ -28,6 +28,25 @@ public interface Serializer {
    * @param out the output stream receiving the object
    * @throws IOException if  an exception occurs while writing to the stream
    */
-  void toByteArrayStream(ByteArrayOutputStream out) throws IOException;
+  public abstract void toByteArrayStream(ByteArrayOutputStream out) throws IOException;
 
+  static byte[] toByteArray(Serializer obj) {
+    try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      obj.toByteArrayStream(out);
+      return out.toByteArray();
+    } catch (IOException ioe) {
+      return null;
+    }
+  }
+
+  static Serializer fromByteArray(byte[] buf) {
+    try {
+      ByteArrayInputStream in = new ByteArrayInputStream(buf);
+      return fromByteArrayStream(in);
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+      return null;
+    }
+  }
 }

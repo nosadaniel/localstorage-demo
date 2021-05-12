@@ -53,12 +53,16 @@ public class DummyStorageFeeder {
       for (String nodeName : new String[]{
           ":plugins:dummyFeeder:data:dummyBooleanValue",
           ":plugins:dummyFeeder:data:flippingBooleanValue"}) {
-        Node n = controller.get(nodeName);
-        for (String keyName : new String[]{
-            "minValue",
-            "maxValue",
-            "value"}) {
-          n.addValue(new NodeValueImpl(keyName, ""));
+        try {
+          Node n = controller.get(nodeName);
+          for (String keyName : new String[]{
+              "minValue",
+              "maxValue",
+              "value"}) {
+            n.addValue(new NodeValueImpl(keyName, ""));
+          }
+        }catch (StorageException e) {
+          e.printStackTrace();
         }
       }
       Random r = new Random();
@@ -84,6 +88,9 @@ public class DummyStorageFeeder {
           Thread.sleep(interval);
         } catch (InterruptedException ie) {
           // we just ignore it...
+        } catch(StorageException e) {
+          // TODO replace with something sensible
+          e.printStackTrace();
         }
       }
       synchronized (lock) {

@@ -3,7 +3,6 @@ package ch.fhnw.geiger.serialization;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -17,35 +16,46 @@ public class SerializerHelper {
   private static final long STACKTRACES_UID = 9012350123956L;
 
   private static void writeIntLong(ByteArrayOutputStream out, Long l) throws IOException {
-    ByteBuffer b = ByteBuffer.allocate(Long.BYTES);
-    b.putLong(l);
-    out.write(b.array());
+    byte[] result = new byte[Long.BYTES];
+    for (int i = Long.BYTES - 1; i >= 0; i--) {
+      result[i] = (byte) (l & 0xFF);
+      l >>= Byte.SIZE;
+    }
+    out.write(result);
   }
 
   private static Long readIntLong(ByteArrayInputStream in) throws IOException {
     int size = Long.BYTES;
-    ByteBuffer b = ByteBuffer.allocate(size);
     byte[] arr = new byte[size];
     in.read(arr);
-    b.put(arr, 0, size);
-    b.flip();
-    return b.getLong();
+    long result = 0;
+    for (int i = 0; i < size; i++) {
+      result <<= Byte.SIZE;
+      result |= (arr[i] & 0xFF);
+    }
+    return result;
   }
 
   private static void writeIntInt(ByteArrayOutputStream out, Integer l) throws IOException {
-    ByteBuffer b = ByteBuffer.allocate(Integer.BYTES);
-    b.putInt(l);
-    out.write(b.array());
+    int size = Integer.BYTES;
+    byte[] result = new byte[size];
+    for (int i = size - 1; i >= 0; i--) {
+      result[i] = (byte) (l & 0xFF);
+      l >>= Byte.SIZE;
+    }
+    out.write(result);
   }
 
   private static Integer readIntInt(ByteArrayInputStream in) throws IOException {
     int size = Integer.BYTES;
-    ByteBuffer b = ByteBuffer.allocate(size);
     byte[] arr = new byte[size];
     in.read(arr);
-    b.put(arr, 0, size);
-    b.flip();
-    return b.getInt();
+    int result = 0;
+    for (int i = 0; i < size; i++) {
+      result <<= Byte.SIZE;
+      result |= (arr[i] & 0xFF);
+    }
+    return result;
   }
 
   /**
@@ -185,28 +195,28 @@ public class SerializerHelper {
   }
 
   public static Object readObject(ByteArrayInputStream in) throws IOException {
-    switch(""+readIntLong(in)) {
-      case ""+STRING_UID:
+    switch ("" + readIntLong(in)) {
+      case "" + STRING_UID:
         byte[] arr = new byte[readIntInt(in)];
         in.read(arr);
         return new String(arr, StandardCharsets.UTF_8);
-      case ""+LONG_UID:
+      case "" + LONG_UID:
         return readIntLong(in);
       default:
         throw new ClassCastException();
     }
   }
 
-  public static void writeObject(ByteArrayOutputStream out,Object o) throws IOException {
-    switch(o.getClass().getName()) {
+  public static void writeObject(ByteArrayOutputStream out, Object o) throws IOException {
+    switch (o.getClass().getName()) {
       case "String":
-        writeString(out,(String)(o));
+        writeString(out, (String) (o));
         break;
       case "Long":
-        writeLong(out,(Long)(o));
+        writeLong(out, (Long) (o));
         break;
       case "Integer":
-        writeInt(out,(Integer)(o));
+        writeInt(out, (Integer) (o));
         break;
       default:
         throw new ClassCastException();

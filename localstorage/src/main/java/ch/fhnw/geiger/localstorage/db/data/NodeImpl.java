@@ -7,10 +7,10 @@ import ch.fhnw.geiger.localstorage.db.GenericController;
 import ch.fhnw.geiger.serialization.SerializerHelper;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
+import ch.fhnw.geiger.totalcross.System;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>The implementation of the node interface.</p>
@@ -104,7 +104,7 @@ public class NodeImpl implements Node {
   /**
    * <p>Converts current node into a materialized node from a skeleton.</p>
    */
-  private void init() {
+  private void init() throws StorageException {
     synchronized (skeleton) {
       if (skeleton.get()) {
         // initialize with full object
@@ -375,7 +375,7 @@ public class NodeImpl implements Node {
       return "";
     }
     String csv = "";
-    for(String s: childNodes.keySet()) {
+    for (String s : childNodes.keySet()) {
       csv = csv.concat(s);
       csv = csv.concat(",");
     }
@@ -519,17 +519,17 @@ public class NodeImpl implements Node {
     sb.append("[");
     sb.append("owner=" + getOwner());
     sb.append(";vis=" + getVisibility());
-    sb.append("]{" + getLineSeparator());
+    sb.append("]{" + System.lineSeparator());
     int i = 0;
     if (values != null) {
       for (Map.Entry<String, NodeValue> e : values.entrySet()) {
         if (i > 0) {
-          sb.append(", " + getLineSeparator());
+          sb.append(", " + System.lineSeparator());
         }
         sb.append(e.getValue().toString("  "));
         i++;
       }
-      sb.append(getLineSeparator() + "}");
+      sb.append(System.lineSeparator() + "}");
     } else {
       sb.append("{}");
     }
@@ -636,16 +636,6 @@ public class NodeImpl implements Node {
       throw new IOException("failed to parse NodeImpl (bad stream end?)");
     }
     return n;
-  }
-
-  public static String getLineSeparator() {
-    // TODO implement without using System class
-    String os = System.getProperty("os.name");
-    if (os.contains("win")) {
-      return "\r\n";
-    } else {
-      return "\n";
-    }
   }
 
 }

@@ -13,7 +13,7 @@ import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import ch.fhnw.geiger.totalcross.UUID;
 import java.util.Vector;
 
 /**
