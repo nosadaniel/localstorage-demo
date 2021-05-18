@@ -30,6 +30,12 @@ public interface Serializer {
    */
   public abstract void toByteArrayStream(ByteArrayOutputStream out) throws IOException;
 
+  /**
+   * Convenience class to serialize to a bytearray.
+   *
+   * @param obj the object to serialize
+   * @return byteArray representing the object
+   */
   static byte[] toByteArray(Serializer obj) {
     try {
       ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -40,6 +46,12 @@ public interface Serializer {
     }
   }
 
+  /**
+   * Convenience Class to deserialize using byte array.
+   *
+   * @param buf the byte array to deserialize
+   * @return Serializer
+   */
   static Serializer fromByteArray(byte[] buf) {
     try {
       ByteArrayInputStream in = new ByteArrayInputStream(buf);

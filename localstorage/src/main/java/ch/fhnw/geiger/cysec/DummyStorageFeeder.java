@@ -61,7 +61,7 @@ public class DummyStorageFeeder {
               "value"}) {
             n.addValue(new NodeValueImpl(keyName, ""));
           }
-        }catch (StorageException e) {
+        } catch (StorageException e) {
           e.printStackTrace();
         }
       }
@@ -88,7 +88,7 @@ public class DummyStorageFeeder {
           Thread.sleep(interval);
         } catch (InterruptedException ie) {
           // we just ignore it...
-        } catch(StorageException e) {
+        } catch (StorageException e) {
           // TODO replace with something sensible
           e.printStackTrace();
         }

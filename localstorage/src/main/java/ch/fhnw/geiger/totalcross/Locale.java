@@ -6,12 +6,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * Class to represent a language Locale.
+ */
 public class Locale implements Comparable<Locale> {
 
   public static final Locale ENGLISH = new Locale("en");
   public static final Locale GERMAN = new Locale("de");
   public static final Locale GERMANY = new Locale("de", "DE");
 
+  /**
+   * LanguageRange class.
+   */
   public static class LanguageRange implements Comparable {
 
     private double weight;
@@ -30,6 +36,13 @@ public class Locale implements Comparable<Locale> {
       return range.toLanguageTag();
     }
 
+    /**
+     * Parses a String and creates LanguageRange.
+     * TODO what does this do?
+     *
+     * @param expression String expresseion to be parsed.
+     * @return List of LangageRanges
+     */
     public static List<LanguageRange> parse(String expression) {
       Set<LanguageRange> ret = new TreeSet<>();
       for (String chunk : expression.split(";")) {
@@ -66,6 +79,11 @@ public class Locale implements Comparable<Locale> {
   String language;
   String country = null;
 
+  /**
+   * Locale constructor.
+   *
+   * @param language String representatio of language
+   */
   public Locale(String language) {
     String[] chunks = language.split("\\-");
     if (chunks.length == 1) {
@@ -95,16 +113,30 @@ public class Locale implements Comparable<Locale> {
     return new Locale(language);
   }
 
+  /**
+   * Create String representation of Locale.
+   *
+   * @return String representation of language
+   */
   public String toString() {
     return toLanguageTag();
   }
 
-  public static List<Locale> filter(List<Locale.LanguageRange> priorityList, Collection<Locale> locales) {
+  /**
+   * Filter the Locales.
+   *
+   * @param priorityList list of available languaeranges
+   * @param locales collection of locales
+   * @return filtered list of Locales
+   */
+  public static List<Locale> filter(List<Locale.LanguageRange> priorityList,
+                                    Collection<Locale> locales) {
     ArrayList<Locale> ret = new ArrayList<>();
     for (LanguageRange r : priorityList) {
       // look for exact match
       for (Locale l : locales) {
-        if (l.toLanguageTag().equals(new Locale(r.getRange()).toLanguageTag()) && !ret.contains(l)) {
+        if (l.toLanguageTag().equals(new Locale(r.getRange()).toLanguageTag())
+            && !ret.contains(l)) {
           ret.add(l);
         }
       }
@@ -128,6 +160,12 @@ public class Locale implements Comparable<Locale> {
     return ret;
   }
 
+  /**
+   * Determing if the two objects are equal.
+   *
+   * @param obj object to compare to
+   * @return true if the objects are equal, false otherwise
+   */
   public boolean equals(Object obj) {
     if (!(obj instanceof Locale)) {
       return false;

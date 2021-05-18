@@ -24,7 +24,7 @@ import java.util.TreeSet;
  *
  * <p>TODO: add recursion support</p>
  */
-public class SearchCriteria implements Serializer,Comparable<SearchCriteria> {
+public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
 
   private static final long serialversionUID = 87128319541L; // TODO generate serialversionUID
 
@@ -214,10 +214,10 @@ public class SearchCriteria implements Serializer,Comparable<SearchCriteria> {
     StringBuilder sb = new StringBuilder();
     sb.append("{").append(System.lineSeparator());
     Set<String> tmp = new TreeSet<>();
-    for (Field f: values.keySet()) {
+    for (Field f : values.keySet()) {
       tmp.add(f.toString());
     }
-    for (String f: new TreeSet<>(tmp)) {
+    for (String f : new TreeSet<>(tmp)) {
       sb.append("  ").append(f).append('=').append(values.get(Field.valueOf(f)))
           .append(System.lineSeparator());
     }
@@ -241,7 +241,7 @@ public class SearchCriteria implements Serializer,Comparable<SearchCriteria> {
   }
 
   /**
-   * <p>Wrapper function to simplify deserialization</p>
+   * <p>Wrapper function to simplify deserialization.</p>
    *
    * @param buf the buffer to be read
    * @return the deserialized object
@@ -267,10 +267,10 @@ public class SearchCriteria implements Serializer,Comparable<SearchCriteria> {
 
   @Override
   public boolean equals(Object o) {
-    if(!(o instanceof SearchCriteria)) {
+    if (!(o instanceof SearchCriteria)) {
       return false;
     }
-    return toString().equals(((SearchCriteria)(o)).toString());
+    return toString().equals(((SearchCriteria) (o)).toString());
   }
 
 }

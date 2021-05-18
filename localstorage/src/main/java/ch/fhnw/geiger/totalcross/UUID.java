@@ -2,11 +2,20 @@ package ch.fhnw.geiger.totalcross;
 
 import java.util.Random;
 
+/**
+ * A UUID implementation to work with TotalCross.
+ */
 public class UUID {
 
   private static Random r = new Random();
   private byte[] uuid = new byte[Long.BYTES * 2];
 
+  /**
+   * Constructor to create a UUID.
+   *
+   * @param mostSigBits Most significant bits
+   * @param leastSigBits least significant bits
+   */
   public UUID(long mostSigBits, long leastSigBits) {
     for (int i = Long.BYTES - 1; i >= 0; i--) {
       uuid[i] = (byte) (mostSigBits & 0xFF);
@@ -22,6 +31,11 @@ public class UUID {
     return new UUID(r.nextLong(), r.nextLong());
   }
 
+  /**
+   * Create a string representation of a UUID.
+   *
+   * @return String representation
+   */
   public String toString() {
     return byteToHex(uuid[0]) + byteToHex(uuid[1]) + byteToHex(uuid[2]) + byteToHex(uuid[3]) + "-"
         + byteToHex(uuid[4]) + byteToHex(uuid[5]) + "-"
@@ -35,6 +49,12 @@ public class UUID {
     return Integer.toHexString(b & 0xFF);
   }
 
+  /**
+   * Create random Hex String.
+   *
+   * @param size size of the resulting hex string
+   * @return hex String
+   */
   public static String randomHexString(int size) {
     StringBuffer sb = new StringBuffer();
     while (sb.length() < size) {

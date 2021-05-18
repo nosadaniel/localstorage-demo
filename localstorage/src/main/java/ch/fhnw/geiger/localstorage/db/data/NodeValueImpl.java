@@ -151,7 +151,8 @@ public class NodeValueImpl implements NodeValue {
 
   private static Locale lookupLocale(Map<Locale, String> map, String languageRange) {
     // Get Language Range
-    List<Locale> matchingLocales = Locale.filter(Locale.LanguageRange.parse(languageRange), map.keySet());
+    List<Locale> matchingLocales = Locale.filter(Locale.LanguageRange.parse(languageRange),
+        map.keySet());
     if (matchingLocales.size() > 0) {
       return matchingLocales.get(0);
     } else {

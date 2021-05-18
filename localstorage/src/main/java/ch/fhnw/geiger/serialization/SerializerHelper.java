@@ -194,6 +194,13 @@ public class SerializerHelper {
     }
   }
 
+  /**
+   * Read an object from ByteArrayInputStream.
+   *
+   * @param in the byteArrayInputStream to use
+   * @return return the object read
+   * @throws IOException if object cannot be read
+   */
   public static Object readObject(ByteArrayInputStream in) throws IOException {
     switch ("" + readIntLong(in)) {
       case "" + STRING_UID:
@@ -207,6 +214,13 @@ public class SerializerHelper {
     }
   }
 
+  /**
+   * Write an object to ByteArrayOutputStream.
+   *
+   * @param out the ByteArrayOutputStream to use
+   * @param o the Object to write
+   * @throws IOException if object cannot be written
+   */
   public static void writeObject(ByteArrayOutputStream out, Object o) throws IOException {
     switch (o.getClass().getName()) {
       case "String":

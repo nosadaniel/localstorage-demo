@@ -3,6 +3,9 @@ package ch.fhnw.geiger.totalcross;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Class that creates Wrappers for the System class.
+ */
 public class System {
 
 
@@ -88,9 +91,7 @@ public class System {
 
   static TcSystem sys;
 
-  /**
-   * Creates either a TotalCross-wrapper or a Java-wrapper.
-   */
+  // Creates either a TotalCross-wrapper or a Java-wrapper.
   static {
     if (TcHelper.isTotalCross()) {
       sys = new TcWrapper();
