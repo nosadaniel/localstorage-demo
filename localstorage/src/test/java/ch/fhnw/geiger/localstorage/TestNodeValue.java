@@ -37,15 +37,18 @@ public class TestNodeValue {
     NodeValueImpl nodeValue = new NodeValueImpl("key", "value");
     assertEquals("test key getter", "value", nodeValue.getValue());
     assertEquals("test key getter (en)", "value", nodeValue.getValue("en"));
-    assertEquals("test key getter (de)", "value", nodeValue.getValue("de"));
-    assertEquals("test key getter (en-us)", "value", nodeValue.getValue("en-US"));
+    nodeValue.setValue("en1",Locale.ENGLISH);
+    assertEquals("test key getter (en)", "en1", nodeValue.getValue("en"));
+    nodeValue.setValue("en2",Locale.ENGLISH);
+    assertEquals("test key getter (de)", "en2", nodeValue.getValue("de"));
+    assertEquals("test key getter (en-us)", "en2", nodeValue.getValue("en-US"));
 
     // with multiple languages
     nodeValue.setValue("de-value", Locale.GERMAN);
     nodeValue.setValue("de-de-value", Locale.GERMANY);
-    assertEquals("test key getter (DEFAULT)", "value", nodeValue.getValue());
-    assertEquals("test key getter (en)", "value", nodeValue.getValue("en"));
-    assertEquals("test key getter (en-us)", "value", nodeValue.getValue("en-US"));
+    assertEquals("test key getter (DEFAULT)", "en2", nodeValue.getValue());
+    assertEquals("test key getter (en)", "en2", nodeValue.getValue("en2"));
+    assertEquals("test key getter (en-us)", "en2", nodeValue.getValue("en-US"));
     assertEquals("test key getter (de)", "de-value", nodeValue.getValue("de"));
     assertEquals("test key getter (de-de)", "de-de-value", nodeValue.getValue("de-DE"));
     assertEquals("test key getter (de-ch)", "de-value", nodeValue.getValue("de-ch"));
