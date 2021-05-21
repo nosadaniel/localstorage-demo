@@ -178,4 +178,9 @@ public class Locale implements Comparable<Locale> {
     return toLanguageTag().compareTo(o.toLanguageTag());
   }
 
+  @Override
+  public int hashCode() {
+    return toLanguageTag().hashCode();
+  }
+
 }
