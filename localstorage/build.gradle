@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'checkstyle'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'maven-publish'
     id 'signing'
@@ -34,10 +33,6 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.12.1'
-
-    // Picocli
-    implementation 'info.picocli:picocli:4.5.2'
-    annotationProcessor 'info.picocli:picocli-codegen:4.5.2'
 }
 
 configurations.all {
@@ -70,7 +65,7 @@ tasks.withType(Checkstyle) {
 jar.dependsOn shadowJar
 jar.dependsOn test
 
-check.dependsOn checkstyleMain
+// check.dependsOn checkstyleMain
 
 /* integrate junit */
 test {

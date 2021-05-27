@@ -5,6 +5,7 @@ import java.util.Random;
 /**
  * A UUID implementation to work with TotalCross.
  */
+@SuppressWarnings("checkstyle:abbreviationaswordinname")
 public class UUID {
 
   private static Random r = new Random();
@@ -27,6 +28,7 @@ public class UUID {
     }
   }
 
+  @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
   public static UUID randomUUID() {
     return new UUID(r.nextLong(), r.nextLong());
   }

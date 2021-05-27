@@ -1,6 +1,5 @@
 package ch.fhnw.geiger.localstorage;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -45,9 +44,6 @@ public class TestSerializer {
     for( int i=0; i<se.getStackTrace().length;i++) {
       compareStackTraceElements(i,se.getStackTrace()[i], se2.getStackTrace()[i]);
     }
-    System.out.println("= Serialized Stacktrace Output ===================="
-        + "==================================");
-    se2.printStackTrace();
   }
 
   private void compareStackTraceElements(int id,StackTraceElement se, StackTraceElement se2) {
@@ -92,9 +88,6 @@ public class TestSerializer {
         se2.getCause().getCause().getMessage());
     // testing last cause empty
     assertNull("empty last cause of chain", se2.getCause().getCause().getCause());
-    System.out.println("= Serialized Stacktrace Output ===================="
-        + "==================================");
-    se2.printStackTrace();
   }
 
   @Test
