@@ -79,7 +79,9 @@ public class GenericController implements StorageController, ChangeRegistrar {
       };
     for (String nodeName : baseNodes) {
       try {
-        Node n = mapper.get(nodeName);
+        // for correct path generation creation of a Node is needed
+        Node tmp = new NodeImpl(nodeName);
+        mapper.get(tmp.getPath());
       } catch (StorageException e) {
         // node does not exist and therefore we create it
         mapper.add(new NodeImpl(nodeName));
