@@ -41,10 +41,24 @@ public class TestSerializer {
     StorageException se2 = StorageException.fromByteArrayStream(
         new ByteArrayInputStream(out.toByteArray()));
     assertEquals(se.getMessage(), se2.getMessage());
-    assertArrayEquals(se.getStackTrace(), se2.getStackTrace());
+    assertEquals("Stack traces not equal in size",se.getStackTrace().length,se2.getStackTrace().length);
+    for( int i=0; i<se.getStackTrace().length;i++) {
+      compareStackTraceElements(i,se.getStackTrace()[i], se2.getStackTrace()[i]);
+    }
     System.out.println("= Serialized Stacktrace Output ===================="
         + "==================================");
     se2.printStackTrace();
+  }
+
+  private void compareStackTraceElements(int id,StackTraceElement se, StackTraceElement se2) {
+    assertEquals("array elements differ in classname of element ["+id+"]",
+        se.getClassName(), se2.getClassName());
+    assertEquals("array elements differ in filename of element ["+id+"]",
+        se.getFileName(), se2.getFileName());
+    assertEquals("array elements differ in methodname of element ["+id+"]",
+        se.getMethodName(), se2.getMethodName());
+    assertEquals("array elements differ in line number of element ["+id+"]",
+        se.getLineNumber(), se2.getLineNumber());
   }
 
   @Test
@@ -58,23 +72,24 @@ public class TestSerializer {
     assertEquals("verifying exception message",
         se.getMessage(),
         se2.getMessage());
-    assertArrayEquals("stacktrace of root cause",
-        se.getStackTrace(),
-        se2.getStackTrace());
+    assertEquals("Stack traces not equal in size",
+        se.getStackTrace().length,se2.getStackTrace().length);
+    for( int i=0; i<se.getStackTrace().length;i++) {
+      compareStackTraceElements(i,se.getStackTrace()[i],se2.getStackTrace()[i]);
+    }
     // testing stacktrace of cause
     assertEquals("verifying exception message",
         se.getCause().getMessage(),
         se2.getCause().getMessage());
-    assertArrayEquals("verifying stacktrace of nested cause",
-        se.getCause().getStackTrace(),
-        se2.getCause().getStackTrace());
+    assertEquals("Stack traces not equal in size",
+        se.getCause().getStackTrace().length,se2.getCause().getStackTrace().length);
+    for( int i=0; i<se.getCause().getStackTrace().length;i++) {
+      compareStackTraceElements(i,se.getCause().getStackTrace()[i],se2.getCause().getStackTrace()[i]);
+    }
     // testing stacktrace of cause
     assertEquals("verifying exception message",
         se.getCause().getCause().getMessage(),
         se2.getCause().getCause().getMessage());
-    assertArrayEquals("verifying stacktrace of nested cause",
-        se.getCause().getCause().getStackTrace(),
-        se2.getCause().getCause().getStackTrace());
     // testing last cause empty
     assertNull("empty last cause of chain", se2.getCause().getCause().getCause());
     System.out.println("= Serialized Stacktrace Output ===================="

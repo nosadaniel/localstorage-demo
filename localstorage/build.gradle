@@ -183,16 +183,16 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-task packageTotalcross {
-    doLast {
-        mavenexec {
-            workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross"
-            goals '-DskipTests', 'package'
-        }
-    }
-}
+//task packageTotalcross {
+//    doLast {
+//        mavenexec {
+//            workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross"
+//            goals '-DskipTests', 'package'
+//        }
+//    }
+//}
 
-jar.dependsOn packageTotalcross
+//jar.dependsOn packageTotalcross
 
 task testTotalcross {
     doLast {
