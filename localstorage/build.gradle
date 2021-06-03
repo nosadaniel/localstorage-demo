@@ -119,8 +119,8 @@ publishing {
             url = (gitBranch() == "main") ? releasesRepoUrl : snapshotsRepoUrl
 
             credentials {
-                username ossrhUsername
-                password ossrhPassword
+                username findProperty('ossrhUsername')
+                password findProperty('ossrhPassword')
             }
         }
     }
