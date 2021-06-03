@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
+import ch.fhnw.geiger.serialization.SerializerHelper;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import ch.fhnw.geiger.totalcross.Locale;
@@ -40,20 +41,20 @@ public class TestSerializer {
     StorageException se2 = StorageException.fromByteArrayStream(
         new ByteArrayInputStream(out.toByteArray()));
     assertEquals(se.getMessage(), se2.getMessage());
-    assertEquals("Stack traces not equal in size",se.getStackTrace().length,se2.getStackTrace().length);
-    for( int i=0; i<se.getStackTrace().length;i++) {
-      compareStackTraceElements(i,se.getStackTrace()[i], se2.getStackTrace()[i]);
+    assertEquals("Stack traces not equal in size", se.getStackTrace().length, se2.getStackTrace().length);
+    for (int i = 0; i < se.getStackTrace().length; i++) {
+      compareStackTraceElements(i, se.getStackTrace()[i], se2.getStackTrace()[i]);
     }
   }
 
-  private void compareStackTraceElements(int id,StackTraceElement se, StackTraceElement se2) {
-    assertEquals("array elements differ in classname of element ["+id+"]",
+  private void compareStackTraceElements(int id, StackTraceElement se, StackTraceElement se2) {
+    assertEquals("array elements differ in classname of element [" + id + "]",
         se.getClassName(), se2.getClassName());
-    assertEquals("array elements differ in filename of element ["+id+"]",
+    assertEquals("array elements differ in filename of element [" + id + "]",
         se.getFileName(), se2.getFileName());
-    assertEquals("array elements differ in methodname of element ["+id+"]",
+    assertEquals("array elements differ in methodname of element [" + id + "]",
         se.getMethodName(), se2.getMethodName());
-    assertEquals("array elements differ in line number of element ["+id+"]",
+    assertEquals("array elements differ in line number of element [" + id + "]",
         se.getLineNumber(), se2.getLineNumber());
   }
 
@@ -69,18 +70,18 @@ public class TestSerializer {
         se.getMessage(),
         se2.getMessage());
     assertEquals("Stack traces not equal in size",
-        se.getStackTrace().length,se2.getStackTrace().length);
-    for( int i=0; i<se.getStackTrace().length;i++) {
-      compareStackTraceElements(i,se.getStackTrace()[i],se2.getStackTrace()[i]);
+        se.getStackTrace().length, se2.getStackTrace().length);
+    for (int i = 0; i < se.getStackTrace().length; i++) {
+      compareStackTraceElements(i, se.getStackTrace()[i], se2.getStackTrace()[i]);
     }
     // testing stacktrace of cause
     assertEquals("verifying exception message",
         se.getCause().getMessage(),
         se2.getCause().getMessage());
     assertEquals("Stack traces not equal in size",
-        se.getCause().getStackTrace().length,se2.getCause().getStackTrace().length);
-    for( int i=0; i<se.getCause().getStackTrace().length;i++) {
-      compareStackTraceElements(i,se.getCause().getStackTrace()[i],se2.getCause().getStackTrace()[i]);
+        se.getCause().getStackTrace().length, se2.getCause().getStackTrace().length);
+    for (int i = 0; i < se.getCause().getStackTrace().length; i++) {
+      compareStackTraceElements(i, se.getCause().getStackTrace()[i], se2.getCause().getStackTrace()[i]);
     }
     // testing stacktrace of cause
     assertEquals("verifying exception message",
@@ -111,6 +112,14 @@ public class TestSerializer {
     assertEquals("verifying criteria equivalence", sc, sc2);
   }
 
-
-
+  @Test
+  public void testLongSerialization() throws Exception {
+    for (Long l1 : new Long[]{Long.MAX_VALUE, Long.MIN_VALUE, 0L, -1L, 1L}) {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      SerializerHelper.writeLong(out, l1);
+      Long l2 = SerializerHelper.readLong(
+          new ByteArrayInputStream(out.toByteArray()));
+      assertEquals("Failed testing long value " + l1, l1, l2);
+    }
+  }
 }

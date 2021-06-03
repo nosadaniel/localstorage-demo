@@ -1,5 +1,6 @@
 package ch.fhnw.geiger.totalcross;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -23,6 +24,19 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
       }
       return -1;
     }
+
+    public void close(Object o) throws IOException {
+      try {
+        Method m = o.getClass().getMethod("close",
+            new Class[]{});
+        m.invoke(o);
+      } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+        // FIXME insert proper logging/error handling (but should not be called anyway)
+        e.printStackTrace();
+      }
+    }
+
+    public abstract void close() throws IOException;
   }
 
   private class TcWrapper extends AbstractWrapper {
@@ -44,6 +58,11 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
 
     public int read(byte[] buf) {
       return read(obj, "readBytes", buf);
+    }
+
+    @Override
+    public void close() throws IOException{
+      close(obj);
     }
   }
 
@@ -69,6 +88,11 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
     public int read(byte[] buf) {
       return read(obj, "read", buf);
     }
+
+    @Override
+    public void close() throws IOException{
+      close(obj);
+    }
   }
 
   TcByteArrayInputStream is;
@@ -89,6 +113,11 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
   @Override
   public int read(byte[] buf) {
     return is.read(buf);
+  }
+
+  @Override
+  public void close() throws Exception {
+    is.close();
   }
 
 }

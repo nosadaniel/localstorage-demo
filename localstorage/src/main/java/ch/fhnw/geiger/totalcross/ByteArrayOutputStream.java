@@ -1,5 +1,6 @@
 package ch.fhnw.geiger.totalcross;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,7 +18,7 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
             new Class[]{byte[].class, int.class, int.class});
         m.invoke(o, buf, 0, buf.length);
       } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-        // FIXME insert proper logging/error handling (but should not be called
+        // FIXME insert proper logging/error handling (but should not be called anyway)
         e.printStackTrace();
       }
     }
@@ -28,12 +29,24 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
         byte[] buf = (byte[]) m.invoke(o);
         return buf;
       } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-        // FIXME insert proper logging/error handling (but should not be called
+        // FIXME insert proper logging/error handling (but should not be called anyway)
         e.printStackTrace();
       }
       return null;
     }
 
+    public void close(Object o) throws IOException {
+      try {
+        Method m = o.getClass().getMethod("close",
+            new Class[]{});
+        m.invoke(o);
+      } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+        // FIXME insert proper logging/error handling (but should not be called anyway)
+        e.printStackTrace();
+      }
+    }
+
+    public abstract void close() throws IOException;
   }
 
   private class TcWrapper extends AbstractWrapper {
@@ -60,6 +73,11 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     @Override
     public byte[] toByteArray() {
       return toByteArray(obj);
+    }
+
+    @Override
+    public void close() throws IOException{
+      close(obj);
     }
   }
 
@@ -90,6 +108,11 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     public byte[] toByteArray() {
       return toByteArray(obj);
     }
+
+    @Override
+    public void close() throws IOException{
+      close(obj);
+    }
   }
 
   TcByteArrayOutputStream is;
@@ -114,5 +137,11 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
   public byte[] toByteArray() {
     return is.toByteArray();
   }
+
+  @Override
+  public void close() throws Exception {
+    is.close();
+  }
+
 
 }

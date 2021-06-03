@@ -1,8 +1,6 @@
 package ch.fhnw.geiger.totalcross;
 
-import java.lang.reflect.InvocationTargetException;
-
-interface TcByteArrayInputStream {
+interface TcByteArrayInputStream extends AutoCloseable {
   /**
    * <p>Reads the next byte of data from this input stream.</p>
    *

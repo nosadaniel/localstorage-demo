@@ -1,6 +1,6 @@
 package ch.fhnw.geiger.totalcross;
 
-interface TcByteArrayOutputStream {
+interface TcByteArrayOutputStream extends AutoCloseable {
   /**
    * <p>Writes a byte array to the stream.</p>
    *
