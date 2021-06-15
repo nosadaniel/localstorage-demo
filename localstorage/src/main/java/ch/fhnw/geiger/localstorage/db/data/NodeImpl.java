@@ -517,19 +517,19 @@ public class NodeImpl implements Node {
     StringBuilder sb = new StringBuilder();
     sb.append(getPath());
     sb.append("[");
-    sb.append("owner=" + getOwner());
-    sb.append(";vis=" + getVisibility());
-    sb.append("]{" + System.lineSeparator());
+    sb.append("owner=").append(getOwner());
+    sb.append(";vis=").append(getVisibility());
+    sb.append("]{").append(System.lineSeparator());
     int i = 0;
     if (values != null) {
       for (Map.Entry<String, NodeValue> e : values.entrySet()) {
         if (i > 0) {
-          sb.append(", " + System.lineSeparator());
+          sb.append(", ").append(System.lineSeparator());
         }
         sb.append(e.getValue().toString("  "));
         i++;
       }
-      sb.append(System.lineSeparator() + "}");
+      sb.append(System.lineSeparator()).append("}");
     } else {
       sb.append("{}");
     }
