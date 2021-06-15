@@ -20,7 +20,6 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
         return bytesRead;
       } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
         // FIXME insert proper logging/error handling (but should not be called
-        e.printStackTrace();
       }
       return -1;
     }
@@ -79,7 +78,7 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
         Object[] arglist = new Object[]{buf};
         obj = ct.newInstance(arglist);
       } catch (Exception e) {
-        // FIXME insert proper logging/error handling (but should not be called
+        // FIXME insert proper logging/error handling (but should not be called anyways)
         e.printStackTrace();
       }
     }

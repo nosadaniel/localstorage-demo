@@ -47,6 +47,11 @@ public class System {
       }
     }
 
+    @Override
+    public long currentTimeMillis() {
+      return java.lang.System.currentTimeMillis();
+    }
+
 
   }
 
@@ -87,6 +92,18 @@ public class System {
         return null;
       }
     }
+
+    @Override
+    public long currentTimeMillis() {
+      try {
+        Method method = cls.getMethod("currentTimeMillis", new Class[]{});
+        return (long) (method.invoke(null));
+      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        // FIXME insert proper logging/error handling (but should not be called anyway)
+        e.printStackTrace();
+        return 0;
+      }
+    }
   }
 
   static TcSystem sys;
@@ -106,6 +123,10 @@ public class System {
 
   public static String lineSeparator() {
     return sys.lineSeparator();
+  }
+
+  public static long currentTimeMillis() {
+    return sys.currentTimeMillis();
   }
 
 }

@@ -9,4 +9,6 @@ public interface TcSystem {
 
   String lineSeparator();
 
+  long currentTimeMillis();
+
 }
