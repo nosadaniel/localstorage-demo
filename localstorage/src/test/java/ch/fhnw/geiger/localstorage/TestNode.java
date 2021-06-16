@@ -21,14 +21,14 @@ public class TestNode {
   }
 
   @Test
-  public void testNodeEquals() {
+  public void testNodeEquals() throws StorageException {
     NodeImpl node = new NodeImpl("name", "path");
     Node node2 = node.deepClone();
     assertEquals("test predefined owner", node, node2);
   }
 
   @Test
-  public void testNodeEqualsOrdinals() {
+  public void testNodeEqualsOrdinals() throws StorageException {
     NodeImpl node = new NodeImpl("name", "path");
     Node node2 = node.deepClone();
     node2.setOwner("newOwner");
@@ -36,7 +36,7 @@ public class TestNode {
   }
 
   @Test
-  public void testNodeEqualsChildren() {
+  public void testNodeEqualsChildren() throws StorageException {
     NodeImpl node = new NodeImpl("name", "path");
     Node node2 = node.deepClone();
     node2.addChild(new NodeImpl("name2", "path:name"));

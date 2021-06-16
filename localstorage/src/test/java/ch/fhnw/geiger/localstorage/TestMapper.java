@@ -32,7 +32,7 @@ public class TestMapper {
    * SetUp clean in memory db before each Test.
    */
   @BeforeClass
-  public static void setupClass() {
+  public static void setupClass() throws StorageException {
     // First test impplementation on dummy mapper
     mapperList.add(new DummyMapper());
     mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
@@ -55,7 +55,7 @@ public class TestMapper {
    * <p>Create test environment.</p>
    */
   @Before
-  public void setupTest() {
+  public void setupTest() throws StorageException {
     // clear all mappers
     for (StorageMapper mapper : mapperList) {
       mapper.zap();
@@ -74,7 +74,7 @@ public class TestMapper {
   }
 
   @Test
-  public void testAddRootNode() {
+  public void testAddRootNode() throws StorageException {
     for (StorageMapper mapper : mapperList) {
       System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
       }).getClass().getEnclosingMethod().getName());
@@ -88,7 +88,7 @@ public class TestMapper {
   }
 
   @Test
-  public void testAddRootNodeNull() {
+  public void testAddRootNodeNull() throws StorageException {
     for (StorageMapper mapper : mapperList) {
       System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
       }).getClass().getEnclosingMethod().getName());
@@ -131,7 +131,7 @@ public class TestMapper {
   }
 
   @Test
-  public void testAddRootNodeIllegalParent() {
+  public void testAddRootNodeIllegalParent() throws StorageException {
     for (StorageMapper mapper : mapperList) {
       mapper.add(new NodeImpl("na", ""));
       for (String parent : new String[]{":name:", "na:me", "name:", "::", ":na::"}) {
@@ -161,7 +161,7 @@ public class TestMapper {
   }
 
   @Test
-  public void testDuplicateAddNode() {
+  public void testDuplicateAddNode() throws StorageException {
     for (StorageMapper mapper : mapperList) {
       System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
       }).getClass().getEnclosingMethod().getName());
@@ -196,7 +196,7 @@ public class TestMapper {
   }
 
   @Test
-  public void testGetNode() {
+  public void testGetNode() throws StorageException {
     for (StorageMapper mapper : mapperList) {
       System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
       }).getClass().getEnclosingMethod().getName());
@@ -230,7 +230,7 @@ public class TestMapper {
   }
 
   @Test
-  public void testLocalePersistenceOnNode() {
+  public void testLocalePersistenceOnNode() throws StorageException {
     for (StorageMapper mapper : mapperList) {
       System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
       }).getClass().getEnclosingMethod().getName());

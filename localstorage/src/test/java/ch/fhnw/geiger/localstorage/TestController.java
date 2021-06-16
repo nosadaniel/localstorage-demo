@@ -15,6 +15,7 @@ import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
 import ch.fhnw.geiger.localstorage.db.mapper.DummyMapper;
 import java.util.Arrays;
 import java.util.Collections;
+import org.junit.Before;
 import org.junit.Test;
 
 /***
@@ -23,8 +24,20 @@ import org.junit.Test;
 public class TestController {
 
   // TODO add test reflecting the recursion for child nodes
-  public StorageController controller = new GenericController("testOwner", new DummyMapper());
 
+  private final static Object semaphore = new Object();
+  public GenericController controller = null;
+
+  @Before
+  public void setupTest() throws StorageException {
+    // clear all stored objects
+    synchronized (semaphore) {
+      if (controller == null) {
+        controller = new GenericController("testOwner", new DummyMapper());
+      }
+      controller.zap();
+    }
+  }
   @Test
   public void testOwnerUpdateOnNode() throws StorageException {
     System.out.println("## Testing controller in " + (new Object() {

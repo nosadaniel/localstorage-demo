@@ -21,12 +21,19 @@ import org.junit.Test;
 public class TestStorageListener {
 
 
-  public GenericController controller = new GenericController("testOwner", new DummyMapper());
+  private final static Object semaphore = new Object();
+
+  public GenericController controller = null;
 
   @Before
-  public void setupTest() {
+  public void setupTest() throws StorageException {
     // clear all stored objects
-    controller.zap();
+    synchronized (semaphore) {
+      if (controller == null) {
+        controller = new GenericController("testOwner", new DummyMapper());
+      }
+      controller.zap();
+    }
   }
 
 
@@ -34,7 +41,7 @@ public class TestStorageListener {
    * <p>Test the implementation if the register/deregister cycle works as expected.</p>
    */
   @Test
-  public void testRegisterDeRegisterListener() {
+  public void testRegisterDeRegisterListener() throws StorageException {
     final Node on = new NodeImpl("");
     StorageListener sl = (event, node1, node2) -> on.update(node1);
 
@@ -76,7 +83,7 @@ public class TestStorageListener {
    * <p>Test the implementation of basic search works as expected.</p>
    */
   @Test
-  public void testListenerForCreateRemoveBaseNode() throws InterruptedException {
+  public void testListenerForCreateRemoveBaseNode() throws StorageException, InterruptedException {
     final String testPath = ":searchtest1";
     final Node on = new NodeImpl("");
     final Node nn = new NodeImpl("");
@@ -137,7 +144,7 @@ public class TestStorageListener {
    */
   @Test
   public void testListenerForCreateRemoveSubNode()
-      throws ClassNotFoundException, InterruptedException {
+      throws StorageException, InterruptedException {
     final String testPath1 = ":Devices:testDevice1";
     final String testPath2 = ":Devices:testDevice2";
     final Object notifier = new Object();

@@ -1,5 +1,6 @@
 package ch.fhnw.geiger.totalcross;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -12,12 +13,14 @@ public class System {
   private static class TcWrapper implements TcSystem {
 
     Class<?> cls;
+    Class<?> tcls;
     String platform;
 
     public TcWrapper() {
       cls = Integer.class;
       try {
         cls = Class.forName("totalcross.sys.Settings");
+        tcls = Class.forName("totalcross.sys.Time");
         // FIXME: Implementation missing
         platform = "win";
         //platform = (String) (cls.getField("platform").get(null));
@@ -49,7 +52,16 @@ public class System {
 
     @Override
     public long currentTimeMillis() {
-      return java.lang.System.currentTimeMillis();
+      try {
+        Constructor<?> constructor = tcls.getConstructor( new Class[]{});
+        Object obj = constructor.newInstance(new Object[0]);
+        Method method = tcls.getMethod("getTime", new Class[]{});
+        return (long) (method.invoke(obj));
+      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
+        // FIXME insert proper logging/error handling (but should not be called anyway)
+        e.printStackTrace();
+        return 0;
+      }
     }
 
 

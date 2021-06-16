@@ -69,8 +69,10 @@ public interface StorageMapper {
    * @param path the fully qualified path to a node.
    * @param key  the key to be fetched
    * @return a representation of the node value
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  NodeValue getValue(String path, String key);
+  NodeValue getValue(String path, String key) throws StorageException;
 
   /**
    * <p>Renames or moves an existing node.</p>
@@ -79,7 +81,7 @@ public interface StorageMapper {
    * @param newPathOrName the new path of the node as fully qualified path or the new name of the
    *                      node
    * @throws StorageException if the new node already exists, the old node does not exist, the new
-   *                          parent nnode does not exist or the storage backed encountered
+   *                          parent node does not exist or the storage backed encountered
    *                          problems
    */
   void rename(String oldPath, String newPathOrName) throws StorageException;
@@ -106,6 +108,8 @@ public interface StorageMapper {
 
   /**
    * <p>Zaps the current database and discards all vaules.</p>
+   *
+   * @throws StorageException In case of problems regarding the storage
    */
-  void zap();
+  void zap() throws StorageException;
 }

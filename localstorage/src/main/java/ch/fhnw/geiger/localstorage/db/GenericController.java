@@ -55,8 +55,10 @@ public class GenericController implements StorageController, ChangeRegistrar {
    *
    * @param owner  the owner to be used for all requests
    * @param mapper the database mapper to use
+   *
+   * @throws StorageException In case of problems regarding the storage
    */
-  public GenericController(String owner, StorageMapper mapper) {
+  public GenericController(String owner, StorageMapper mapper) throws StorageException {
     this.owner = owner;
     this.mapper = mapper;
     this.mapper.setController(this);
@@ -257,15 +259,25 @@ public class GenericController implements StorageController, ChangeRegistrar {
     if (oldNode == null || !oldNode.equals(newNode)) {
       synchronized (listeners) {
         for (Map.Entry<SearchCriteria, StorageListener> e : listeners.entrySet()) {
-          if (
-              (
-                  oldNode != null && newNode != null
-                      && (e.getKey().evaluate(oldNode) || e.getKey().evaluate(newNode))
-              )
-                  || (oldNode != null && e.getKey().evaluate(oldNode))
-                  || (newNode != null && e.getKey().evaluate(newNode))
-          ) {
-            new Thread(() -> e.getValue().gotStorageChange(event, oldNode, newNode)).start();
+          try {
+            if (
+                (
+                    oldNode != null && newNode != null
+                        && (e.getKey().evaluate(oldNode) || e.getKey().evaluate(newNode))
+                )
+                    || (oldNode != null && e.getKey().evaluate(oldNode))
+                    || (newNode != null && e.getKey().evaluate(newNode))
+            ) {
+              new Thread(() -> {
+                try {
+                  e.getValue().gotStorageChange(event, oldNode, newNode);
+                } catch (StorageException storageException) {
+                  // FIXME do something sensible (should not happen anyway)
+                }
+              }).start();
+            }
+          }catch (StorageException se) {
+            // FIXME do something sensible (should not happen anyway)
           }
         }
       }
@@ -304,7 +316,7 @@ public class GenericController implements StorageController, ChangeRegistrar {
     }
   }
 
-  public void zap() {
+  public void zap() throws StorageException {
     mapper.zap();
     initMapper();
   }

@@ -78,14 +78,18 @@ public interface Node extends Serializer {
    *
    * @param key the key to be looked up
    * @return the requested value or null if not found
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  NodeValue getValue(String key);
+  NodeValue getValue(String key) throws StorageException;
 
   /**
    * <p>Update a specific value of the node.</p>
    *
    * @param value the key to be updated
    * @return the requested value or null if not found
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   NodeValue updateValue(NodeValue value) throws StorageException;
 
@@ -94,8 +98,10 @@ public interface Node extends Serializer {
    *
    * @param key the key of the value to be removed
    * @return the removed node value or null if not found
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  NodeValue removeValue(String key);
+  NodeValue removeValue(String key) throws StorageException;
 
   /**
    * <p>Get a deep copy of all values stored in the node.</p>
@@ -108,16 +114,20 @@ public interface Node extends Serializer {
    * <p>Adds a child node to this node.</p>
    *
    * @param node the child node to be added
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  void addChild(Node node);
+  void addChild(Node node) throws StorageException;
 
   /***
    * <p>Gets a child node from the current node.</p>
    *
    * @param name the name of the child node to fetch
    * @return the requested child node or null if the node does not exist
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  Node getChild(String name);
+  Node getChild(String name) throws StorageException;
 
 
   /***
@@ -131,10 +141,19 @@ public interface Node extends Serializer {
    * <p>Get a map of all existing child nodes.</p>
    *
    * @return the map containing all child nodes
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  Map<String, Node> getChildren();
+  Map<String, Node> getChildren() throws StorageException;
 
-  String getChildNodesCsv();
+  /**
+   * <p>Gets the child nodes as CVS export.</p>
+   *
+   * @return A string representing the nodes as CVS
+   *
+   * @throws StorageException if the storage backend encounters a problem
+   */
+  String getChildNodesCsv() throws StorageException;
 
   /**
    * <p>Returns true if the current node is not yet materialized.</p>
@@ -162,14 +181,18 @@ public interface Node extends Serializer {
    * <p>Update all data of the node with the data of the given node.</p>
    *
    * @param n2 the node whose values should be copied
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  void update(Node n2);
+  void update(Node n2) throws StorageException;
 
   /**
    * <p>Create a deeep clone of the current node.</p>
    *
    * @return the cloned node
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  NodeImpl deepClone();
+  NodeImpl deepClone() throws StorageException;
 
 }

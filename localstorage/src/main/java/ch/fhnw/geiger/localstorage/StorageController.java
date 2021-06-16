@@ -15,6 +15,8 @@ public interface StorageController {
    *
    * @param path the path of the node to be fetched
    * @return The requested node
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   Node get(String path) throws StorageException;
 
@@ -22,6 +24,8 @@ public interface StorageController {
    * <p>Add StorageNode to data.</p>
    *
    * @param node is the node to add
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   void add(Node node) throws StorageException;
 
@@ -29,6 +33,8 @@ public interface StorageController {
    * <p>Update a StorageNode inside the data.</p>
    *
    * @param node is the node to updated
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   void update(Node node) throws StorageException;
 
@@ -37,6 +43,8 @@ public interface StorageController {
    *
    * @param path the name of the starage node to be removed
    * @return the removed node or null if node doesn't exist
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   Node delete(String path) throws StorageException;
 
@@ -48,6 +56,8 @@ public interface StorageController {
    *
    * @param oldPath the old path of the node
    * @param newName the new name or new path of the node
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   void rename(String oldPath, String newName) throws StorageException;
 
@@ -67,6 +77,8 @@ public interface StorageController {
    *
    * @param path  the path of the node to add the value
    * @param value the NodeValueObject to add
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   void addValue(String path, NodeValue value) throws StorageException;
 
@@ -80,6 +92,8 @@ public interface StorageController {
    *
    * @param nodeName the node to update
    * @param value    the new NodeValueObject used for updating
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   void updateValue(String nodeName, NodeValue value) throws StorageException;
 
@@ -93,6 +107,8 @@ public interface StorageController {
    * @param path the path to the node
    * @param key  the key to be removed from the value
    * @return the removed node value
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   NodeValue deleteValue(String path, String key) throws StorageException;
 
@@ -101,16 +117,22 @@ public interface StorageController {
    *
    * @param criteria a list of SearchCriteria
    * @return List of StorageNodes, list could be empty
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   List<Node> search(SearchCriteria criteria) throws StorageException;
 
   /**
    * <p>Closes all database connections and flushes the content.</p>
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   void close() throws StorageException;
 
   /**
    * <p>Flushes all values to the backend.</p>
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
   void flush() throws StorageException;
 
@@ -118,6 +140,8 @@ public interface StorageController {
    * <p>Clear the entire storage.</p>
    *
    * <p>Handle with care... there is no undo function.</p>
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  void zap();
+  void zap() throws StorageException;
 }

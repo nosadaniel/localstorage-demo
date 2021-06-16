@@ -52,13 +52,13 @@ public class NodeImpl implements Node {
     skeleton.set(true);
     try {
       set(Field.PATH, path);
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
     this.controller = controller;
   }
 
-  private NodeImpl(Node node) {
+  private NodeImpl(Node node) throws StorageException {
     update(node);
   }
 
@@ -95,7 +95,7 @@ public class NodeImpl implements Node {
     try {
       set(Field.PATH, parent + GenericController.PATH_DELIMITER + name);
       set(Field.VISIBILITY, vis.toString());
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
     this.skeleton.set(false);
@@ -146,7 +146,7 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public NodeValue getValue(String key) {
+  public NodeValue getValue(String key) throws StorageException {
     init();
     synchronized (values) {
       NodeValue ret = values.get(key);
@@ -182,7 +182,7 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public NodeValue removeValue(String key) {
+  public NodeValue removeValue(String key) throws StorageException {
     init();
     synchronized (values) {
       return values.remove(key);
@@ -190,7 +190,7 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public void addChild(Node node) {
+  public void addChild(Node node) throws StorageException {
     init();
     synchronized (childNodes) {
       if (!childNodes.containsKey(node.getName())) {
@@ -203,7 +203,7 @@ public class NodeImpl implements Node {
   public String getOwner() {
     try {
       return get(Field.OWNER);
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
@@ -215,7 +215,7 @@ public class NodeImpl implements Node {
     }
     try {
       return set(Field.OWNER, newOwner);
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
@@ -224,7 +224,7 @@ public class NodeImpl implements Node {
   public String getName() {
     try {
       return getNameFromPath(get(Field.PATH));
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
@@ -233,7 +233,7 @@ public class NodeImpl implements Node {
   public String getParentPath() {
     try {
       return getParentFromPath(get(Field.PATH));
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
@@ -242,7 +242,7 @@ public class NodeImpl implements Node {
   public String getPath() {
     try {
       return get(Field.PATH);
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
@@ -255,7 +255,7 @@ public class NodeImpl implements Node {
         ret = Visibility.RED;
       }
       return ret;
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
@@ -264,7 +264,7 @@ public class NodeImpl implements Node {
   public Visibility setVisibility(Visibility newVisibility) {
     try {
       return Visibility.valueOf(set(Field.VISIBILITY, newVisibility.toString()));
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
@@ -280,9 +280,9 @@ public class NodeImpl implements Node {
    *
    * @param field the ordinal field to get
    * @return the currently set value
-   * @throws ClassNotFoundException if a field does not exist
+   * @throws StorageException if a field does not exist
    */
-  public String get(Field field) throws ClassNotFoundException {
+  public String get(Field field) throws StorageException {
     synchronized (skeleton) {
       if (field != Field.PATH && field != Field.NAME) {
         init();
@@ -297,7 +297,7 @@ public class NodeImpl implements Node {
       case NAME:
         return getNameFromPath(ordinals.get(Field.PATH));
       default:
-        throw new ClassNotFoundException("unable to fetch field " + field);
+        throw new StorageException("unable to fetch field " + field);
     }
   }
 
@@ -307,9 +307,9 @@ public class NodeImpl implements Node {
    * @param field the ordinal field to be set
    * @param value the new value
    * @return the previously set value
-   * @throws ClassNotFoundException if a field does not exist
+   * @throws StorageException if a field does not exist
    */
-  public String set(Field field, String value) throws ClassNotFoundException {
+  public String set(Field field, String value) throws StorageException {
     // materialize node if required
     synchronized (skeleton) {
       if (field != Field.PATH) {
@@ -333,7 +333,7 @@ public class NodeImpl implements Node {
       case LAST_MODIFIED:
         return ordinals.put(field, value);
       default:
-        throw new ClassNotFoundException("unable to set field " + field);
+        throw new StorageException("unable to set field " + field);
     }
   }
 
@@ -347,7 +347,7 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public Map<String, Node> getChildren() {
+  public Map<String, Node> getChildren() throws StorageException {
     init();
 
     // copy inner structure
@@ -363,13 +363,13 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public Node getChild(String name) {
+  public Node getChild(String name) throws StorageException {
     init();
     return childNodes.get(name);
   }
 
   @Override
-  public String getChildNodesCsv() {
+  public String getChildNodesCsv() throws StorageException {
     init();
     if (childNodes.size() == 0) {
       return "";
@@ -410,8 +410,13 @@ public class NodeImpl implements Node {
     // check if one of the nodes is materialized
     if (!isSkeleton() || (isSkeleton() && !n2.isSkeleton())) {
       // materialize both nodes
-      init();
-      n2.init();
+      try {
+        init();
+        n2.init();
+      } catch (StorageException se) {
+        // should not happen
+        // FIXME throw exception to logger
+      }
 
       // compare ordinals
       if (ordinals.size() != n2.ordinals.size()) {
@@ -432,7 +437,12 @@ public class NodeImpl implements Node {
         return false;
       }
       for (Map.Entry<String, NodeValue> e : values.entrySet()) {
-        if (!e.getValue().equals(n2.getValue(e.getKey()))) {
+        try {
+          if (!e.getValue().equals(n2.getValue(e.getKey()))) {
+            return false;
+          }
+        } catch (StorageException se) {
+          //FIXME do logging here (should not happen)
           return false;
         }
       }
@@ -462,7 +472,7 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public void update(Node n2) {
+  public void update(Node n2) throws StorageException  {
 
     // copy basic values
     this.controller = n2.getController();
@@ -504,7 +514,7 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public NodeImpl deepClone() {
+  public NodeImpl deepClone() throws StorageException {
     return new NodeImpl(this);
   }
 

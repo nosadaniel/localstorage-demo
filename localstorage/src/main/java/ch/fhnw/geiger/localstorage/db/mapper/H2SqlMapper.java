@@ -78,8 +78,10 @@ public class H2SqlMapper extends AbstractMapper {
    * @param jdbcUrl      the url to connect to
    * @param jdbcUsername the username of the database
    * @param jdbcPassword the password of the database
+   *
+   * @throws StorageException In case of problems regarding the storage
    */
-  public H2SqlMapper(String jdbcUrl, String jdbcUsername, String jdbcPassword) {
+  public H2SqlMapper(String jdbcUrl, String jdbcUsername, String jdbcPassword) throws StorageException {
     // Connect to the database
     this.jdbcUrl = jdbcUrl;
     this.jdbcUsername = jdbcUsername;
@@ -101,7 +103,7 @@ public class H2SqlMapper extends AbstractMapper {
     this.controller = controller;
   }
 
-  private void initialize() {
+  private void initialize() throws StorageException {
     try {
       conn = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
       conn.prepareStatement(initString).executeUpdate();
@@ -196,7 +198,7 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public void add(Node node) {
+  public void add(Node node) throws StorageException {
     checkPath(node);
     // TODO This seems like bad coding, as we expect an exception to be thrown from
     // get as only node are added which do not exist yet
@@ -240,7 +242,7 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public void update(Node node) {
+  public void update(Node node) throws StorageException {
     checkPath(node);
     get(node.getPath()); // checks if node exists, throws storage exception if not exists
 
@@ -295,7 +297,7 @@ public class H2SqlMapper extends AbstractMapper {
     delete(oldPath);
   }
 
-  private void addValue(String path, NodeValue value) {
+  private void addValue(String path, NodeValue value) throws StorageException {
     checkPath(path);
     if (value == null) {
       throw new NullPointerException();
@@ -358,7 +360,7 @@ public class H2SqlMapper extends AbstractMapper {
     }
   }
 
-  private NodeValue deleteValue(String path, String key) {
+  private NodeValue deleteValue(String path, String key) throws StorageException {
     if (key == null || "".equals(path)) {
       throw new NullPointerException();
     }
@@ -396,7 +398,7 @@ public class H2SqlMapper extends AbstractMapper {
     return value;
   }
 
-  private void updateValue(String path, NodeValue value) {
+  private void updateValue(String path, NodeValue value) throws StorageException {
     checkPath(path);
     if (value == null || "".equals(path)) {
       throw new NullPointerException();
@@ -412,7 +414,7 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public NodeImpl delete(String path) {
+  public NodeImpl delete(String path) throws StorageException {
     NodeImpl oldNode = get(path);
     if (!"".equals(oldNode.getChildNodesCsv())) {
       throw new StorageException("Node does have childs... cannot remove " + oldNode.getName());
@@ -443,7 +445,7 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public NodeValue getValue(String path, String key) {
+  public NodeValue getValue(String path, String key) throws StorageException {
     if ("".equals(path) || "".equals(key)) {
       throw new NullPointerException();
     }
@@ -501,7 +503,7 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public List<Node> search(SearchCriteria criteria) {
+  public List<Node> search(SearchCriteria criteria) throws StorageException {
     String sqlNodeSearch = "SELECT path,owner,name,visibility,children FROM storage_node "
         + "WHERE (path = ? and owner = ? and name = ? and visibility = ?)";
     String sqlValueSearch = "SELECT path,key,value,type,locale,last_modified "
@@ -581,7 +583,7 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public void zap() {
+  public void zap() throws StorageException {
     // Usually Truncate would be used, but it does not work with referenced tables
     String sqlStatement1 = "DELETE FROM storage_node";
     String sqlStatement2 = "DELETE FROM node_value";

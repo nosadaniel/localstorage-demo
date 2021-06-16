@@ -108,8 +108,10 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
    *
    * @param node the node to be evalueated
    * @return true iif the node matches the criteria
+   *
+   * @throws StorageException if the storage backend encounters a problem
    */
-  public boolean evaluate(Node node) {
+  public boolean evaluate(Node node) throws StorageException {
     // evaluate node criteria
     try {
       // node path is a sub tree search
@@ -122,7 +124,7 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
           return false;
         }
       }
-    } catch (ClassNotFoundException e) {
+    } catch (StorageException e) {
       throw new RuntimeException("OOPS! This was deemed to be impossible... "
           + "please check with developer", e);
     }
