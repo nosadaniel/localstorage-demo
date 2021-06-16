@@ -15,6 +15,7 @@ import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
 import ch.fhnw.geiger.localstorage.db.mapper.DummyMapper;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -334,4 +335,33 @@ public class TestController {
             () -> controller.getValue(":renameTests:name2:name21", "key21"));
   }
 
+  @Test
+  public void testGetChildrenForEach() throws StorageException {
+    Node base = new NodeImpl("baseNode");
+    Node childNode = new NodeImpl("childNode", ":baseNode");
+
+    NodeValue threat = new NodeValueImpl("name", "Malware");
+    NodeValue name = new NodeValueImpl("GEIGER_threat", "Malware");
+
+    childNode.addValue(threat);
+    childNode.addValue(name);
+    controller.add(base);
+    controller.add(childNode);
+
+    Node threatsGlobalNode = controller.get(":baseNode");
+    for (Map.Entry<String, Node> entry : threatsGlobalNode.getChildren().entrySet()) {
+      //key  is threat UUID, value is node path
+      String nodeName = entry.getKey();
+      assertEquals("checking nodename", "childNode", nodeName);
+
+      NodeValue threat_name = entry.getValue().getValue("name");
+      assertEquals("checking first NodeValue", threat, threat_name);
+
+      NodeValue GEIGERThreat = entry.getValue().getValue("GEIGER_threat");
+      assertEquals("checking second NodeValue", name, GEIGERThreat);
+
+      assertEquals("checking values", threat_name.getValue("en"),
+          GEIGERThreat.getValue("en"));
+    }
+  }
 }
