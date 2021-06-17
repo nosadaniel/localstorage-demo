@@ -106,7 +106,7 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
   /**
    * <p>Evaluates a provided node against this criteria.</p>
    *
-   * @param node the node to be evalueated
+   * @param node the node to be evaluated
    * @return true iif the node matches the criteria
    *
    * @throws StorageException if the storage backend encounters a problem
@@ -272,7 +272,7 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
     if (!(o instanceof SearchCriteria)) {
       return false;
     }
-    return toString().equals(((SearchCriteria) (o)).toString());
+    return toString().equals(o.toString());
   }
 
 }

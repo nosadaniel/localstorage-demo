@@ -29,7 +29,7 @@ public class SwitchableBoolean {
   }
 
   /**
-   * <p>gets the curently set value.</p>
+   * <p>gets the currently set value.</p>
    *
    * @return the currently set value
    */

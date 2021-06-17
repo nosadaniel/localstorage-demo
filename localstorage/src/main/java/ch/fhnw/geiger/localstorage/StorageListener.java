@@ -8,7 +8,7 @@ import ch.fhnw.geiger.localstorage.db.data.Node;
 public interface StorageListener {
 
   /***
-   * <p>Event listener for all starge node changes.</p>
+   * <p>Event listener for all storage node changes.</p>
    *
    * @param event the type of event causing the call
    * @param oldNode the old node content

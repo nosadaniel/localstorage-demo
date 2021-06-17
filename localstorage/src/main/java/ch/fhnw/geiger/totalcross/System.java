@@ -34,7 +34,7 @@ public class System {
     @Override
     public String getProperty(String property) {
       if ("os.name".equals(property)) {
-        return (String) platform;
+        return platform;
       } else {
         return null;
       }

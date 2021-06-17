@@ -31,7 +31,7 @@ public class NodeValueImpl implements NodeValue {
    */
   private String key;
 
-  private Map<Locale, String> value = new HashMap<>();
+  private final Map<Locale, String> value = new HashMap<>();
 
   /**
    * <p>The type of the value.</p>>
@@ -41,7 +41,7 @@ public class NodeValueImpl implements NodeValue {
   /**
    * Description of this value, can be used for translation.
    */
-  private Map<Locale, String> description = new HashMap<>();
+  private final Map<Locale, String> description = new HashMap<>();
 
   /**
    * Defines the epoch when this value was last modified.
@@ -235,25 +235,26 @@ public class NodeValueImpl implements NodeValue {
   public String toString(String prefix) {
     StringBuilder sb = new StringBuilder();
     // build head of value
-    sb.append(prefix + getKey());
+    sb.append(prefix).append(getKey());
     if (getType() != null) {
-      sb.append(":" + getType());
+      sb.append(":").append(getType());
     }
     // build values
     sb.append("={");
     if (value.size() == 1) {
-      sb.append(DEFAULT_LOCALE + "=>\"" + value.get(DEFAULT_LOCALE) + "\"}");
+      sb.append(DEFAULT_LOCALE).append("=>\"").append(value.get(DEFAULT_LOCALE)).append("\"}");
     } else {
       sb.append(System.lineSeparator());
       int i = 0;
       for (Locale l : new TreeSet<>(value.keySet())) {
         if (i > 0) {
-          sb.append("," + System.lineSeparator());
+          sb.append(",").append(System.lineSeparator());
         }
-        sb.append(prefix + "  " + l.toLanguageTag() + "=>\"" + value.get(l) + "\"");
+        sb.append(prefix).append("  ").append(l.toLanguageTag()).append("=>\"")
+            .append(value.get(l)).append("\"");
         i++;
       }
-      sb.append(System.lineSeparator() + prefix + "}");
+      sb.append(System.lineSeparator()).append(prefix).append("}");
       // build description
 
     }

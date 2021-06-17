@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Vector;
 
 /**
- * <p>A non-persisting dummy maper for test purposes.</p>
+ * <p>A non-persisting dummy mapper for test purposes.</p>
  */
 public class DummyMapper extends AbstractMapper {
 
@@ -109,7 +109,7 @@ public class DummyMapper extends AbstractMapper {
         throw new StorageException("Node does not exist");
       }
       if (!"".equals(nodes.get(nodeName).getChildNodesCsv())) {
-        throw new StorageException("Node does have childs... cannot remove " + nodeName);
+        throw new StorageException("Node does have children... cannot remove " + nodeName);
       }
       Node n = nodes.remove(nodeName);
       if (n.getParentPath() != null && !"".equals(n.getParentPath())) {

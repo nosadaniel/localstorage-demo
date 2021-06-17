@@ -417,7 +417,7 @@ public class H2SqlMapper extends AbstractMapper {
   public NodeImpl delete(String path) throws StorageException {
     NodeImpl oldNode = get(path);
     if (!"".equals(oldNode.getChildNodesCsv())) {
-      throw new StorageException("Node does have childs... cannot remove " + oldNode.getName());
+      throw new StorageException("Node does have children... cannot remove " + oldNode.getName());
     }
 
     // remove values

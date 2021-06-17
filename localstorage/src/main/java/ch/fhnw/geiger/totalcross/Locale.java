@@ -40,8 +40,8 @@ public class Locale implements Comparable<Locale> {
      * Parses a String and creates LanguageRange.
      * TODO what does this do?
      *
-     * @param expression String expresseion to be parsed.
-     * @return List of LangageRanges
+     * @param expression String expression to be parsed.
+     * @return List of LanguageRanges
      */
     public static List<LanguageRange> parse(String expression) {
       Set<LanguageRange> ret = new TreeSet<>();
@@ -54,8 +54,7 @@ public class Locale implements Comparable<Locale> {
           ret.add(new LanguageRange(chunkElements[0], 1.0));
         }
       }
-      List<LanguageRange> ret2 = new ArrayList<>();
-      ret2.addAll(ret);
+      List<LanguageRange> ret2 = new ArrayList<>(ret);
       return ret2;
     }
 
@@ -82,7 +81,7 @@ public class Locale implements Comparable<Locale> {
   /**
    * Locale constructor.
    *
-   * @param language String representatio of language
+   * @param language String representation of language
    */
   public Locale(String language) {
     String[] chunks = language.split("\\-");
@@ -125,7 +124,7 @@ public class Locale implements Comparable<Locale> {
   /**
    * Filter the Locales.
    *
-   * @param priorityList list of available languaeranges
+   * @param priorityList list of available LanguageRanges
    * @param locales collection of locales
    * @return filtered list of Locales
    */
@@ -161,7 +160,7 @@ public class Locale implements Comparable<Locale> {
   }
 
   /**
-   * Determing if the two objects are equal.
+   * Determine if the two objects are equal.
    *
    * @param obj object to compare to
    * @return true if the objects are equal, false otherwise
