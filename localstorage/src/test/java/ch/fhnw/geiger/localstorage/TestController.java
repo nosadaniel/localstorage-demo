@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Ignore;
-import java.util.Map;
-import org.junit.Before;
 import org.junit.Test;
 
 /***
@@ -366,35 +364,12 @@ public class TestController {
       );
       controller.add(threat);
     }
-
     System.out.println();
-
-    Map<String, String> uuid2Threat = new HashMap();
-
     threats = controller.get(":GlobalN");
 
-    Assert.assertEquals("Checking that main is not skeletonized", false, threats.isSkeleton());
+    Assert.assertFalse("Checking that main is not skeletonized", threats.isSkeleton());
     Assert.assertEquals("Checking that child nodes are included", 2, threats.getChildren().size());
     Assert.assertEquals("Checking that child nodes are included in CVS", 2, threats.getChildNodesCsv().split(",").length);
-
-    // checking to String for skeletonized children
-    for (Node n : threats.getChildren().values()) {
-      System.out.println(n.toString());
-      Assert.assertTrue("Checking that toString() does not modify skeletonized objects", n.toString().contains("<skeletonized>"));
-    }
-
-    for (Map.Entry<String, Node> childThreat : threats.getChildren().entrySet()) {
-      String threatUUID = childThreat.getKey();
-      System.out.println("processing " + threatUUID);
-      String threatName = childThreat.getValue().getValue("name").getValue();
-      String geigerThreat = childThreat.getValue().getValue("GEIGER_threat").getValue();
-      System.out.println("threat_name" + threatName); //print threat name
-      if (threatName.equals(geigerThreat)) {
-        uuid2Threat.put(threatUUID, threatName);
-      }
-
-    }
-
   }
 
   @Test
@@ -402,32 +377,28 @@ public class TestController {
     StorageController controller = getController();
     Node n = new NodeImpl(":TestNode", null,
         new NodeValue[]{
-          new NodeValueImpl("key1","value1")
+            new NodeValueImpl("key1", "value1")
         },
         new Node[]{
             new NodeImpl(":TestNode:node1"),
             new NodeImpl(":TestNode:node2"),
             new NodeImpl(":TestNode:node3"),
-            new NodeImpl(":TestNode:node4",controller)
+            new NodeImpl(":TestNode:node4", controller)
         }
     );
     Assert.assertTrue("Failed writing first time (wrong return value)", controller.addOrUpdate(n));
     Assert.assertEquals("Failed writing first time. Failed to compare written to provided node", n, controller.get(n.getPath()));
-    for(int i=1;i<4;i++) {
+    for (int i = 1; i < 4; i++) {
       Assert.assertEquals("Failed writing first time. Failed to compare written to provided node", ":TestNode:node" + i, controller.get(":TestNode:node" + i).getPath());
     }
     try {
       controller.get(":TestNode:node4");
       fail("expected Exception when getting a skeletonized reply");
-    } catch(StorageException se) {
+    } catch (StorageException se) {
       // expected result
-    } catch(Exception e) {
+    } catch (Exception e) {
       fail("expected StorageException when getting a skeletonized reply");
     }
     Assert.assertFalse("Failed writing first time (wrong return value)", controller.addOrUpdate(n));
-  }
-
-
-}
   }
 }
