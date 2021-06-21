@@ -17,6 +17,7 @@ import ch.fhnw.geiger.localstorage.db.mapper.H2SqlMapper;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -194,9 +195,45 @@ public class TestController {
   }
 
   @Test
-  @Ignore
-  public void testStorageNodeSearch() {
+  public void testStorageNodeSearch() throws StorageException {
+    StorageController controller = getController();
 
+    controller.add(
+        new NodeImpl(":parent1", null,
+            new NodeValue[]{
+                new NodeValueImpl("parentKey", "parentValue")
+            },
+            new Node[]{
+                new NodeImpl(":parent1:child0", null,
+                    new NodeValueImpl[0],
+                    new Node[] {
+                        new NodeImpl(":parent1:child0:empty")
+                    }
+                ),
+                new NodeImpl(":parent1:child1", null,
+                    new NodeValue[] {
+                        new NodeValueImpl("name1","value1")
+                    },
+                    new Node[0]
+                )
+            }
+        )
+    );
+
+    SearchCriteria criteria = new SearchCriteria(":parent1", "name1", null);
+    testcaseSearchCriteria("searching single child node",controller,criteria,new String[] {":parent1:child1"});
+
+    criteria = new SearchCriteria(":parent1:child0", "name1", null);
+    testcaseSearchCriteria("searching single child node in a sub branch without matching node",controller,criteria,new String[] {});
+  }
+
+  private static void testcaseSearchCriteria(String caseName,StorageController controller, SearchCriteria criteria,String[] paths) throws StorageException {
+    List<Node> result = controller.search(criteria);
+    List l = Arrays.asList(paths);
+    Assert.assertEquals("("+caseName+") Bad number of results returned", paths.length, result.size());
+    for(Node n:result) {
+      Assert.assertTrue("("+caseName+") Unable to find expected Node ",l.contains(n.getPath()));
+    }
   }
 
   @Test

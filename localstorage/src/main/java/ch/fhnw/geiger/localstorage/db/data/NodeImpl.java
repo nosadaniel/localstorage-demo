@@ -536,7 +536,10 @@ public class NodeImpl implements Node {
 
   @Override
   public void update(Node n2) throws StorageException {
+    update(n2, true);
+  }
 
+  private void update(Node n2, boolean deepClone) throws StorageException {
     // copy basic values
     this.controller = n2.getController();
     this.skeleton.set(n2.isSkeleton());
@@ -566,7 +569,12 @@ public class NodeImpl implements Node {
       synchronized (childNodes) {
         childNodes.clear();
         for (Map.Entry<String, Node> e : n2.getChildren().entrySet()) {
-          childNodes.put(e.getKey(), e.getValue().deepClone());
+          if (deepClone) {
+            childNodes.put(e.getKey(), e.getValue().deepClone());
+          } else {
+            // FIXME no tombstone or expiry support
+            childNodes.put(e.getKey(), new NodeImpl(e.getValue().getPath(), this.controller));
+          }
         }
       }
     }
@@ -577,8 +585,18 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public NodeImpl deepClone() throws StorageException {
+  public Node deepClone() throws StorageException {
     return new NodeImpl(this);
+  }
+
+  @Override
+  public Node shallowClone() throws StorageException {
+    NodeImpl ret = new NodeImpl(getPath());
+
+    // making a shallow update on empty node
+    ret.update(this, false);
+
+    return ret;
   }
 
   public void touch() {

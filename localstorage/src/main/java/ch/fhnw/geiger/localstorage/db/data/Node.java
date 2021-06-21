@@ -188,11 +188,21 @@ public interface Node extends Serializer {
   void update(Node n2) throws StorageException;
 
   /**
-   * <p>Create a deeep clone of the current node.</p>
+   * <p>Create a deep clone of the current node.</p>
    *
    * @return the cloned node
    * @throws StorageException if the storage backend encounters a problem
    */
-  NodeImpl deepClone() throws StorageException;
+  Node deepClone() throws StorageException;
+
+  /**
+   * <p>Create a shallow clone of the current node.</p>
+   *
+   * <p>any children of the node are included skeletoized.</p>
+   *
+   * @return the cloned node
+   * @throws StorageException if the storage backend encounters a problem
+   */
+  Node shallowClone() throws StorageException;
 
 }

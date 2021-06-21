@@ -21,12 +21,10 @@ import java.util.TreeSet;
  * <p>Each criteria can either be set or left blank the search will match all
  * nonempty criteria.
  * </p>
- *
- * <p>TODO: add recursion support</p>
  */
 public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
 
-  private static final long serialversionUID = 87128319541L; // TODO generate serialversionUID
+  private static final long serialversionUID = 87128319541L;
 
   /**
    * <p>Defines the type of comparator to be used when accessing an ordinal.</p>
@@ -35,6 +33,17 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
     STRING,
     DATETIME,
     BOOLEAN
+  }
+
+  public SearchCriteria() {
+  }
+
+  public SearchCriteria(String path, String key, String value) {
+    setNodePath(path);
+    setNodeValueKey(key);
+    if (value != null && !"%".equals(value)) {
+      setNodeValueValue(value);
+    }
   }
 
   private final Map<Field, String> values = new HashMap<>();
@@ -109,14 +118,13 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
    *
    * @param node the node to be evaluated
    * @return true iif the node matches the criteria
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   public boolean evaluate(Node node) throws StorageException {
     // evaluate node criteria
     try {
       // node path is a sub tree search
-      if (!getNodePath().startsWith(getNodePath())) {
+      if (!node.getPath().startsWith(getNodePath())) {
         return false;
       }
       // compare other ordinals
