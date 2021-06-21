@@ -436,9 +436,11 @@ public class H2SqlMapper extends AbstractMapper {
     }
 
     // remove reference from parent
-    NodeImpl parentNode = get(oldNode.getParentPath());
-    parentNode.removeChild(oldNode.getName());
-    update(parentNode);
+    if(!"".equals(oldNode.getParentPath())) {
+      NodeImpl parentNode = get(oldNode.getParentPath());
+      parentNode.removeChild(oldNode.getName());
+      update(parentNode);
+    }
 
     // return node
     return oldNode;

@@ -203,7 +203,6 @@ public class TestMapper {
       Node node = new NodeImpl("testNode1", "");
       Node childNode = new NodeImpl("testNode1a", ":testNode1");
       NodeValue nv = new NodeValueImpl("key", "value", "type", "description", 1);
-      node.addChild(childNode);
       node.addValue(nv);
 
       // write data
@@ -211,6 +210,7 @@ public class TestMapper {
       mapper.add(node);
       mapper.add(node2);
       mapper.add(childNode);
+      node.addChild(childNode);
 
       // get data
       Node storedNode = mapper.get(":testNode1");
@@ -240,9 +240,8 @@ public class TestMapper {
       nv.setDescription("Schwiizertüütschi Beschriibig", new Locale("de", "ch"));
       nv.setValue("Wert", Locale.GERMAN);
       nv.setValue("Au ä Wert", new Locale("de", "ch"));
-      Node node = new NodeImpl("testNode1", "");
-      Node childNode = new NodeImpl("testNode1a", ":testNode1");
-      node.addChild(childNode);
+      Node node = new NodeImpl(":testNode1");
+      Node childNode = new NodeImpl(":testNode1:testNode1a");
       node.addValue(nv);
       System.out.println("## Stored " + node);
 
@@ -251,6 +250,8 @@ public class TestMapper {
       mapper.add(node);
       mapper.add(node2);
       mapper.add(childNode);
+
+      node.addChild(childNode);
 
       // get data
       Node storedNode = mapper.get(":testNode1");
@@ -267,6 +268,13 @@ public class TestMapper {
       assertEquals("comparing child node", childNode, storedChildNode);
       assertEquals("comparing parent node2", node2, storedNode2);
       assertEquals("checking for child node count", 1, storedNode.getChildren().size());
+
+      node.removeChild(childNode.getName());
+      mapper.delete(childNode.getPath());
+
+      mapper.delete(node.getPath());
+
+      mapper.delete(node2.getPath());
     }
   }
 }

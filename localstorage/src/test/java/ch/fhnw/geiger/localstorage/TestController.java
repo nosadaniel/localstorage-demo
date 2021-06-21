@@ -180,13 +180,13 @@ public class TestController {
   @Test
   public void testStorageNodeRemoveWithChild() throws StorageException {
     StorageController controller = getController();
-    controller.add(new NodeImpl("parent1", ""));
+    controller.addOrUpdate(new NodeImpl("parent1", ""));
     NodeImpl node = new NodeImpl("name1", ":parent1");
     // add child
     NodeImpl childNode = new NodeImpl("child1", ":parent1:name1");
     node.addChild(childNode);
-    controller.add(node);
-    controller.add(childNode);
+    controller.addOrUpdate(node);
+    controller.addOrUpdate(childNode);
 
     assertThrows(StorageException.class, () -> controller.delete(":parent1:name1"));
 
