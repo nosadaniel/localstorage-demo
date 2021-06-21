@@ -107,7 +107,7 @@ public interface StorageMapper {
   void flush();
 
   /**
-   * <p>Zaps the current database and discards all vaules.</p>
+   * <p>Zaps the current database and discards all values.</p>
    *
    * @throws StorageException In case of problems regarding the storage
    */

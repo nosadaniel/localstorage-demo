@@ -51,7 +51,7 @@ public interface StorageController extends ChangeRegistrar {
   /**
    * <p>Remove a StorageNode from the data.</p>
    *
-   * @param path the name of the starage node to be removed
+   * @param path the name of the storage node to be removed
    * @return the removed node or null if node doesn't exist
    *
    * @throws StorageException if the storage backend encounters a problem

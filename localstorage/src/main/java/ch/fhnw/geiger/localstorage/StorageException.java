@@ -5,8 +5,6 @@ import ch.fhnw.geiger.serialization.SerializerHelper;
 import ch.fhnw.geiger.totalcross.ByteArrayInputStream;
 import ch.fhnw.geiger.totalcross.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * <p>Exception to be raised on any problems related to the local storage.</p>
@@ -18,8 +16,8 @@ public class StorageException extends IOException implements Serializer {
 
     private static final long serialversionUID = 721364991234L;
 
-    private String exceptionName;
-    private String message;
+    private final String exceptionName;
+    private final String message;
 
     public SerializedException(Throwable t) {
       super(t.getCause());
@@ -137,7 +135,7 @@ public class StorageException extends IOException implements Serializer {
   /**
    * <p>Static deserializer.</p>
    *
-   * <p>CReates a storage exception from the stream.</p>
+   * <p>Creates a storage exception from the stream.</p>
    *
    * @param in The input byte stream to be used
    * @return the object parsed from the input stream by the respective class
@@ -155,7 +153,7 @@ public class StorageException extends IOException implements Serializer {
     StackTraceElement[] ste = SerializerHelper.readStackTraces(in);
 
     // deserialize Throwable
-    List<Throwable> tv = new Vector<>();
+    //List<Throwable> tv = new Vector<>();
     Throwable t = null;
 
     if (SerializerHelper.readInt(in) == 1) {

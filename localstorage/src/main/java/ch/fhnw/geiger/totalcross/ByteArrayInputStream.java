@@ -99,7 +99,7 @@ public class ByteArrayInputStream implements TcByteArrayInputStream {
   /**
    * Creates either a TotalCross-wrapper or a Java-wrapper.
    *
-   * @param buf the byte buffer to be used for the inputstrema
+   * @param buf the byte buffer to be used for the InputStream
    */
   public ByteArrayInputStream(byte[] buf) {
     if (TcHelper.isTotalCross()) {

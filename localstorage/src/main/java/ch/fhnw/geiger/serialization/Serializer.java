@@ -28,7 +28,7 @@ public interface Serializer {
    * @param out the output stream receiving the object
    * @throws IOException if  an exception occurs while writing to the stream
    */
-  public abstract void toByteArrayStream(ByteArrayOutputStream out) throws IOException;
+  void toByteArrayStream(ByteArrayOutputStream out) throws IOException;
 
   /**
    * Convenience class to serialize to a bytearray.

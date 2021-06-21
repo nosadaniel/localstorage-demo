@@ -8,8 +8,8 @@ import java.util.Random;
 @SuppressWarnings("checkstyle:abbreviationaswordinname")
 public class UUID {
 
-  private static Random r = new Random();
-  private byte[] uuid = new byte[Long.BYTES * 2];
+  private static final Random r = new Random();
+  private final byte[] uuid = new byte[Long.BYTES * 2];
 
   /**
    * Constructor to create a UUID.
@@ -58,11 +58,11 @@ public class UUID {
    * @return hex String
    */
   public static String randomHexString(int size) {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     while (sb.length() < size) {
       sb.append(Integer.toHexString(r.nextInt()));
     }
 
-    return sb.toString().substring(0, size);
+    return sb.substring(0, size);
   }
 }

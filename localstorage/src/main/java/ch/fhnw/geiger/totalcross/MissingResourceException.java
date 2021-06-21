@@ -5,8 +5,8 @@ package ch.fhnw.geiger.totalcross;
  */
 public class MissingResourceException extends RuntimeException {
 
-  private String classname;
-  private String key;
+  private final String classname;
+  private final String key;
 
   /**
    * MissingResourceException constructor.

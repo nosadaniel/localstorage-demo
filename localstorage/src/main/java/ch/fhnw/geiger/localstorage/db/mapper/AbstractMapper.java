@@ -10,7 +10,7 @@ import ch.fhnw.geiger.localstorage.db.data.Node;
  */
 public abstract class AbstractMapper implements StorageMapper {
 
-  protected void getSanity(String path) throws StorageException {
+  protected void getSanity(String path) {
     if (path == null) {
       throw new NullPointerException("path may not be null");
     }
