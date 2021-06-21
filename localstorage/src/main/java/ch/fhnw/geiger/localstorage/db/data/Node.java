@@ -78,7 +78,6 @@ public interface Node extends Serializer {
    *
    * @param key the key to be looked up
    * @return the requested value or null if not found
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   NodeValue getValue(String key) throws StorageException;
@@ -88,7 +87,6 @@ public interface Node extends Serializer {
    *
    * @param value the key to be updated
    * @return the requested value or null if not found
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   NodeValue updateValue(NodeValue value) throws StorageException;
@@ -98,7 +96,6 @@ public interface Node extends Serializer {
    *
    * @param key the key of the value to be removed
    * @return the removed node value or null if not found
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   NodeValue removeValue(String key) throws StorageException;
@@ -141,7 +138,6 @@ public interface Node extends Serializer {
    * <p>Get a map of all existing child nodes.</p>
    *
    * @return the map containing all child nodes
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   Map<String, Node> getChildren() throws StorageException;
@@ -150,7 +146,6 @@ public interface Node extends Serializer {
    * <p>Gets the child nodes as CVS export.</p>
    *
    * @return A string representing the nodes as CVS
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   String getChildNodesCsv() throws StorageException;
@@ -161,6 +156,13 @@ public interface Node extends Serializer {
    * @return true if the current node is a skeleton only
    */
   boolean isSkeleton();
+
+  /**
+   * <p>Returns true if the node was there in the past but deleted.</p>
+   *
+   * @return true if the node was deleted
+   */
+  boolean isTombstone();
 
   /**
    * <p>get the controller needed for materializing the node if required.</p>
@@ -181,7 +183,6 @@ public interface Node extends Serializer {
    * <p>Update all data of the node with the data of the given node.</p>
    *
    * @param n2 the node whose values should be copied
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   void update(Node n2) throws StorageException;
@@ -190,7 +191,6 @@ public interface Node extends Serializer {
    * <p>Create a deeep clone of the current node.</p>
    *
    * @return the cloned node
-   *
    * @throws StorageException if the storage backend encounters a problem
    */
   NodeImpl deepClone() throws StorageException;

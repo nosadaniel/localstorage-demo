@@ -102,6 +102,50 @@ public class NodeImpl implements Node {
   }
 
   /**
+   * <p>creates a fully fledged new empty node.</p>
+   *
+   * @param path        the path of  the node
+   * @param isTombstone true if the node is a tombstone node
+   */
+  public NodeImpl(String path, boolean isTombstone) {
+    this(path);
+    try {
+      set(Field.TOMBSTONE, isTombstone ? "true" : "false");
+    } catch (StorageException e) {
+      throw new RuntimeException("Oops.... this should not happen... contact developer", e);
+    }
+  }
+
+  /**
+   * <p>create a fully feldged standard node.</p>
+   *
+   * @param path       the node path
+   * @param visibility the visbility of the node or null if default
+   * @param nodeValues the node values to be stored or null if none
+   * @param childNodes the child nodes to be included or null if none
+   */
+  public NodeImpl(String path, Visibility visibility, NodeValue[] nodeValues, Node[] childNodes) {
+    this(getNameFromPath(path), getParentFromPath(path));
+    if (visibility != null) {
+      setVisibility(visibility);
+    }
+    try {
+      if (nodeValues != null) {
+        for (NodeValue nv : nodeValues) {
+          addValue(nv);
+        }
+      }
+      if (childNodes != null) {
+        for (Node n : childNodes) {
+          addChildNode(n);
+        }
+      }
+    } catch (StorageException se) {
+      throw new RuntimeException("OOPS! that should not have happened... please contact developer", se);
+    }
+  }
+
+  /**
    * <p>Converts current node into a materialized node from a skeleton.</p>
    */
   private void init() throws StorageException {
@@ -284,7 +328,7 @@ public class NodeImpl implements Node {
    */
   public String get(Field field) throws StorageException {
     synchronized (skeleton) {
-      if (field != Field.PATH && field != Field.NAME) {
+      if (field != Field.PATH && field != Field.NAME && field != Field.TOMBSTONE) {
         init();
       }
     }
@@ -293,6 +337,8 @@ public class NodeImpl implements Node {
       case PATH:
       case VISIBILITY:
       case LAST_MODIFIED:
+      case EXPIRY:
+      case TOMBSTONE:
         return ordinals.get(field);
       case NAME:
         return getNameFromPath(ordinals.get(Field.PATH));
@@ -331,13 +377,30 @@ public class NodeImpl implements Node {
       case PATH:
       case VISIBILITY:
       case LAST_MODIFIED:
+      case EXPIRY:
         return ordinals.put(field, value);
+      case TOMBSTONE:
+        return ordinals.put(field, "true".equals(value) ? "true" : "false");
       default:
         throw new StorageException("unable to set field " + field);
     }
   }
 
-  public void addChildNode(NodeImpl n) {
+  /**
+   * <p>Checks if the current node is marked as TOMBSTONE (old deleted node).</p>
+   *
+   * @return true if node is a tombstone
+   */
+  @Override
+  public boolean isTombstone() {
+    try {
+      return "true".equals(get(Field.TOMBSTONE));
+    } catch (StorageException e) {
+      throw new RuntimeException("OOPS! Unexpected exception... please contact developer", e);
+    }
+  }
+
+  public void addChildNode(Node n) {
     childNodes.put(n.getName(), n);
   }
 
@@ -472,14 +535,14 @@ public class NodeImpl implements Node {
   }
 
   @Override
-  public void update(Node n2) throws StorageException  {
+  public void update(Node n2) throws StorageException {
 
     // copy basic values
     this.controller = n2.getController();
-    this.skeleton.set(isSkeleton());
+    this.skeleton.set(n2.isSkeleton());
 
     // copy just the name
-    this.ordinals.put(Field.NAME, ((NodeImpl) (n2)).ordinals.get(Field.NAME));
+    this.ordinals.put(Field.PATH, ((NodeImpl) (n2)).ordinals.get(Field.PATH));
 
     if (!n2.isSkeleton()) {
 
@@ -527,11 +590,20 @@ public class NodeImpl implements Node {
     StringBuilder sb = new StringBuilder();
     sb.append(getPath());
     sb.append("[");
-    sb.append("owner=").append(getOwner());
-    sb.append(";vis=").append(getVisibility());
-    sb.append("]{").append(System.lineSeparator());
+    if (isSkeleton()) {
+      //make sure that no accide ntal materiaization is done
+      sb.append("{<skeletonized>}");
+      sb.append("]{").append(System.lineSeparator());
+    } else {
+      sb.append("owner=").append(getOwner());
+      sb.append(";vis=").append(getVisibility());
+      sb.append("]{").append(System.lineSeparator());
+    }
     int i = 0;
-    if (values != null) {
+    if (isSkeleton()) {
+      //make sure that no accidental materiaization is done
+      sb.append("{<skeletonized>}");
+    } else if (values != null) {
       for (Map.Entry<String, NodeValue> e : values.entrySet()) {
         if (i > 0) {
           sb.append(", ").append(System.lineSeparator());

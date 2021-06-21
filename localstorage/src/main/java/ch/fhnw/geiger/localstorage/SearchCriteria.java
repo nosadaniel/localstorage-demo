@@ -33,7 +33,8 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
    */
   public enum ComparatorType {
     STRING,
-    DATETIME
+    DATETIME,
+    BOOLEAN
   }
 
   private final Map<Field, String> values = new HashMap<>();

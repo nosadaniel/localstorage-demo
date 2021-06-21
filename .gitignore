@@ -81,3 +81,4 @@ local.properties
 /localstorage/gradle.properties
 /**/target
 /localstorage-totalcross/localstorage.iml
+/localstorage-totalcross/testdb.mv.db

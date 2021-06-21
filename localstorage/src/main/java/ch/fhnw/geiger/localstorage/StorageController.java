@@ -8,7 +8,7 @@ import java.util.List;
  * <p>Generic implementation of a convenient storage controller providing persistence to a
  * mapper backend.</p>
  */
-public interface StorageController {
+public interface StorageController extends ChangeRegistrar {
 
   /**
    * <p>Fetches a node by its path.</p>
@@ -19,6 +19,16 @@ public interface StorageController {
    * @throws StorageException if the storage backend encounters a problem
    */
   Node get(String path) throws StorageException;
+
+  /**
+   * <p>Fetches a node by its path.</p>
+   *
+   * @param path the path of the node to be fetched
+   * @return The requested node
+   *
+   * @throws StorageException if the storage backend encounters a problem
+   */
+  Node getNodeOrTombstone(String path) throws StorageException;
 
   /**
    * <p>Add StorageNode to data.</p>
@@ -49,16 +59,29 @@ public interface StorageController {
   Node delete(String path) throws StorageException;
 
   /**
-   * <p>Rename a node identified by a path.</p>
+   * <p>add or update the node and all materialized sub-nodes.</p>
    *
-   * <p>This call renames a node. The new name may be a name only or a fully qualified path.
-   * The later operation moves the node and all child objects.</p>
+   * <p>
+   *   Any materialized node is added or updated. Tombstoned nodes may be used to deltete a node.
+   * </p>
    *
-   * @param oldPath the old path of the node
-   * @param newName the new name or new path of the node
-   *
+   * @param node the node to be written o updated
+   * @return true if at least one node was added
    * @throws StorageException if the storage backend encounters a problem
    */
+  boolean addOrUpdate(Node node) throws StorageException;
+
+    /**
+     * <p>Rename a node identified by a path.</p>
+     *
+     * <p>This call renames a node. The new name may be a name only or a fully qualified path.
+     * The later operation moves the node and all child objects.</p>
+     *
+     * @param oldPath the old path of the node
+     * @param newName the new name or new path of the node
+     *
+     * @throws StorageException if the storage backend encounters a problem
+     */
   void rename(String oldPath, String newName) throws StorageException;
 
   /**

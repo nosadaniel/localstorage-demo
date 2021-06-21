@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNull;
 
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 

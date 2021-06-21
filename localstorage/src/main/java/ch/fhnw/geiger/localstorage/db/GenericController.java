@@ -129,7 +129,53 @@ public class GenericController implements StorageController, ChangeRegistrar {
   }
 
   @Override
+  public boolean addOrUpdate(Node node) throws StorageException {
+    if(node == null) {
+      return false;
+    } else if(node.isSkeleton()) {
+      return false;
+    } else if(node.isTombstone()) {
+      delete(node.getPath());
+      return false;
+    } else {
+      boolean ret=false;
+      try {
+        add(node);
+        ret=true;
+      } catch(StorageException e) {
+        update(node);
+      }
+      if(node.getChildren()!=null) {
+        for(Node n2:node.getChildren().values()) {
+          ret|=addOrUpdate(n2);
+        }
+      }
+      return ret;
+    }
+  }
+
+  @Override
   public Node get(String path) throws StorageException {
+    Node n=getNodeOrTombstone(path);
+    if(n==null) {
+      return null;
+    } else if(n.isTombstone()) {
+      return null;
+    }
+    List<String> l = new Vector<>();
+    for(Node cn:n.getChildren().values()) {
+      if(cn.isTombstone()) {
+        l.add(cn.getName());
+      }
+    }
+    for(String name:l) {
+      n.removeChild(name);
+    }
+    return n;
+  }
+
+  @Override
+  public Node getNodeOrTombstone(String path) throws StorageException {
     return mapper.get(path);
   }
 

@@ -10,14 +10,18 @@ public interface ChangeRegistrar {
    *
    * @param listener the listener to be added
    * @param criteria the criteria triggering calls to the listener
+   *
+   * @throws StorageException in case of any communication or storage problem
    */
-  void registerChangeListener(StorageListener listener, SearchCriteria criteria);
+  void registerChangeListener(StorageListener listener, SearchCriteria criteria) throws StorageException;
 
   /***
    * <p>Removes a registered listener.</p>
    *
    * @param listener the listener to be removed
    * @return the removed search criteria
+   *
+   * @throws StorageException in case of any communication or storage problem
    */
-  SearchCriteria[] deregisterChangeListener(StorageListener listener);
+  SearchCriteria[] deregisterChangeListener(StorageListener listener) throws StorageException;
 }
