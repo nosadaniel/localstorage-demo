@@ -82,7 +82,6 @@
                 <configuration>
                     <name>${project.name}</name>
                     <platforms>
-                        <platform>-android</platform>
                         <platform>-win32</platform>
                     </platforms>
                 </configuration>

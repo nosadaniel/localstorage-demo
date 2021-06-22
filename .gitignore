@@ -82,3 +82,4 @@ local.properties
 /**/target
 /localstorage-totalcross/localstorage.iml
 /localstorage-totalcross/testdb.mv.db
+/localstorage/testdb.mv.db
