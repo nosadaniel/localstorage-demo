@@ -35,7 +35,7 @@ pipeline {
 
         stage('Gradle publish') {
             steps {
-                sh './gradlew -Dgradle.user.home=$HOME/.gradle publish --no-daemon'
+                sh './gradlew -Dgradle.user.home=$HOME/.gradle package totalcrossMavenPackage publish --no-daemon'
             }
         }
 
@@ -45,9 +45,9 @@ pipeline {
           publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'localstorage/build/reports/tests/test/', reportFiles: 'index.html', reportName: 'GEIGER localstorage Report', reportTitles: 'GEIGER-localstorage'])
         }
         success {
-            archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
-			step([$class: 'JavadocArchiver', javadocDir: 'localstorage/build/docs/javadoc', keepAll: false])
-            updateGitlabCommitStatus(name: 'build', state: 'success')
+          archiveArtifacts artifacts: '**/build/libs/*.jar, **/target/install/**/*', fingerprint: true
+		  step([$class: 'JavadocArchiver', javadocDir: 'localstorage/build/docs/javadoc', keepAll: false])
+          updateGitlabCommitStatus(name: 'build', state: 'success')
         }
         failure {
           updateGitlabCommitStatus(name: 'build', state: 'failed')

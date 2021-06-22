@@ -1,6 +1,6 @@
 package ch.fhnw.geiger.totalcross;
 
-import java.util.Random;
+import ch.fhnw.geiger.totalcross.Random;
 
 /**
  * A UUID implementation to work with TotalCross.
@@ -30,7 +30,15 @@ public class UUID {
 
   @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
   public static UUID randomUUID() {
-    return new UUID(r.nextLong(), r.nextLong());
+    int i1= r.nextInt();
+    int i2= r.nextInt();
+    int i3 = r.nextInt();
+    int i4 = r.nextInt();
+    long l1= ((((long)i1 & 0xffffffff) << 32) |
+        (((long)i2 & 0xffffffff)      ));
+    long l2= ((((long)i3 & 0xffffffff) << 32) |
+        (((long)i4 & 0xffffffff)      ));
+    return new UUID(l1,l2);
   }
 
   /**

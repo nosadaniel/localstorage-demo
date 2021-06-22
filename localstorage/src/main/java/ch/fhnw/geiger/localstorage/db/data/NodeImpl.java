@@ -600,7 +600,7 @@ public class NodeImpl implements Node {
   }
 
   public void touch() {
-    //ordinals.put(Field.LAST_MODIFIED, "" + (new Date().getTime()));
+    //ordinals.put(Field.LAST_MODIFIED, "" + ch.fhnw.geiger.totalcross.System.currentTimeMillis());
   }
 
   @Override

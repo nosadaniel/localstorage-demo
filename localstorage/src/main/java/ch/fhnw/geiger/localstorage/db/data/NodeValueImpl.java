@@ -211,7 +211,7 @@ public class NodeValueImpl implements NodeValue {
   }
 
   private void updateLastmodified() {
-    this.lastModified = new Date().getTime();
+    this.lastModified = ch.fhnw.geiger.totalcross.System.currentTimeMillis();
   }
 
   @Override
