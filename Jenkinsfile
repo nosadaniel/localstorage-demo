@@ -35,7 +35,7 @@ pipeline {
 
         stage('Gradle publish') {
             steps {
-                sh './gradlew -Dgradle.user.home=$HOME/.gradle package totalcrossMavenPackage publish --no-daemon'
+                sh './gradlew -Dgradle.user.home=$HOME/.gradle package totalcrossMavenPackageLinux publish --no-daemon'
             }
         }
 
