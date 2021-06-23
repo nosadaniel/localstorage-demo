@@ -178,8 +178,13 @@ signing {
     sign publishing.publications.mavenJava
 }
 
+jar{
+    from rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross/target/install/win32/localstorage-totalcross.tcz"
+    rename '(.+).tcz', 'toolbox-storageLib.tcz'
+}
+
 task packageTotalcross {
-    doLast {
+    doFirst {
         mavenexec {
             workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross"
             goals '-DskipTests', 'package'
