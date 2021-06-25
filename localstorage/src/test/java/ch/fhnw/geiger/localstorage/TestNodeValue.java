@@ -37,9 +37,9 @@ public class TestNodeValue {
     NodeValueImpl nodeValue = new NodeValueImpl("key", "value");
     assertEquals("test key getter", "value", nodeValue.getValue());
     assertEquals("test key getter (en)", "value", nodeValue.getValue("en"));
-    nodeValue.setValue("en1",Locale.ENGLISH);
+    nodeValue.setValue("en1", Locale.ENGLISH);
     assertEquals("test key getter (en)", "en1", nodeValue.getValue("en"));
-    nodeValue.setValue("en2",Locale.ENGLISH);
+    nodeValue.setValue("en2", Locale.ENGLISH);
     assertEquals("test key getter (de)", "en2", nodeValue.getValue("de"));
     assertEquals("test key getter (en-us)", "en2", nodeValue.getValue("en-US"));
 

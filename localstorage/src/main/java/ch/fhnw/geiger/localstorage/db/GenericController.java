@@ -130,24 +130,24 @@ public class GenericController implements StorageController, ChangeRegistrar {
 
   @Override
   public boolean addOrUpdate(Node node) throws StorageException {
-    if(node == null) {
+    if (node == null) {
       return false;
-    } else if(node.isSkeleton()) {
+    } else if (node.isSkeleton()) {
       return false;
-    } else if(node.isTombstone()) {
+    } else if (node.isTombstone()) {
       delete(node.getPath());
       return false;
     } else {
-      boolean ret=false;
+      boolean ret = false;
       try {
         add(node);
-        ret=true;
-      } catch(StorageException e) {
+        ret = true;
+      } catch (StorageException e) {
         update(node);
       }
-      if(node.getChildren()!=null) {
-        for(Node n2:node.getChildren().values()) {
-          ret|=addOrUpdate(n2);
+      if (node.getChildren() != null) {
+        for (Node n2 : node.getChildren().values()) {
+          ret |= addOrUpdate(n2);
         }
       }
       return ret;
@@ -156,19 +156,19 @@ public class GenericController implements StorageController, ChangeRegistrar {
 
   @Override
   public Node get(String path) throws StorageException {
-    Node n=getNodeOrTombstone(path);
-    if(n==null) {
+    Node n = getNodeOrTombstone(path);
+    if (n == null) {
       return null;
-    } else if(n.isTombstone()) {
+    } else if (n.isTombstone()) {
       return null;
     }
     List<String> l = new Vector<>();
-    for(Node cn:n.getChildren().values()) {
-      if(cn.isTombstone()) {
+    for (Node cn : n.getChildren().values()) {
+      if (cn.isTombstone()) {
         l.add(cn.getName());
       }
     }
-    for(String name:l) {
+    for (String name : l) {
       n.removeChild(name);
     }
     return n;
@@ -322,7 +322,7 @@ public class GenericController implements StorageController, ChangeRegistrar {
                 }
               }).start();
             }
-          }catch (StorageException se) {
+          } catch (StorageException se) {
             // FIXME do something sensible (should not happen anyway)
           }
         }

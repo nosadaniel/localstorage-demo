@@ -53,8 +53,8 @@ public class DummyMapper extends AbstractMapper {
         nodes.get(node.getParentPath()).addChild(node);
       }
       nodes.put(node.getPath(), node.shallowClone());
-      for(Node n:node.getChildren().values()) {
-        if(!n.isSkeleton()) {
+      for (Node n : node.getChildren().values()) {
+        if (!n.isSkeleton()) {
           add(n);
         }
       }

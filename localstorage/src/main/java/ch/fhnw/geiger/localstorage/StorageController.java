@@ -71,17 +71,17 @@ public interface StorageController extends ChangeRegistrar {
    */
   boolean addOrUpdate(Node node) throws StorageException;
 
-    /**
-     * <p>Rename a node identified by a path.</p>
-     *
-     * <p>This call renames a node. The new name may be a name only or a fully qualified path.
-     * The later operation moves the node and all child objects.</p>
-     *
-     * @param oldPath the old path of the node
-     * @param newName the new name or new path of the node
-     *
-     * @throws StorageException if the storage backend encounters a problem
-     */
+  /**
+   * <p>Rename a node identified by a path.</p>
+   *
+   * <p>This call renames a node. The new name may be a name only or a fully qualified path.
+   * The later operation moves the node and all child objects.</p>
+   *
+   * @param oldPath the old path of the node
+   * @param newName the new name or new path of the node
+   *
+   * @throws StorageException if the storage backend encounters a problem
+   */
   void rename(String oldPath, String newName) throws StorageException;
 
   /**

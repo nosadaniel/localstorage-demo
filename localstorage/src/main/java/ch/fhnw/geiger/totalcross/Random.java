@@ -18,7 +18,7 @@ public class Random {
   }
 
   public Random(long seed) {
-    this.seed=seed;
+    this.seed = seed;
   }
 
   /**

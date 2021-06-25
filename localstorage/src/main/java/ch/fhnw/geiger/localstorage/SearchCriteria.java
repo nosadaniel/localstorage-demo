@@ -38,6 +38,13 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
   public SearchCriteria() {
   }
 
+  /**
+   * <p>Create a Searchcriteria.</p>
+   *
+   * @param path the path to search for
+   * @param key the key to search for
+   * @param value the value to search for
+   */
   public SearchCriteria(String path, String key, String value) {
     setNodePath(path);
     setNodeValueKey(key);
@@ -122,20 +129,18 @@ public class SearchCriteria implements Serializer, Comparable<SearchCriteria> {
    */
   public boolean evaluate(Node node) throws StorageException {
     // evaluate node criteria
-    try {
-      // node path is a sub tree search
-      if (!node.getPath().startsWith(getNodePath())) {
-        return false;
-      }
-      // compare other ordinals
-      for (Field f : new Field[]{Field.OWNER, Field.VISIBILITY}) {
-        if (values.get(f) != null && !regexEvalString(values.get(f), ((NodeImpl) (node)).get(f))) {
-          return false;
-        }
-      }
-    } catch (StorageException e) {
-      throw new RuntimeException("OOPS! This was deemed to be impossible... "
-          + "please check with developer", e);
+    // node path is a sub tree search
+    if (!node.getPath().startsWith(getNodePath())) {
+      return false;
+    }
+    // compare other ordinals
+    if (values.get(Field.OWNER) != null
+        && !regexEvalString(values.get(Field.OWNER), node.getOwner())) {
+      return false;
+    }
+    if (values.get(Field.VISIBILITY) != null
+        && !regexEvalString(values.get(Field.VISIBILITY), node.getVisibility().toString())) {
+      return false;
     }
     // getting values to check
     Map<String, NodeValue> nodeValues = node.getValues();

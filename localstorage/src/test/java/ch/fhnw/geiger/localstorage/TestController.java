@@ -202,50 +202,56 @@ public class TestController {
         new NodeImpl(":parent1", null,
             new NodeValue[]{
                 new NodeValueImpl("parentKey", "parentValue")
-            },
+              },
             new Node[]{
                 new NodeImpl(":parent1:child0", null,
                     new NodeValueImpl[0],
                     new Node[] {
                         new NodeImpl(":parent1:child0:empty")
-                    }
+                      }
                 ),
                 new NodeImpl(":parent1:child1", null,
                     new NodeValue[] {
-                        new NodeValueImpl("name1","value1")
-                    },
+                        new NodeValueImpl("name1", "value1")
+                      },
                     new Node[0]
                 )
-            }
+              }
         )
     );
 
     SearchCriteria criteria = new SearchCriteria(":parent1", "name1", null);
-    testcaseSearchCriteria("searching single child node",controller,criteria,new String[] {":parent1:child1"});
+    testcaseSearchCriteria("searching single child node",
+        controller, criteria, new String[] {":parent1:child1"});
 
     criteria = new SearchCriteria(":parent1:child0", "name1", null);
-    testcaseSearchCriteria("searching single child node in a sub branch without matching node",controller,criteria,new String[] {});
+    testcaseSearchCriteria("searching single child node in a sub branch "
+        + "without matching node", controller, criteria, new String[] {});
   }
 
-  private static void testcaseSearchCriteria(String caseName,StorageController controller, SearchCriteria criteria,String[] paths) throws StorageException {
+  private static void testcaseSearchCriteria(String caseName, StorageController controller,
+                                             SearchCriteria criteria, String[] paths)
+      throws StorageException {
     List<Node> result = controller.search(criteria);
-    List l = Arrays.asList(paths);
-    Assert.assertEquals("("+caseName+") Bad number of results returned", paths.length, result.size());
-    for(Node n:result) {
-      Assert.assertTrue("("+caseName+") Unable to find expected Node ",l.contains(n.getPath()));
+    List<String> l = Arrays.asList(paths);
+    Assert.assertEquals("(" + caseName + ") Bad number of results returned",
+        paths.length, result.size());
+    for (Node n : result) {
+      Assert.assertTrue("(" + caseName + ") Unable to find expected Node ",
+          l.contains(n.getPath()));
     }
   }
 
   @Test
   @Ignore
   public void testRegisterChangeListener() {
-
+    fail("not implemented");
   }
 
   @Test
   @Ignore
   public void testNotifyChangeListener() {
-
+    fail("not implemented");
   }
 
   @Test
@@ -328,7 +334,7 @@ public class TestController {
         new NodeImpl("name2", ":renameTests"),
         new NodeImpl("name21", ":renameTests:name2"),
         new NodeImpl("name3", ":renameTests")
-    };
+      };
 
     NodeValue nv = new NodeValueImpl("key", "value");
     NodeValue nv1 = new NodeValueImpl("key1", "value1");
@@ -380,10 +386,13 @@ public class TestController {
 
   @Test
   public void testSkeletonMaterialization() throws StorageException {
-    StorageController controller = new GenericController("owner", new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
+    StorageController controller = new GenericController("owner",
+        new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE",
+            "sa2", "1234"));
     controller.zap();
     // Create empty node :Global:threats
-    Node threats = new NodeImpl(":GlobalN", null, new NodeValue[]{new NodeValueImpl("name", "parent node")}, null);
+    Node threats = new NodeImpl(":GlobalN", null, new NodeValue[]{
+        new NodeValueImpl("name", "parent node")}, null);
     controller.add(threats);
 
     // create hashmap of values to be added
@@ -396,17 +405,21 @@ public class TestController {
       Node threat = new NodeImpl(":GlobalN:" + e.getKey(), Visibility.RED,
           new NodeValue[]{
               new NodeValueImpl("name", e.getValue()[0]),
-              new NodeValueImpl("GEIGER_threat", e.getValue().length > 1 ? e.getValue()[1] : e.getValue()[0])
-          }, null
+              new NodeValueImpl("GEIGER_threat", e.getValue().length > 1
+                  ? e.getValue()[1] : e.getValue()[0])
+            }, null
       );
       controller.add(threat);
     }
     System.out.println();
     threats = controller.get(":GlobalN");
 
-    Assert.assertFalse("Checking that main is not skeletonized", threats.isSkeleton());
-    Assert.assertEquals("Checking that child nodes are included", 2, threats.getChildren().size());
-    Assert.assertEquals("Checking that child nodes are included in CVS", 2, threats.getChildNodesCsv().split(",").length);
+    Assert.assertFalse("Checking that main is not skeletonized",
+        threats.isSkeleton());
+    Assert.assertEquals("Checking that child nodes are included", 2,
+        threats.getChildren().size());
+    Assert.assertEquals("Checking that child nodes are included in CVS", 2,
+        threats.getChildNodesCsv().split(",").length);
   }
 
   @Test
@@ -415,18 +428,22 @@ public class TestController {
     Node n = new NodeImpl(":TestNode", null,
         new NodeValue[]{
             new NodeValueImpl("key1", "value1")
-        },
+          },
         new Node[]{
             new NodeImpl(":TestNode:node1"),
             new NodeImpl(":TestNode:node2"),
             new NodeImpl(":TestNode:node3"),
             new NodeImpl(":TestNode:node4", controller)
-        }
+          }
     );
-    Assert.assertTrue("Failed writing first time (wrong return value)", controller.addOrUpdate(n));
-    Assert.assertEquals("Failed writing first time. Failed to compare written to provided node", n, controller.get(n.getPath()));
+    Assert.assertTrue("Failed writing first time (wrong return value)",
+        controller.addOrUpdate(n));
+    Assert.assertEquals("Failed writing first time. "
+        + "Failed to compare written to provided node", n, controller.get(n.getPath()));
     for (int i = 1; i < 4; i++) {
-      Assert.assertEquals("Failed writing first time. Failed to compare written to provided node", ":TestNode:node" + i, controller.get(":TestNode:node" + i).getPath());
+      Assert.assertEquals("Failed writing first time. "
+          + "Failed to compare written to provided node", ":TestNode:node"
+          + i, controller.get(":TestNode:node" + i).getPath());
     }
     try {
       controller.get(":TestNode:node4");

@@ -76,7 +76,7 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     }
 
     @Override
-    public void close() throws IOException{
+    public void close() throws IOException {
       close(obj);
     }
   }
@@ -110,7 +110,7 @@ public class ByteArrayOutputStream implements TcByteArrayOutputStream {
     }
 
     @Override
-    public void close() throws IOException{
+    public void close() throws IOException {
       close(obj);
     }
   }

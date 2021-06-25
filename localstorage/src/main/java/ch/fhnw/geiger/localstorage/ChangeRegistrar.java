@@ -13,7 +13,8 @@ public interface ChangeRegistrar {
    *
    * @throws StorageException in case of any communication or storage problem
    */
-  void registerChangeListener(StorageListener listener, SearchCriteria criteria) throws StorageException;
+  void registerChangeListener(StorageListener listener, SearchCriteria criteria)
+      throws StorageException;
 
   /***
    * <p>Removes a registered listener.</p>

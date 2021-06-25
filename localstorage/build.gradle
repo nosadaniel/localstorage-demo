@@ -1,9 +1,10 @@
 plugins {
     id 'java'
+    //id 'checkstyle'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id "com.github.dkorotych.gradle-maven-exec" version "2.2.1"
     id 'maven-publish'
     id 'signing'
-    id "com.github.dkorotych.gradle-maven-exec" version "2.2.1"
 }
 
 group = 'eu.cyber-geiger'
@@ -13,7 +14,19 @@ sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
-    jcenter()
+    maven {
+        url = uri('http://repo.maven.apache.org/maven2')
+        mavenContent {
+            releasesOnly()
+        }
+    }
+
+    maven {
+        url = uri('https://oss.sonatype.org/content/repositories/snapshots/')
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
 }
 
 configurations {
@@ -30,12 +43,15 @@ dependencies {
     // junit
     testImplementation("junit:junit:4.13")
     testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.7.0")
+
+    // logging
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.12.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.12.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.12.1'
 }
 
 configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     resolutionStrategy {
         force 'xml-apis:xml-apis:1.0.b2'
     }
@@ -45,7 +61,6 @@ tasks.named('jar') {
     manifest {
         attributes('Implementation-Title': project.name,
                 'Implementation-Version': project.version,
-                'Main-Class': 'ch.fhnw.geiger.localstorage.CommandLine'
         )
     }
 }
@@ -61,11 +76,10 @@ tasks.withType(Checkstyle) {
     }
 }
 
-
 jar.dependsOn shadowJar
 jar.dependsOn test
 
-// check.dependsOn checkstyleMain
+//check.dependsOn checkstyleMain
 
 /* integrate junit */
 test {
@@ -204,5 +218,3 @@ task testTotalcross {
 }
 
 check.dependsOn testTotalcross
-
-

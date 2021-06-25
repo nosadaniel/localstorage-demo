@@ -53,11 +53,12 @@ public class System {
     @Override
     public long currentTimeMillis() {
       try {
-        Constructor<?> constructor = tcls.getConstructor( new Class[]{});
+        Constructor<?> constructor = tcls.getConstructor(new Class[]{});
         Object obj = constructor.newInstance(new Object[0]);
         Method method = tcls.getMethod("getTime", new Class[]{});
         return (long) (method.invoke(obj));
-      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
+      } catch (IllegalAccessException | InvocationTargetException
+          | NoSuchMethodException | InstantiationException e) {
         // FIXME insert proper logging/error handling (but should not be called anyway)
         e.printStackTrace();
         return 0;

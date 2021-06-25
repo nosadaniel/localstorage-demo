@@ -41,7 +41,8 @@ public class TestSerializer {
     StorageException se2 = StorageException.fromByteArrayStream(
         new ByteArrayInputStream(out.toByteArray()));
     assertEquals(se.getMessage(), se2.getMessage());
-    assertEquals("Stack traces not equal in size", se.getStackTrace().length, se2.getStackTrace().length);
+    assertEquals("Stack traces not equal in size", se.getStackTrace().length,
+        se2.getStackTrace().length);
     for (int i = 0; i < se.getStackTrace().length; i++) {
       compareStackTraceElements(i, se.getStackTrace()[i], se2.getStackTrace()[i]);
     }
@@ -81,7 +82,8 @@ public class TestSerializer {
     assertEquals("Stack traces not equal in size",
         se.getCause().getStackTrace().length, se2.getCause().getStackTrace().length);
     for (int i = 0; i < se.getCause().getStackTrace().length; i++) {
-      compareStackTraceElements(i, se.getCause().getStackTrace()[i], se2.getCause().getStackTrace()[i]);
+      compareStackTraceElements(i, se.getCause().getStackTrace()[i],
+          se2.getCause().getStackTrace()[i]);
     }
     // testing stacktrace of cause
     assertEquals("verifying exception message",

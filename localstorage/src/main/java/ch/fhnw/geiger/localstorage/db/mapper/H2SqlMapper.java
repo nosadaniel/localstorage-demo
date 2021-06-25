@@ -33,11 +33,12 @@ public class H2SqlMapper extends AbstractMapper {
 
   private static final String initString = ""
       + "CREATE TABLE storage_node (\n"
-      + "path VARCHAR(" + MAXFIELDSIZE + ") NULL PRIMARY KEY,\n"
+      + "path VARCHAR(" + MAXFIELDSIZE + ") NOT NULL PRIMARY KEY,\n"
       + "owner VARCHAR(40),\n"
       + "name VARCHAR(40) NOT NULL,\n"
       + "visibility ENUM('RED', 'AMBER', 'GREEN', 'WHITE') NOT NULL,\n"
-      + "children VARCHAR(" + MAXFIELDSIZE + ") NULL\n"
+      + "children VARCHAR(" + MAXFIELDSIZE + ") NULL,\n"
+      + "tombstone BOOLEAN default False\n"
       + ");\n"
       + "\n"
       + "CREATE TABLE node_value (\n"
@@ -81,7 +82,8 @@ public class H2SqlMapper extends AbstractMapper {
    *
    * @throws StorageException In case of problems regarding the storage
    */
-  public H2SqlMapper(String jdbcUrl, String jdbcUsername, String jdbcPassword) throws StorageException {
+  public H2SqlMapper(String jdbcUrl, String jdbcUsername, String jdbcPassword)
+      throws StorageException {
     // Connect to the database
     this.jdbcUrl = jdbcUrl;
     this.jdbcUsername = jdbcUsername;
@@ -119,11 +121,11 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public NodeImpl get(String path) throws StorageException {
+  public Node get(String path) throws StorageException {
     checkPath(path);
     getSanity(path);
     NodeImpl res;
-    String sqlStatement = "SELECT path, owner, name, visibility, children "
+    String sqlStatement = "SELECT path, owner, name, visibility, children, tombstone "
         + "FROM storage_node WHERE path = ?";
     try {
       PreparedStatement ps = conn.prepareStatement(sqlStatement);
@@ -132,6 +134,13 @@ public class H2SqlMapper extends AbstractMapper {
       if (!rs.next()) {
         throw new StorageException("Node does not exist");
       } else {
+        if (rs.getBoolean("tombstone")) {
+          // add minimum information for tombstone not (Not NUll fields)
+          res = new NodeImpl(rs.getString("path"), true);
+          res.setVisibility(Visibility.valueOf(rs.getString("visibility")));
+          return res;
+        }
+        // create non tombstone node
         res = new NodeImpl(rs.getString("path"));
         String owner = rs.getString("owner");
         if (owner != null) {
@@ -152,7 +161,7 @@ public class H2SqlMapper extends AbstractMapper {
     }
 
     // get all values and add to node
-    sqlStatement = "SELECT path,key,value,type,locale,last_modified "
+    sqlStatement = "SELECT path, key, value, type, locale, last_modified "
         + "FROM node_value WHERE path = ?";
     String key;
     try {
@@ -166,7 +175,7 @@ public class H2SqlMapper extends AbstractMapper {
             Long.parseLong(rs.getString("last_modified")));
 
         // get translations and add to node_value
-        String sqlStatementTranslations = "SELECT path,key,identifier,locale,translation "
+        String sqlStatementTranslations = "SELECT path, key, identifier, locale, translation "
             + "FROM translation WHERE (path = ? AND key = ?)";
         try {
           PreparedStatement psTranslations = conn.prepareStatement(sqlStatementTranslations);
@@ -199,6 +208,11 @@ public class H2SqlMapper extends AbstractMapper {
 
   @Override
   public void add(Node node) throws StorageException {
+    // check skeleton
+    if (node.isSkeleton()) {
+      throw new StorageException("Skeleton nodes cannot be added, "
+          + "please materialize before adding");
+    }
     checkPath(node);
     // TODO This seems like bad coding, as we expect an exception to be thrown from
     // get as only node are added which do not exist yet
@@ -218,12 +232,13 @@ public class H2SqlMapper extends AbstractMapper {
         throw new StorageException("Parent node \"" + node.getParentPath() + "\" does not exist");
       }
       // add reference to parent
-      NodeImpl parent = get(node.getParentPath());
+      Node parent = get(node.getParentPath());
       parent.addChild(node);
       update(parent);
     }
-    String sqlStatement = "INSERT INTO storage_node(path, owner, name, visibility, children) "
-        + "VALUES (?,?,?,?,?)";
+    String sqlStatement = "INSERT INTO "
+        + "storage_node(path, owner, name, visibility, children, tombstone) "
+        + "VALUES (?,?,?,?,?,?)";
     try {
       PreparedStatement ps = conn.prepareStatement(sqlStatement);
       ps.setString(1, node.getPath());
@@ -231,6 +246,7 @@ public class H2SqlMapper extends AbstractMapper {
       ps.setString(3, node.getName());
       ps.setInt(4, node.getVisibility().ordinal());
       ps.setString(5, node.getChildNodesCsv());
+      ps.setBoolean(6, node.isTombstone());
       ps.execute();
     } catch (SQLException e) {
       throw new StorageException("Could not add new node", e);
@@ -243,17 +259,23 @@ public class H2SqlMapper extends AbstractMapper {
 
   @Override
   public void update(Node node) throws StorageException {
+    // check skeleton
+    if (node.isSkeleton()) {
+      throw new StorageException("Skeleton nodes cannot be added, "
+          + "please materialize before adding");
+    }
     checkPath(node);
     get(node.getPath()); // checks if node exists, throws storage exception if not exists
 
-    String sqlStatement = "UPDATE storage_node SET(owner, visibility, children) = (?,?,?) "
-        + "WHERE path = ?";
+    String sqlStatement = "UPDATE storage_node SET owner = ?, visibility = ?, children = ?, "
+        + "tombstone = ? WHERE path = ?";
     try {
       PreparedStatement ps = conn.prepareStatement(sqlStatement);
       ps.setString(1, node.getOwner());
       ps.setInt(2, node.getVisibility().ordinal());
       ps.setString(3, node.getChildNodesCsv());
-      ps.setString(4, node.getPath());
+      ps.setBoolean(4, node.isTombstone());
+      ps.setString(5, node.getPath());
       ps.execute();
 
       // Values are being created if they dont exist else updated
@@ -273,12 +295,15 @@ public class H2SqlMapper extends AbstractMapper {
   public void rename(String oldPath, String newPath) throws StorageException {
     checkPath(oldPath);
     checkPath(newPath);
-    NodeImpl oldNode = get(oldPath);
-    NodeImpl newNode = new NodeImpl(newPath);
+    Node oldNode = get(oldPath);
 
-    // set missing properties
-    newNode.setOwner(oldNode.getOwner());
-    newNode.setVisibility(oldNode.getVisibility());
+    // handle tombstones
+    NodeImpl newNode;
+    if (oldNode.isTombstone()) {
+      newNode = new NodeImpl(newPath, true);
+    } else {
+      newNode = new NodeImpl(newPath, oldNode.getOwner(), oldNode.getVisibility());
+    }
 
     // copy values
     for (NodeValue nv : oldNode.getValues().values()) {
@@ -414,8 +439,8 @@ public class H2SqlMapper extends AbstractMapper {
   }
 
   @Override
-  public NodeImpl delete(String path) throws StorageException {
-    NodeImpl oldNode = get(path);
+  public Node delete(String path) throws StorageException {
+    Node oldNode = get(path);
     if (!"".equals(oldNode.getChildNodesCsv())) {
       throw new StorageException("Node does have children... cannot remove " + oldNode.getName());
     }
@@ -425,19 +450,14 @@ public class H2SqlMapper extends AbstractMapper {
       deleteValue(path, nv.getKey());
     }
 
-    // remove the node
-    String sqlStatement = "DELETE FROM storage_node WHERE path = ?";
-    try {
-      PreparedStatement ps = conn.prepareStatement(sqlStatement);
-      ps.setString(1, path);
-      ps.execute();
-    } catch (SQLException e) {
-      throw new StorageException("Could not remove Node", e);
-    }
+    // remove the node by deleting all properties and create tombstone
+    Node deletedNode = new NodeImpl(path, true);
+    deletedNode.setVisibility(oldNode.getVisibility());
+    update(deletedNode);
 
     // remove reference from parent
-    if(!"".equals(oldNode.getParentPath())) {
-      NodeImpl parentNode = get(oldNode.getParentPath());
+    if (!"".equals(oldNode.getParentPath())) {
+      Node parentNode = get(oldNode.getParentPath());
       parentNode.removeChild(oldNode.getName());
       update(parentNode);
     }
@@ -506,12 +526,12 @@ public class H2SqlMapper extends AbstractMapper {
 
   @Override
   public List<Node> search(SearchCriteria criteria) throws StorageException {
-    String sqlNodeSearch = "SELECT path,owner,name,visibility,children FROM storage_node "
+    String sqlNodeSearch = "SELECT path, owner, name, visibility, children FROM storage_node "
         + "WHERE (path = ? and owner = ? and name = ? and visibility = ?)";
     String sqlValueSearch = "SELECT path,key,value,type,locale,last_modified "
         + "FROM node_value WHERE (path = ? and key = ? and value = ? and type = ? "
         + "and last_modified = ?)";
-    Map<String, NodeImpl> nodes = new HashMap<>();
+    Map<String, Node> nodes = new HashMap<>();
     Map<String, NodeValue> values = new HashMap<>();
     try {
       // get nodes

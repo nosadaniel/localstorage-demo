@@ -6,9 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import ch.fhnw.geiger.localstorage.db.GenericController;
-import ch.fhnw.geiger.localstorage.db.data.Field;
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
+import ch.fhnw.geiger.localstorage.db.data.NodeValue;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
 import ch.fhnw.geiger.localstorage.db.mapper.DummyMapper;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,10 +21,15 @@ import org.junit.Test;
 public class TestStorageListener {
 
 
-  private final static Object semaphore = new Object();
+  private static final Object semaphore = new Object();
 
   public GenericController controller = null;
 
+  /**
+   * Setup the controller for each Test.
+   *
+   * @throws StorageException if controller couldnt be setup
+   */
   @Before
   public void setupTest() throws StorageException {
     // clear all stored objects
@@ -215,7 +220,8 @@ public class TestStorageListener {
     evt.delete(0, 100);
     Node nodeWithoutValue = tn.deepClone();
     Node nodeWithValue = nodeWithoutValue.deepClone();
-    nodeWithValue.addValue(new NodeValueImpl("key", "value"));
+    NodeValue value = new NodeValueImpl("key", "value");
+    nodeWithValue.addValue(value);
     controller.update(nodeWithValue);
     for (int i = 0; nums.get() < 2 && i < 10; i++) {
       synchronized (notifier) {
@@ -232,8 +238,9 @@ public class TestStorageListener {
     on.update(new NodeImpl(":null"));
     nn.update(new NodeImpl(":null"));
     evt.delete(0, 100);
-    Node newNode = nodeWithValue.deepClone();
-    ((NodeImpl) (newNode)).set(Field.PATH, testPath2);
+    Node newNode = new NodeImpl(testPath2);
+    newNode.setOwner("testOwner");
+    newNode.addValue(value);
     controller.rename(testPath1, testPath2);
     for (int i = 0; nums.get() < 3 && i < 10; i++) {
       synchronized (notifier) {

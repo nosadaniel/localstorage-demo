@@ -111,13 +111,14 @@ public class NodeImpl implements Node {
     this(path);
     try {
       set(Field.TOMBSTONE, isTombstone ? "true" : "false");
+      setVisibility(Visibility.RED);
     } catch (StorageException e) {
       throw new RuntimeException("Oops.... this should not happen... contact developer", e);
     }
   }
 
   /**
-   * <p>create a fully feldged standard node.</p>
+   * <p>create a fully fledged standard node.</p>
    *
    * @param path       the node path
    * @param visibility the visbility of the node or null if default
@@ -141,7 +142,8 @@ public class NodeImpl implements Node {
         }
       }
     } catch (StorageException se) {
-      throw new RuntimeException("OOPS! that should not have happened... please contact developer", se);
+      throw new RuntimeException("OOPS! that should not have happened... please contact developer",
+          se);
     }
   }
 
@@ -315,8 +317,7 @@ public class NodeImpl implements Node {
 
   @Override
   public Map<String, NodeValue> getValues() {
-    // TODO do not expose inner objects
-    return values;
+    return new HashMap<>(values);
   }
 
   /**
@@ -326,7 +327,7 @@ public class NodeImpl implements Node {
    * @return the currently set value
    * @throws StorageException if a field does not exist
    */
-  public String get(Field field) throws StorageException {
+  private String get(Field field) throws StorageException {
     synchronized (skeleton) {
       if (field != Field.PATH && field != Field.NAME && field != Field.TOMBSTONE) {
         init();
@@ -355,7 +356,7 @@ public class NodeImpl implements Node {
    * @return the previously set value
    * @throws StorageException if a field does not exist
    */
-  public String set(Field field, String value) throws StorageException {
+  private String set(Field field, String value) throws StorageException {
     // materialize node if required
     synchronized (skeleton) {
       if (field != Field.PATH) {

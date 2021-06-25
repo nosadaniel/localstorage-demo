@@ -9,15 +9,21 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Class to test die Locale implementation.
+ */
 public class TestLocale {
 
   @Test
   public void localeTest() {
     Locale l = Locale.ENGLISH;
     Assert.assertEquals("Checking default language tag", "en", l.getLanguage());
-    Assert.assertEquals("Checking default language tag simplification (without country)", "en", new Locale("en", "UK").getLanguage());
-    Assert.assertEquals("Checking casing", "en-UK", new Locale("En", "uK").toLanguageTag());
-    Assert.assertNotEquals("Checking default language tag simplification (without country)", Locale.ENGLISH, new Locale("en", "uk"));
+    Assert.assertEquals("Checking default language tag simplification (without country)",
+        "en", new Locale("en", "UK").getLanguage());
+    Assert.assertEquals("Checking casing", "en-UK",
+        new Locale("En", "uK").toLanguageTag());
+    Assert.assertNotEquals("Checking default language tag simplification (without country)",
+        Locale.ENGLISH, new Locale("en", "uk"));
   }
 
   @Test
@@ -52,7 +58,7 @@ public class TestLocale {
     Locale.LanguageRange[] lr = new Locale.LanguageRange[]{
         new Locale.LanguageRange("de", 1),
         new Locale.LanguageRange("en", 0.5)
-    };
+      };
 
     List<Locale> res = Locale.filter(Arrays.asList(lr), l);
     Assert.assertEquals("Number of locale", 1, res.size());
@@ -61,7 +67,7 @@ public class TestLocale {
     lr = new Locale.LanguageRange[]{
         new Locale.LanguageRange("de", 1),
         new Locale.LanguageRange("fr", 0.5)
-    };
+      };
     res = Locale.filter(Arrays.asList(lr), l);
     Assert.assertEquals("Number of locale", 1, res.size());
     Assert.assertEquals("Expected locale", new Locale("fr", "ch"), res.get(0));
@@ -74,7 +80,7 @@ public class TestLocale {
     m.put(new Locale("en"), "en2");
     m.put(new Locale("en", "gb"), "en3");
     Assert.assertEquals("en2", m.get(Locale.ENGLISH));
-    Assert.assertEquals("en3", m.get(new Locale("en","gb")));
+    Assert.assertEquals("en3", m.get(new Locale("en", "gb")));
   }
 
 }

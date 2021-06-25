@@ -28,17 +28,22 @@ public class UUID {
     }
   }
 
+  /**
+   * <p>Creates a random Unique identifier.</p>
+   *
+   * @return a random unique identifier
+   */
   @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
   public static UUID randomUUID() {
-    int i1= r.nextInt();
-    int i2= r.nextInt();
+    int i1 = r.nextInt();
+    int i2 = r.nextInt();
     int i3 = r.nextInt();
     int i4 = r.nextInt();
-    long l1= ((((long)i1 & 0xffffffff) << 32) |
-        (((long)i2 & 0xffffffff)      ));
-    long l2= ((((long)i3 & 0xffffffff) << 32) |
-        (((long)i4 & 0xffffffff)      ));
-    return new UUID(l1,l2);
+    long l1 = ((((long) i1 & 0xffffffff) << 32)
+        | (((long) i2 & 0xffffffff)));
+    long l2 = ((((long) i3 & 0xffffffff) << 32)
+        | (((long) i4 & 0xffffffff)));
+    return new UUID(l1, l2);
   }
 
   /**
