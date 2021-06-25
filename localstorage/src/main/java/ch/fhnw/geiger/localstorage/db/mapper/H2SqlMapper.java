@@ -210,8 +210,7 @@ public class H2SqlMapper extends AbstractMapper {
   public void add(Node node) throws StorageException {
     // check skeleton
     if (node.isSkeleton()) {
-      throw new StorageException("Skeleton nodes cannot be added, "
-          + "please materialize before adding");
+      throw new StorageException("Skeleton nodes cannot be added.");
     }
     checkPath(node);
     // TODO This seems like bad coding, as we expect an exception to be thrown from
@@ -236,6 +235,7 @@ public class H2SqlMapper extends AbstractMapper {
       parent.addChild(node);
       update(parent);
     }
+    // add node
     String sqlStatement = "INSERT INTO "
         + "storage_node(path, owner, name, visibility, children, tombstone) "
         + "VALUES (?,?,?,?,?,?)";
@@ -472,7 +472,11 @@ public class H2SqlMapper extends AbstractMapper {
       throw new NullPointerException();
     }
     checkPath(path);
-    get(path); // check if node exists
+    // check if node exists and is not a tombstone
+    Node ret = get(path);
+    if (ret.isTombstone()) {
+      throw new StorageException("Node does not exists: " + path);
+    }
 
     String sqlSelectStatement = "SELECT path,key,value,type,locale,last_modified "
         + "FROM node_value WHERE (path = ? and key = ?)";

@@ -2,6 +2,7 @@ package ch.fhnw.geiger.localstorage;
 
 import static ch.fhnw.geiger.localstorage.Visibility.RED;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThrows;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -28,15 +30,17 @@ import org.junit.Test;
  */
 public class TestController {
 
-  private StorageController getController() throws StorageException {
-    StorageController controller = new GenericController("testOwner", new DummyMapper());
+  StorageController controller;
+
+  @Before
+  public void setup() throws StorageException {
+    // TODO add support for multiple mappers to ensure the same functionality with all mappers
+    controller = new GenericController("testOwner", new DummyMapper());
     controller.zap();
-    return controller;
   }
 
   @Test
   public void testOwnerUpdateOnNode() throws StorageException {
-    StorageController controller = getController();
     System.out.println("## Testing controller in " + (new Object() {
     }).getClass().getEnclosingMethod().getName());
     Node node = new NodeImpl("testNode1", "");
@@ -47,7 +51,6 @@ public class TestController {
 
   @Test
   public void testStorageNodeCreate() throws StorageException {
-    StorageController controller = getController();
     controller.add(new NodeImpl("testNode1", ""));
 
     // fetch stored node
@@ -62,7 +65,6 @@ public class TestController {
 
   @Test
   public void testStorageNodeAdd() throws StorageException {
-    StorageController controller = getController();
     controller.add(new NodeImpl("parent1", ""));
     controller.add(new NodeImpl("name2", ":parent1"));
 
@@ -74,6 +76,7 @@ public class TestController {
     assertEquals("name2", storedNode.getName());
     assertEquals(":parent1:name2", storedNode.getPath());
     assertSame(RED, storedNode.getVisibility());
+
   }
 
   /**
@@ -81,7 +84,6 @@ public class TestController {
    */
   @Test
   public void testStorageNodeUpdate() throws StorageException {
-    StorageController controller = getController();
     // create original node
     controller.add(new NodeImpl("parent1", ""));
 
@@ -110,7 +112,6 @@ public class TestController {
 
   @Test
   public void testValueUpdate() throws StorageException {
-    StorageController controller = getController();
     try {
       controller.add(new NodeImpl("testNode1", ":parent1"));
       fail("Should raise an exception as parent node does not exist");
@@ -160,7 +161,6 @@ public class TestController {
 
   @Test
   public void testStorageNodeRemove() throws StorageException {
-    StorageController controller = getController();
     controller.add(new NodeImpl("parent1", ""));
     NodeImpl node = new NodeImpl("name1", ":parent1");
     NodeValue nv = new NodeValueImpl("key", "value");
@@ -174,12 +174,11 @@ public class TestController {
 
     // check values
     assertEquals(nv, removed.getValue("key"));
-    assertThrows(NullPointerException.class, () -> controller.getValue(removed.getPath(), "key"));
+    assertThrows(StorageException.class, () -> controller.getValue(removed.getPath(), "key"));
   }
 
   @Test
   public void testStorageNodeRemoveWithChild() throws StorageException {
-    StorageController controller = getController();
     controller.addOrUpdate(new NodeImpl("parent1", ""));
     NodeImpl node = new NodeImpl("name1", ":parent1");
     // add child
@@ -196,7 +195,6 @@ public class TestController {
 
   @Test
   public void testStorageNodeSearch() throws StorageException {
-    StorageController controller = getController();
 
     controller.add(
         new NodeImpl(":parent1", null,
@@ -256,7 +254,6 @@ public class TestController {
 
   @Test
   public void testRenameNode() throws StorageException {
-    StorageController controller = getController();
     NodeImpl[] nodes = new NodeImpl[]{
         new NodeImpl("renameTests"),
         new NodeImpl("name1", ":renameTests"),
@@ -327,7 +324,6 @@ public class TestController {
 
   @Test
   public void testRenameNodeWithValues() throws StorageException {
-    StorageController controller = getController();
     NodeImpl[] nodes = new NodeImpl[]{
         new NodeImpl("renameTests"),
         new NodeImpl("name1", ":renameTests"),
@@ -378,9 +374,9 @@ public class TestController {
         controller.get(":renameTests:name2a:name21").getValue("key21"));
 
     // check old values
-    assertThrows(NullPointerException.class,
+    assertThrows(StorageException.class,
         () -> controller.getValue(":renameTests:name2", "key2"));
-    assertThrows(NullPointerException.class,
+    assertThrows(StorageException.class,
         () -> controller.getValue(":renameTests:name2:name21", "key21"));
   }
 
@@ -424,7 +420,6 @@ public class TestController {
 
   @Test
   public void addOrUpdateTest() throws StorageException {
-    StorageController controller = getController();
     Node n = new NodeImpl(":TestNode", null,
         new NodeValue[]{
             new NodeValueImpl("key1", "value1")
@@ -433,26 +428,22 @@ public class TestController {
             new NodeImpl(":TestNode:node1"),
             new NodeImpl(":TestNode:node2"),
             new NodeImpl(":TestNode:node3"),
-            new NodeImpl(":TestNode:node4", controller)
           }
     );
     Assert.assertTrue("Failed writing first time (wrong return value)",
         controller.addOrUpdate(n));
     Assert.assertEquals("Failed writing first time. "
         + "Failed to compare written to provided node", n, controller.get(n.getPath()));
-    for (int i = 1; i < 4; i++) {
+    for (int i = 1; i < 3; i++) {
       Assert.assertEquals("Failed writing first time. "
           + "Failed to compare written to provided node", ":TestNode:node"
           + i, controller.get(":TestNode:node" + i).getPath());
     }
-    try {
-      controller.get(":TestNode:node4");
-      fail("expected Exception when getting a skeletonized reply");
-    } catch (StorageException se) {
-      // expected result
-    } catch (Exception e) {
-      fail("expected StorageException when getting a skeletonized reply");
-    }
-    Assert.assertFalse("Failed writing first time (wrong return value)", controller.addOrUpdate(n));
+
+    assertFalse("Adding a skeleton node",
+        controller.addOrUpdate(new NodeImpl(":TestNode:node4", controller)));
+
+    assertThrows(StorageException.class, () -> controller.get(":TestNode:node4"));
+    assertFalse("Failed writing first time (wrong return value)", controller.addOrUpdate(n));
   }
 }

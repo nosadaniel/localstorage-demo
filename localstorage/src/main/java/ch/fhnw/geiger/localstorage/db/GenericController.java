@@ -157,10 +157,8 @@ public class GenericController implements StorageController, ChangeRegistrar {
   @Override
   public Node get(String path) throws StorageException {
     Node n = getNodeOrTombstone(path);
-    if (n == null) {
-      return null;
-    } else if (n.isTombstone()) {
-      return null;
+    if (n == null || n.isTombstone()) {
+      throw new StorageException("Node does not exist");
     }
     List<String> l = new Vector<>();
     for (Node cn : n.getChildren().values()) {
@@ -188,6 +186,11 @@ public class GenericController implements StorageController, ChangeRegistrar {
 
     // add object
     mapper.add(node);
+
+    // add child nodes
+    for (Node n : node.getChildren().values()) {
+      mapper.add(n);
+    }
 
     checkListeners(EventType.CREATE, null, node, null, null);
   }

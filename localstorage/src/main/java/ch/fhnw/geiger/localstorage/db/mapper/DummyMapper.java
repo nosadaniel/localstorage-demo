@@ -34,6 +34,11 @@ public class DummyMapper extends AbstractMapper {
     if (ret == null) {
       throw new StorageException("Node not found");
     }
+    if (ret.isTombstone()) {
+      Node returnNode = new NodeImpl(path, true);
+      returnNode.setVisibility(ret.getVisibility());
+      return returnNode;
+    }
     return ret.deepClone();
   }
 
@@ -44,20 +49,20 @@ public class DummyMapper extends AbstractMapper {
       if (nodes.get(node.getPath()) != null) {
         throw new StorageException("Node does already exist");
       }
+      if (node.isSkeleton()) {
+        throw new StorageException("Skeleton nodes cannot be added.");
+      }
 
       // check if parent node is available
       if (node.getParentPath() != null && !"".equals(node.getParentPath())) {
         if (nodes.get(node.getParentPath()) == null) {
           throw new StorageException("Parent node \"" + node.getParentPath() + "\" does not exist");
         }
+        // add reference to parent
         nodes.get(node.getParentPath()).addChild(node);
       }
+      // add node
       nodes.put(node.getPath(), node.shallowClone());
-      for (Node n : node.getChildren().values()) {
-        if (!n.isSkeleton()) {
-          add(n);
-        }
-      }
     }
   }
 
@@ -117,6 +122,10 @@ public class DummyMapper extends AbstractMapper {
         throw new StorageException("Node does have children... cannot remove " + nodeName);
       }
       Node n = nodes.remove(nodeName);
+      // add tombstone
+      Node tombstone = new NodeImpl(n.getPath(), true);
+      tombstone.setVisibility(n.getVisibility());
+      nodes.put(n.getPath(), tombstone);
       if (n.getParentPath() != null && !"".equals(n.getParentPath())) {
         nodes.get(n.getParentPath()).removeChild(n.getName());
       }
@@ -125,8 +134,12 @@ public class DummyMapper extends AbstractMapper {
   }
 
   @Override
-  public NodeValue getValue(String path, String key) {
-    return nodes.get(path).getValues().get(key);
+  public NodeValue getValue(String path, String key) throws StorageException {
+    Node ret = get(path);
+    if (ret.isTombstone()) {
+      throw new StorageException("Not does not exist");
+    }
+    return ret.getValues().get(key);
   }
 
   @Override

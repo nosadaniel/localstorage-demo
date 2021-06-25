@@ -3,9 +3,11 @@ package ch.fhnw.geiger.localstorage;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import ch.fhnw.geiger.localstorage.db.GenericController;
 import ch.fhnw.geiger.localstorage.db.StorageMapper;
 import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
@@ -284,43 +286,55 @@ public class TestMapper {
   @Test
   public void testTombstones() throws StorageException {
     // TODO activate once dummyMapper is fixed
-    //    for (StorageMapper mapper : mapperList) {
-    //      System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
-    //      }).getClass().getEnclosingMethod().getName());
-    // add a Node
-    StorageMapper mapper = new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234");
-    mapper.add(new NodeImpl(":parent"));
-    NodeImpl node = new NodeImpl("testNode1", ":parent", Visibility.GREEN);
-    node.setOwner("theOwner");
-    mapper.add(node);
+    for (StorageMapper mapper : mapperList) {
+      System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
+      }).getClass().getEnclosingMethod().getName());
+      // add a Node
+      //StorageMapper mapper = new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234");
+      mapper.add(new NodeImpl(":parent"));
+      NodeImpl node = new NodeImpl("testNode1", ":parent", Visibility.GREEN);
+      node.setOwner("theOwner");
+      mapper.add(node);
 
-    // delete the Node and check return
-    Node deletedNode = mapper.delete(node.getPath());
-    assertEquals("checking deleted Node", node, deletedNode);
+      // delete the Node and check return
+      Node deletedNode = mapper.delete(node.getPath());
+      assertEquals("checking deleted Node", node, deletedNode);
 
-    // get tombstone from mapper
-    Node tombstoneNode = mapper.get(node.getPath());
-    assertTrue("check if node is a tombstone", tombstoneNode.isTombstone());
-    assertEquals("check path", node.getPath(), tombstoneNode.getPath());
-    assertEquals("check values", 0, tombstoneNode.getValues().size());
-    assertNull("check owner", tombstoneNode.getOwner());
-    assertEquals("check children", 0, tombstoneNode.getChildren().size());
-    assertEquals("check visibility", node.getVisibility(), tombstoneNode.getVisibility());
+      // get tombstone from mapper
+      Node tombstoneNode = mapper.get(node.getPath());
+      assertTrue("check if node is a tombstone", tombstoneNode.isTombstone());
+      assertEquals("check path", node.getPath(), tombstoneNode.getPath());
+      assertEquals("check values", 0, tombstoneNode.getValues().size());
+      assertNull("check owner", tombstoneNode.getOwner());
+      assertEquals("check children", 0, tombstoneNode.getChildren().size());
+      assertEquals("check visibility", node.getVisibility(), tombstoneNode.getVisibility());
 
-    // test add Tombstone
+      // test add Tombstone
 
-    Node testAddNode = new NodeImpl(":testAddNodePath", true);
-    assertEquals("check constructor visibility", Visibility.RED,
-        testAddNode.getVisibility());
-    mapper.add(testAddNode);
-    Node returnedNode = mapper.get(":testAddNodePath");
-    assertTrue("check if node is a tombstone", returnedNode.isTombstone());
-    assertEquals("check path", testAddNode.getPath(), returnedNode.getPath());
-    assertEquals("check values", 0, returnedNode.getValues().size());
-    assertNull("check owner", returnedNode.getOwner());
-    assertEquals("check children", 0, returnedNode.getChildren().size());
-    assertEquals("check visibility", testAddNode.getVisibility(),
-        returnedNode.getVisibility());
-    //}
+      Node testAddNode = new NodeImpl(":testAddNodePath", true);
+      assertEquals("check constructor visibility", Visibility.RED,
+          testAddNode.getVisibility());
+      mapper.add(testAddNode);
+      Node returnedNode = mapper.get(":testAddNodePath");
+      assertTrue("check if node is a tombstone", returnedNode.isTombstone());
+      assertEquals("check path", testAddNode.getPath(), returnedNode.getPath());
+      assertEquals("check values", 0, returnedNode.getValues().size());
+      assertNull("check owner", returnedNode.getOwner());
+      assertEquals("check children", 0, returnedNode.getChildren().size());
+      assertEquals("check visibility", testAddNode.getVisibility(),
+          returnedNode.getVisibility());
+    }
+  }
+
+  @Test
+  public void testAddSkeleton() throws StorageException {
+    for (StorageMapper mapper : mapperList) {
+      System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
+      }).getClass().getEnclosingMethod().getName());
+      // try to add a skeleton node
+      assertThrows(StorageException.class,
+          () -> mapper.add(new NodeImpl(":TestNode",
+              new GenericController("theOwner", new DummyMapper()))));
+    }
   }
 }
