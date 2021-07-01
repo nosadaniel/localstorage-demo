@@ -52,7 +52,8 @@ public class TestMapper {
     for (StorageMapper mapper : mapperList) {
       mapper.zap();
       mapper.close();
-      new File("./testdb.mv.db").delete();
+      boolean isDeleted = new File("./testdb.mv.db").delete();
+      System.out.println("the DB file for " + mapper + " has been deleted: " + isDeleted);
     }
   }
 
