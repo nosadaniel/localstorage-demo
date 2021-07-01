@@ -1,3 +1,4 @@
+/*
 package ch.fhnw.geiger.localstorage.db.mapper;
 
 import ch.fhnw.geiger.localstorage.SearchCriteria;
@@ -22,11 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 
+*/
 /**
  * <p>This class maps the DBInterface functions to an H2SQL database.</p>
  *
  * @author Sacha Leemann
- */
+ *//*
+
 public class H2SqlMapper extends AbstractMapper {
 
   private static final int MAXFIELDSIZE = 1024;
@@ -71,7 +74,8 @@ public class H2SqlMapper extends AbstractMapper {
   private final String jdbcPassword;
   private StorageController controller = null;
 
-  /**
+  */
+/**
    * <p>Constructor for a generic, persisting data Mapper based on H2SQL.</p>
    *
    * <p>If the database does not exist it will be created.</p>
@@ -81,7 +85,8 @@ public class H2SqlMapper extends AbstractMapper {
    * @param jdbcPassword the password of the database
    *
    * @throws StorageException In case of problems regarding the storage
-   */
+   *//*
+
   public H2SqlMapper(String jdbcUrl, String jdbcUsername, String jdbcPassword)
       throws StorageException {
     // Connect to the database
@@ -623,11 +628,14 @@ public class H2SqlMapper extends AbstractMapper {
     }
   }
 
-  /**
+  */
+/**
    * <p>Used to define what a translation is used for.</p>
-   */
+   *//*
+
   public enum Identifier {
     VALUE,
     DESCRIPTION
   }
 }
+*/

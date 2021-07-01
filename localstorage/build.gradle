@@ -8,7 +8,7 @@ plugins {
 }
 
 group = 'eu.cyber-geiger'
-version = '0.3.3c'
+version = '0.3.3c-noH2'
 description = 'localStorage'
 sourceCompatibility = '1.8'
 
@@ -35,7 +35,7 @@ configurations {
 
 dependencies {
     // H2SQL
-    implementation 'com.h2database:h2:1.4.200'
+    //implementation 'com.h2database:h2:1.4.200'
 
     compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.38'
     checkstyleConfig("com.puppycrawl.tools:checkstyle:8.38") { transitive = false }
