@@ -50,6 +50,7 @@ public class TestMapper {
   @AfterClass
   public static void tearDownClass() throws StorageException {
     for (StorageMapper mapper : mapperList) {
+      mapper.zap();
       mapper.close();
       new File("./testdb.mv.db").delete();
     }
@@ -245,16 +246,18 @@ public class TestMapper {
       nv.setValue("Wert", Locale.GERMAN);
       nv.setValue("Au ä Wert", new Locale("de", "ch"));
       NodeImpl node = new NodeImpl(":testNode1");
-
       node.addValue(nv);
-      System.out.println("## Stored " + node);
+
 
       // write data
       NodeImpl node2 = new NodeImpl("testNode2", "");
       mapper.add(node);
+      System.out.println("## Stored " + node);
       mapper.add(node2);
+      System.out.println("## Stored " + node2);
       NodeImpl childNode = new NodeImpl(":testNode1:testNode1a");
       mapper.add(childNode);
+      System.out.println("## Stored " + childNode);
 
       node.addChild(childNode);
 
