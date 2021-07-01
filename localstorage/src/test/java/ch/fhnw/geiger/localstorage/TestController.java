@@ -32,6 +32,11 @@ public class TestController {
 
   StorageController controller;
 
+  /**
+   * Setup the controller for each test.
+   *
+   * @throws StorageException if controller could not be setup
+   */
   @Before
   public void setup() throws StorageException {
     // TODO add support for multiple mappers to ensure the same functionality with all mappers

@@ -36,7 +36,7 @@
         <repository>
             <id>totalcross-repo</id>
             <name>ip-172-31-40-140-releases</name>
-            <url>http://maven.totalcross.com/artifactory/repo1</url>
+            <url>https://maven.totalcross.com/artifactory/repo1</url>
         </repository>
     </repositories>
 
@@ -44,7 +44,7 @@
         <pluginRepository>
             <id>totalcross-repo</id>
             <name>ip-172-31-40-140-releases</name>
-            <url>http://maven.totalcross.com/artifactory/repo1</url>
+            <url>https://maven.totalcross.com/artifactory/repo1</url>
         </pluginRepository>
     </pluginRepositories>
 

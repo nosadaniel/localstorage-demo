@@ -8,14 +8,14 @@ plugins {
 }
 
 group = 'eu.cyber-geiger'
-version = '0.3.3b'
+version = '0.3.3c'
 description = 'localStorage'
 sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
     maven {
-        url = uri('http://repo.maven.apache.org/maven2')
+        url = uri('https://repo.maven.apache.org/maven2')
         mavenContent {
             releasesOnly()
         }
@@ -160,7 +160,7 @@ publishing {
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
                 developers {
@@ -178,7 +178,7 @@ publishing {
                 scm {
                     connection = 'scm:git:git://github.com/cyber-geiger/toolbox-storage.git'
                     developerConnection = 'scm:git:ssh://github.com/cyber-geiger/toolbox-storage.git'
-                    url = 'http://github.com/cyber-geiger/toolbox-storage/'
+                    url = 'https://github.com/cyber-geiger/toolbox-storage/'
                 }
             }
 
