@@ -15,6 +15,7 @@ import ch.fhnw.geiger.localstorage.db.data.NodeValue;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
 import ch.fhnw.geiger.localstorage.db.mapper.DummyMapper;
 //import ch.fhnw.geiger.localstorage.db.mapper.H2SqlMapper;
+import ch.fhnw.geiger.localstorage.db.mapper.SqliteMapper;
 import ch.fhnw.geiger.totalcross.Locale;
 import java.io.File;
 import java.util.List;
@@ -38,8 +39,9 @@ public class TestMapper {
   @BeforeClass
   public static void setupClass() throws StorageException {
     // First test impplementation on dummy mapper
-    mapperList.add(new DummyMapper());
+    //mapperList.add(new DummyMapper());
     //mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
+    mapperList.add(new SqliteMapper("test.sqlite"));
   }
 
   /**
