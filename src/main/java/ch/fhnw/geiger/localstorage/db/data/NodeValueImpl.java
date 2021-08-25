@@ -4,12 +4,13 @@ import ch.fhnw.geiger.serialization.SerializerHelper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -30,7 +31,7 @@ public class NodeValueImpl implements NodeValue {
    */
   private String key;
 
-  private final Map<Locale, String> value = new HashMap<>();
+  private final Map<String, String> value = new HashMap<>();
 
   /**
    * <p>The type of the value.</p>>
@@ -40,7 +41,7 @@ public class NodeValueImpl implements NodeValue {
   /**
    * Description of this value, can be used for translation.
    */
-  private final Map<Locale, String> description = new HashMap<>();
+  private final Map<String, String> description = new HashMap<>();
 
   /**
    * Defines the epoch when this value was last modified.
@@ -72,7 +73,7 @@ public class NodeValueImpl implements NodeValue {
   public NodeValueImpl(String key, String value, String type, String description,
                        long lastModified) {
     if (key == null || value == null) {
-      throw new NullPointerException();
+      throw new NullPointerException("Neither key nor value may be null (" + key + "=" + value + ")");
     }
     this.key = key;
     setLocalizedString(this.value, value, DEFAULT_LOCALE);
@@ -105,7 +106,11 @@ public class NodeValueImpl implements NodeValue {
 
   @Override
   public Map<Locale, String> getAllValueTranslations() {
-    return new HashMap<>(value);
+    Map<Locale, String> m = new HashMap<>();
+    for (Map.Entry<String, String> e : value.entrySet()) {
+      m.put(Locale.forLanguageTag(e.getKey()), e.getValue());
+    }
+    return m;
   }
 
   @Override
@@ -144,32 +149,40 @@ public class NodeValueImpl implements NodeValue {
 
   @Override
   public Map<Locale, String> getAllDescriptionTranslations() {
-    return new HashMap<>(description);
+    Map<Locale, String> m = new HashMap<>();
+    for (Map.Entry<String, String> e : description.entrySet()) {
+      m.put(Locale.forLanguageTag(e.getKey()), e.getValue());
+    }
+    return m;
   }
 
-  private static Locale lookupLocale(Map<Locale, String> map, String languageRange) {
+  private static Locale lookupLocale(Map<String, String> map, String languageRange) {
     // Get Language Range
-    List<Locale> matchingLocales = Locale.filter(Locale.LanguageRange.parse(languageRange),
-        map.keySet());
-    if (matchingLocales.size() > 0) {
-      return matchingLocales.get(0);
+    //Set<Locale> s = new HashSet<>();
+    //for (String l : map.keySet()) {
+    //  s.add(Locale.forLanguageTag(l));
+    //}
+    //List<Locale> matchingLocales = Locale.filter(Locale.LanguageRange.parse(languageRange), s);
+    String l = Locale.lookupTag(Locale.LanguageRange.parse(languageRange),  map.keySet());
+    if (l!=null) {
+      return Locale.forLanguageTag(l);
     } else {
       return DEFAULT_LOCALE;
     }
   }
 
-  private static String getLocalizedString(Map<Locale, String> map, String languageRange) {
-    return map.get(lookupLocale(map, languageRange));
+  private static String getLocalizedString(Map<String, String> map, String languageRange) {
+    return map.get(lookupLocale(map, languageRange).toLanguageTag());
   }
 
-  private static void setLocalizedString(Map<Locale, String> map, String value, Locale locale)
+  private static void setLocalizedString(Map<String, String> map, String value, Locale locale)
       throws MissingResourceException {
     if (getLocalizedString(map, DEFAULT_LOCALE.toLanguageTag()) == null
-        && locale != DEFAULT_LOCALE) {
+        && !locale.toLanguageTag().equals(DEFAULT_LOCALE.toLanguageTag())) {
       throw new MissingResourceException("undefined string for locale " + DEFAULT_LOCALE, "Locale",
           locale.toLanguageTag());
     }
-    map.put(locale, value);
+    map.put(locale.toLanguageTag(), value);
   }
 
   @Override
@@ -198,12 +211,12 @@ public class NodeValueImpl implements NodeValue {
     NodeValueImpl n2 = (NodeValueImpl) (node);
     this.key = n2.getKey();
     this.value.clear();
-    for (Map.Entry<Locale, String> e : n2.value.entrySet()) {
+    for (Map.Entry<String, String> e : n2.value.entrySet()) {
       this.value.put(e.getKey(), e.getValue());
     }
     this.type = n2.getType();
     this.description.clear();
-    for (Map.Entry<Locale, String> e : n2.description.entrySet()) {
+    for (Map.Entry<String, String> e : n2.description.entrySet()) {
       this.description.put(e.getKey(), e.getValue());
     }
     updateLastmodified();
@@ -241,15 +254,15 @@ public class NodeValueImpl implements NodeValue {
     // build values
     sb.append("={");
     if (value.size() == 1) {
-      sb.append(DEFAULT_LOCALE).append("=>\"").append(value.get(DEFAULT_LOCALE)).append("\"}");
+      sb.append(DEFAULT_LOCALE.toLanguageTag()).append("=>\"").append(value.get(DEFAULT_LOCALE.toLanguageTag())).append("\"}");
     } else {
       sb.append(System.lineSeparator());
       int i = 0;
-      for (Locale l : new TreeSet<>(value.keySet())) {
+      for (String l : new TreeSet<>(value.keySet())) {
         if (i > 0) {
           sb.append(",").append(System.lineSeparator());
         }
-        sb.append(prefix).append("  ").append(l.toLanguageTag()).append("=>\"")
+        sb.append(prefix).append("  ").append(Locale.forLanguageTag(l).toLanguageTag()).append("=>\"")
             .append(value.get(l)).append("\"");
         i++;
       }
@@ -281,8 +294,8 @@ public class NodeValueImpl implements NodeValue {
     // value
     SerializerHelper.writeInt(out, value.size());
     synchronized (value) {
-      for (Map.Entry<Locale, String> e : value.entrySet()) {
-        SerializerHelper.writeString(out, e.getKey().toLanguageTag());
+      for (Map.Entry<String, String> e : value.entrySet()) {
+        SerializerHelper.writeString(out, e.getKey());
         SerializerHelper.writeString(out, e.getValue());
       }
     }
@@ -296,8 +309,8 @@ public class NodeValueImpl implements NodeValue {
     // description
     SerializerHelper.writeInt(out, description.size());
     synchronized (description) {
-      for (Map.Entry<Locale, String> e : description.entrySet()) {
-        SerializerHelper.writeString(out, e.getKey().toLanguageTag());
+      for (Map.Entry<String, String> e : description.entrySet()) {
+        SerializerHelper.writeString(out, e.getKey());
         SerializerHelper.writeString(out, e.getValue());
       }
     }
@@ -326,7 +339,7 @@ public class NodeValueImpl implements NodeValue {
     int counter = SerializerHelper.readInt(in);
     nv.value.clear();
     for (int i = 0; i < counter; i++) {
-      nv.value.put(Locale.forLanguageTag(SerializerHelper.readString(in)),
+      nv.value.put(Locale.forLanguageTag(SerializerHelper.readString(in)).toLanguageTag(),
           SerializerHelper.readString(in));
     }
 
@@ -339,7 +352,7 @@ public class NodeValueImpl implements NodeValue {
     // restore description
     counter = SerializerHelper.readInt(in);
     for (int i = 0; i < counter; i++) {
-      nv.description.put(Locale.forLanguageTag(SerializerHelper.readString(in)),
+      nv.description.put(Locale.forLanguageTag(SerializerHelper.readString(in)).toLanguageTag(),
           SerializerHelper.readString(in));
     }
 

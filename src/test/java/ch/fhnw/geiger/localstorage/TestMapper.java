@@ -38,7 +38,7 @@ public class TestMapper {
   @BeforeClass
   public static void setupClass() throws StorageException {
     // First test impplementation on dummy mapper
-    //mapperList.add(new DummyMapper());
+    mapperList.add(new DummyMapper());
     //mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
     mapperList.add(new SqliteMapper("test.sqlite"));
   }
@@ -243,6 +243,7 @@ public class TestMapper {
       }).getClass().getEnclosingMethod().getName());
 
       NodeValue nv = new NodeValueImpl("key", "value", "type", "description", 1);
+      nv.setDescription("Default description");
       nv.setDescription("Deutsche Beschreibung", Locale.GERMAN);
       nv.setDescription("Schwiizertüütschi Beschriibig", new Locale("de", "ch"));
       nv.setValue("Wert", Locale.GERMAN);

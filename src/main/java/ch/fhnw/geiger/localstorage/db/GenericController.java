@@ -59,6 +59,9 @@ public class GenericController implements StorageController, ChangeRegistrar {
    * @throws StorageException In case of problems regarding the storage
    */
   public GenericController(String owner, StorageMapper mapper) throws StorageException {
+    if(owner==null) {
+      throw new NullPointerException("Owner may not be null");
+    }
     this.owner = owner;
     this.mapper = mapper;
     this.mapper.setController(this);
@@ -86,17 +89,26 @@ public class GenericController implements StorageController, ChangeRegistrar {
         mapper.get(tmp.getPath());
       } catch (StorageException e) {
         // node does not exist and therefore we create it
-        mapper.add(new NodeImpl(nodeName));
+        Node tmp = new NodeImpl(nodeName);
+        tmp.setOwner(owner);
+        mapper.add(tmp);
       }
     }
 
     // check if current user exists
     Node localNode = mapper.get(":Local");
     NodeValue uuid = localNode.getValue("currentUser");
+    if(uuid==null) {
+      uuid=new NodeValueImpl("currentUser",UUID.randomUUID().toString());
+      localNode.addValue(uuid);
+      localNode.setOwner(owner);
+      mapper.update(localNode);
+    }
     if (uuid == null) {
       // create new default user
       uuid = new NodeValueImpl("currentUser", UUID.randomUUID().toString());
       localNode.addValue(uuid);
+      localNode.setOwner(owner);
       mapper.update(localNode);
     }
 
@@ -105,7 +117,9 @@ public class GenericController implements StorageController, ChangeRegistrar {
     try {
       mapper.get(userNodeName);
     } catch (StorageException se) {
-      mapper.add(new NodeImpl(userNodeName));
+      Node n = new NodeImpl(userNodeName);
+      n.setOwner(owner);
+      mapper.add(n);
     }
 
     // check if current device exists
@@ -115,6 +129,7 @@ public class GenericController implements StorageController, ChangeRegistrar {
       // create new default device
       uuid = new NodeValueImpl("currentDevice", UUID.randomUUID().toString());
       localNode.addValue(uuid);
+      localNode.setOwner(owner);
       mapper.update(localNode);
     }
 

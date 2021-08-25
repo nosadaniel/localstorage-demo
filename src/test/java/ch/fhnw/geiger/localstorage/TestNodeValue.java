@@ -46,8 +46,9 @@ public class TestNodeValue {
     // with multiple languages
     nodeValue.setValue("de-value", Locale.GERMAN);
     nodeValue.setValue("de-de-value", Locale.GERMANY);
+    nodeValue.getValue("de-DE");
     assertEquals("test key getter (DEFAULT)", "en2", nodeValue.getValue());
-    assertEquals("test key getter (en)", "en2", nodeValue.getValue("en2"));
+    assertEquals("test key getter (en)", "en2", nodeValue.getValue("sp"));
     assertEquals("test key getter (en-us)", "en2", nodeValue.getValue("en-US"));
     assertEquals("test key getter (de)", "de-value", nodeValue.getValue("de"));
     assertEquals("test key getter (de-de)", "de-de-value", nodeValue.getValue("de-DE"));
