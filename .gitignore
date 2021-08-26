@@ -80,8 +80,4 @@ local.properties
 /settings.gradle
 /localstorage/gradle.properties
 /**/target
-/localstorage-totalcross/localstorage.iml
-/localstorage-totalcross/testdb.mv.db
-/localstorage/testdb.mv.db
-/localstorage/*.sqlite
 /test.sqlite

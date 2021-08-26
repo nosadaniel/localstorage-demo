@@ -18,7 +18,7 @@ import java.util.*;
 /**
  * This class maps the DBinterface functions to a SQLite database
  */
-public class SqliteMapper extends AbstractMapper {
+public class SqliteMapper extends AbstractSQLMapper {
 
   private static final int MAXFIELDSIZE = 1024;
 
@@ -58,7 +58,7 @@ public class SqliteMapper extends AbstractMapper {
   private Connection conn;
   private StorageController controller = null;
 
-  public SqliteMapper(String jdbcPath) throws StorageException {
+  public SqliteMapper(String jdbcPath) {
     try {
       // connect only if database already exists
       conn = DriverManager.getConnection("jdbc:sqlite:" + jdbcPath);
@@ -68,7 +68,11 @@ public class SqliteMapper extends AbstractMapper {
       //conn = new SQLiteConnection(jdbcPath, "geiger.db");
     } catch (SQLException throwables) {
       // database does not exists it should be created
-      initialize();
+      try{
+        initialize();
+      } catch(StorageException se) {
+        throw new RuntimeException(se);
+      }
     }
   }
 

@@ -1,4 +1,3 @@
-/*
 package ch.fhnw.geiger.localstorage.db.mapper;
 
 import ch.fhnw.geiger.localstorage.SearchCriteria;
@@ -11,7 +10,6 @@ import ch.fhnw.geiger.localstorage.db.data.Node;
 import ch.fhnw.geiger.localstorage.db.data.NodeImpl;
 import ch.fhnw.geiger.localstorage.db.data.NodeValue;
 import ch.fhnw.geiger.localstorage.db.data.NodeValueImpl;
-import ch.fhnw.geiger.totalcross.Locale;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -20,17 +18,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-
-*/
 /**
  * <p>This class maps the DBInterface functions to an H2SQL database.</p>
  *
  * @author Sacha Leemann
- *//*
+ */
 
-public class H2SqlMapper extends AbstractMapper {
+public class H2SqlMapper extends AbstractSQLMapper {
 
   private static final int MAXFIELDSIZE = 1024;
 
@@ -69,13 +66,12 @@ public class H2SqlMapper extends AbstractMapper {
       + "";
 
   private Connection conn;
-  private final String jdbcUrl;
-  private final String jdbcUsername;
-  private final String jdbcPassword;
+  private String jdbcUrl;
+  private String jdbcUsername;
+  private String jdbcPassword;
   private StorageController controller = null;
 
-  */
-/**
+  /**
    * <p>Constructor for a generic, persisting data Mapper based on H2SQL.</p>
    *
    * <p>If the database does not exist it will be created.</p>
@@ -83,17 +79,27 @@ public class H2SqlMapper extends AbstractMapper {
    * @param jdbcUrl      the url to connect to
    * @param jdbcUsername the username of the database
    * @param jdbcPassword the password of the database
-   *
    * @throws StorageException In case of problems regarding the storage
-   *//*
-
+   */
   public H2SqlMapper(String jdbcUrl, String jdbcUsername, String jdbcPassword)
       throws StorageException {
-    // Connect to the database
+    initDB(jdbcUrl,jdbcUsername,jdbcPassword);
+
+  }
+
+
+  public H2SqlMapper(String jdbcUrl, String jdbcUsername, String jdbcPassword,boolean runtimeException) {
+    try{
+      initDB(jdbcUrl,jdbcUsername,jdbcPassword);
+    } catch(StorageException se) {
+      throw new RuntimeException(se);
+    }
+  }
+
+  private void initDB(String jdbcUrl, String jdbcUsername, String jdbcPassword) throws StorageException{
     this.jdbcUrl = jdbcUrl;
     this.jdbcUsername = jdbcUsername;
     this.jdbcPassword = jdbcPassword;
-
     try {
       // connect only if database already exists
       conn = DriverManager.getConnection(jdbcUrl + ";IFEXISTS=TRUE", jdbcUsername, jdbcPassword);
@@ -628,14 +634,11 @@ public class H2SqlMapper extends AbstractMapper {
     }
   }
 
-  */
-/**
+  /**
    * <p>Used to define what a translation is used for.</p>
-   *//*
-
+   */
   public enum Identifier {
     VALUE,
     DESCRIPTION
   }
 }
-*/

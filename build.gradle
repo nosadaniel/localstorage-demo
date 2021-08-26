@@ -8,15 +8,12 @@ plugins {
 }
 
 group = 'eu.cyber-geiger'
-version = '0.3.3c-noH2'
+version = '0.3.4'
 description = 'localStorage'
 sourceCompatibility = '1.8'
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri('https://maven.totalcross.com/artifactory/repo1')
-    }
     maven {
         url = uri('https://repo.maven.apache.org/maven2')
         mavenContent {
@@ -37,9 +34,8 @@ configurations {
 }
 
 dependencies {
-    // H2SQL
-    //implementation 'com.h2database:h2:1.4.200'
-    implementation 'com.totalcross:totalcross-sdk:7.1.0'
+    // SQL
+    implementation 'com.h2database:h2:1.4.200'
     implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.36.0.1'
 
     compile group: 'com.puppycrawl.tools', name: 'checkstyle', version: '8.38'
@@ -196,31 +192,3 @@ publishing {
 signing {
     sign publishing.publications.mavenJava
 }
-
-jar{
-    from rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross/target/install/win32/localstorage-totalcross.tcz"
-    rename '(.+).tcz', 'toolbox-storageLib.tcz'
-}
-
-/*task packageTotalcross {
-    doFirst {
-        mavenexec {
-            workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross"
-            goals '-DskipTests', 'package'
-        }
-    }
-}
-
-jar.dependsOn packageTotalcross
-
-task testTotalcross {
-    doLast {
-        mavenexec {
-            workingDir rootProject.getProjectDir().getAbsolutePath() + "/localstorage-totalcross"
-            goals 'test'
-        }
-    }
-}
-
-check.dependsOn testTotalcross
-*/
