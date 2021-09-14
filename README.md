@@ -1,3 +1,4 @@
+# ***OUTDATED README***
 # GEIGER local Storage implementation
 
 This repository contains the implementation for the local storage used in the GEIGER project.
