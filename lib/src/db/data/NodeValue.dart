@@ -14,7 +14,7 @@ abstract class NodeValue/* with Serializer*/ {
   ///
   /// @param languageRange the set of languages requested
   /// @return the string representation of the value
-  String getValue([String languageRange]);
+  String? getValue([String languageRange]);
 
   /// <p>Gets all translations of the value.</p>
   ///
@@ -31,20 +31,20 @@ abstract class NodeValue/* with Serializer*/ {
   /// <p>Gets the type of value.</p>
   ///
   /// @return the string representation of the type
-  String getType();
+  String? getType();
 
   /// <p>Sets the type of value.</p>
   /// @param type the string representation of the type to be set
   ///
   /// @return the string representation of the previously set type
-  String setType(String type);
+  String? setType(String type);
 
   /// <p>Gets the description of the value.</p>
   ///
   /// <p>This description is used when asking for the users consent to share this data.</p>
   /// @param languageRange the set of languages requested
   /// @return the string of the currently set description
-  String getDescription([String languageRange]);
+  String? getDescription([String languageRange]);
 
   /// <p>Gets all translations of the description of the value.</p>
   ///
@@ -58,7 +58,7 @@ abstract class NodeValue/* with Serializer*/ {
   /// @param locale      the locale to be written
   /// @return the string of the previously set description.
   /// @throws MissingResourceException if the default locale is missing
-  String setDescription(String description, [Locale locale]);
+  String? setDescription(String description, [Locale locale]);
 
   /// <p>Gets the epoch of the last modification of the value.</p>
   ///

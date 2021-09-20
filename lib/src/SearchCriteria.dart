@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:localstorage/src/db/data/Field.dart';
 
 import 'db/data/Node.dart';
-import 'db/data/NodeValue.dart';
 
 /// <p>Defines the type of comparator to be used when accessing an ordinal.</p>
 enum ComparatorType { STRING, DATETIME, BOOLEAN }
@@ -122,9 +121,9 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
         ((values[Field.VALUE] != null) || (values[Field.TYPE] != null))) {
       for (var e in nodeValues.entries) {
         var type = values[Field.TYPE];
-        var r3 = type == null || !regexEvalString(type, e.value.getType());
+        var r3 = type == null || !regexEvalString(type, e.value.getType()!);
         var value = values[Field.VALUE];
-        var r2 = value == null || !regexEvalString(value, e.value.getValue());
+        var r2 = value == null || !regexEvalString(value, e.value.getValue()!);
         if (r2 && r3) {
           return true;
         }
@@ -136,10 +135,10 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
         if (nv == null) {
           return false;
         }
-        if (!regexEvalString(values[Field.TYPE]!, nv.getType())) {
+        if (!regexEvalString(values[Field.TYPE]!, nv.getType()!)) {
           return false;
         }
-        if (!regexEvalString(values[Field.VALUE]!, nv.getValue())) {
+        if (!regexEvalString(values[Field.VALUE]!, nv.getValue()!)) {
           return false;
         }
       }

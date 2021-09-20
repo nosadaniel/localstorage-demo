@@ -7,13 +7,13 @@ import 'package:uuid/uuid.dart';
 import '../ChangeRegistrar.dart';
 import '../EventType.dart';
 import '../SearchCriteria.dart';
-import '../SearchCriteria.dart';
 import '../StorageController.dart';
 import '../StorageException.dart';
 import 'StorageMapper.dart';
 import 'data/Node.dart';
 import 'data/NodeImpl.dart';
 import 'data/NodeValue.dart';
+import 'data/NodeValueImpl.dart';
 
 /// <p>This Class Acts as an intermediate class to relay storageRequests to the
 /// StorageMapper.</p>
@@ -72,7 +72,7 @@ class GenericController implements StorageController, ChangeRegistrar {
 // for correct path generation creation of a Node is needed
         Node tmp = NodeImpl.fromPath(nodeName);
         mapper.get(tmp.getPath()!);
-      } on StorageException catch (e) {
+      } on StorageException {
 // node does not exist and therefore we create it
         Node tmp = NodeImpl.fromPath(nodeName);
         tmp.setOwner(owner);
@@ -98,10 +98,10 @@ class GenericController implements StorageController, ChangeRegistrar {
     }
 
 // check if current user node exists
-    var userNodeName = ':Users:' + uuid.getValue();
+    var userNodeName = ':Users:' + uuid.getValue()!;
     try {
       mapper.get(userNodeName);
-    } on StorageException catch (se) {
+    } on StorageException {
       Node n = NodeImpl.fromPath(userNodeName);
       n.setOwner(owner);
       mapper.add(n);
@@ -112,17 +112,17 @@ class GenericController implements StorageController, ChangeRegistrar {
     uuid = localNode.getValue('currentDevice');
     if (uuid == null) {
 // create new default device
-      uuid = NodeValueImpl('currentDevice', UUID.randomUUID().toString());
+      uuid = NodeValueImpl('currentDevice', Uuid().v4());
       localNode.addValue(uuid);
       localNode.setOwner(owner);
       mapper.update(localNode);
     }
 
 // check if current device node exists
-    var deviceNodeName = ':Devices:' + uuid.getValue();
+    var deviceNodeName = ':Devices:' + uuid.getValue()!;
     try {
       mapper.get(deviceNodeName);
-    } on StorageException catch (se) {
+    } on StorageException {
       mapper.add(NodeImpl.fromPath(deviceNodeName));
     }
   }
@@ -141,7 +141,7 @@ class GenericController implements StorageController, ChangeRegistrar {
       try {
         add(node);
         ret = true;
-      } on StorageException catch (e) {
+      } on StorageException {
         update(node);
       }
       if (node.getChildren() != null) {
@@ -214,7 +214,7 @@ class GenericController implements StorageController, ChangeRegistrar {
       if (!child.isSkeleton()) {
         try {
           add(child);
-        } on StorageException catch (e) {
+        } on StorageException {
 // node already exists, therefore it was changed
           update(child);
         }
@@ -319,12 +319,12 @@ class GenericController implements StorageController, ChangeRegistrar {
             Future.microtask(() {
               try {
                 e.value.gotStorageChange(event, oldNode, newNode);
-              } on StorageException catch (storageException) {
+              } on StorageException {
                 // FIXME do something sensible (should not happen anyway)
               }
             });
           }
-        } on StorageException catch (se) {
+        } on StorageException {
           // FIXME do something sensible (should not happen anyway)
         }
       }
