@@ -12,6 +12,7 @@ import '../StorageController.dart';
 import '../StorageException.dart';
 import 'StorageMapper.dart';
 import 'data/Node.dart';
+import 'data/NodeImpl.dart';
 import 'data/NodeValue.dart';
 
 /// <p>This Class Acts as an intermediate class to relay storageRequests to the
@@ -23,7 +24,6 @@ import 'data/NodeValue.dart';
 /// @author Sacha
 /// @version 0.1
 class GenericController implements StorageController, ChangeRegistrar {
-
   static StorageController? defaultController;
 
   /// the path delimiter.
@@ -59,16 +59,22 @@ class GenericController implements StorageController, ChangeRegistrar {
 
   void initMapper() {
     final baseNodes = <String>[
-      '', ':Devices', ':Users', ':Enterprise', ':Keys', ':Global', ':Local'
+      '',
+      ':Devices',
+      ':Users',
+      ':Enterprise',
+      ':Keys',
+      ':Global',
+      ':Local'
     ];
     for (var nodeName in baseNodes) {
       try {
 // for correct path generation creation of a Node is needed
-        Node tmp = NodeImpl(nodeName);
-        mapper.get(tmp.getPath());
+        Node tmp = NodeImpl.fromPath(nodeName);
+        mapper.get(tmp.getPath()!);
       } on StorageException catch (e) {
 // node does not exist and therefore we create it
-        Node tmp = NodeImpl(nodeName);
+        Node tmp = NodeImpl.fromPath(nodeName);
         tmp.setOwner(owner);
         mapper.add(tmp);
       }
@@ -96,7 +102,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     try {
       mapper.get(userNodeName);
     } on StorageException catch (se) {
-      Node n = NodeImpl(userNodeName);
+      Node n = NodeImpl.fromPath(userNodeName);
       n.setOwner(owner);
       mapper.add(n);
     }
@@ -117,41 +123,35 @@ class GenericController implements StorageController, ChangeRegistrar {
     try {
       mapper.get(deviceNodeName);
     } on StorageException catch (se) {
-      mapper.add(NodeImpl(deviceNodeName));
+      mapper.add(NodeImpl.fromPath(deviceNodeName));
     }
   }
 
-
   @override
-  bool addOrUpdate(Node node) {
+  bool addOrUpdate(Node? node) {
     if (node == null) {
       return false;
     } else if (node.isSkeleton()) {
       return false;
     } else if (node.isTombstone()) {
-      delete(node.getPath());
+      delete(node.getPath()!);
       return false;
     } else {
       var ret = false;
       try {
         add(node);
         ret = true;
-      }
-      on StorageException catch (e) {
+      } on StorageException catch (e) {
         update(node);
       }
       if (node.getChildren() != null) {
-        for (var n2 in node
-            .getChildren()
-            .values) {
+        for (var n2 in node.getChildren().values) {
           ret |= addOrUpdate(n2);
         }
       }
-      return
-        ret;
+      return ret;
     }
   }
-
 
   @override
   Node get(String path) {
@@ -160,26 +160,21 @@ class GenericController implements StorageController, ChangeRegistrar {
       throw StorageException('Node does not exist');
     }
     var l = List<String>.empty(growable: true);
-    for (var cn in n
-        .getChildren()
-        .values) {
+    for (var cn in n.getChildren().values) {
       if (cn.isTombstone()) {
-        l.add(cn.getName());
+        l.add(cn.getName()!);
       }
     }
     for (var name in l) {
       n.removeChild(name);
     }
-    return
-      n;
+    return n;
   }
-
 
   @override
   Node getNodeOrTombstone(String path) {
     return mapper.get(path);
   }
-
 
   @override
   void add(Node node) {
@@ -192,18 +187,12 @@ class GenericController implements StorageController, ChangeRegistrar {
     mapper.add(node);
 
 // add child nodes
-    for (var n in node
-        .getChildren()
-        .values) {
+    for (var n in node.getChildren().values) {
       mapper.add(n);
     }
 
-    checkListeners(EventType.CREATE, null, node, null
-        ,
-        null
-    );
+    checkListeners(EventType.CREATE, null, node, null, null);
   }
-
 
   @override
   void update(Node node) {
@@ -213,7 +202,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     }
 
 // get old node for update events
-    var oldNode = mapper.get(node.getPath());
+    var oldNode = mapper.get(node.getPath()!);
 
 // write node
     mapper.update(node);
@@ -221,21 +210,17 @@ class GenericController implements StorageController, ChangeRegistrar {
     checkListeners(EventType.UPDATE, oldNode, node, null, null);
 
 // any child that is not a skeleton will be handled as new or changed
-    for (var child in node
-        .getChildren()
-        .values) {
+    for (var child in node.getChildren().values) {
       if (!child.isSkeleton()) {
         try {
           add(child);
-        }
-        on StorageException catch (e) {
+        } on StorageException catch (e) {
 // node already exists, therefore it was changed
           update(child);
         }
       }
     }
   }
-
 
   @override
   Node delete(String path) {
@@ -244,26 +229,23 @@ class GenericController implements StorageController, ChangeRegistrar {
     return ret;
   }
 
-
   @override
   void rename(String oldPath, String newPathOrName) {
-    NodeImpl oldNode = (NodeImpl) mapper.get(oldPath);
+    var oldNode = mapper.get(oldPath) as NodeImpl;
     var newPath = newPathOrName;
     if (!newPathOrName.startsWith(PATH_DELIMITER)) {
 // create path from name
-      newPath = oldNode.getParentPath() + PATH_DELIMITER + newPathOrName;
+      newPath = oldNode.getParentPath()! + PATH_DELIMITER + newPathOrName;
     }
     mapper.rename(oldPath, newPath);
-    NodeImpl newNode = (NodeImpl) mapper.get(newPath);
+    var newNode = mapper.get(newPath) as NodeImpl;
     checkListeners(EventType.RENAME, oldNode, newNode, null, null);
   }
-
 
   @override
   NodeValue getValue(String path, String key) {
     return mapper.getValue(path, key);
   }
-
 
   @override
   void addValue(String nodeName, NodeValue newValue) {
@@ -278,7 +260,6 @@ class GenericController implements StorageController, ChangeRegistrar {
     mapper.update(newNode);
     checkListeners(EventType.UPDATE, oldNode, newNode, null, newValue);
   }
-
 
   @override
   void updateValue(String nodeName, NodeValue newValue) {
@@ -295,7 +276,6 @@ class GenericController implements StorageController, ChangeRegistrar {
     checkListeners(EventType.UPDATE, oldNode, newNode, oldValue, newValue);
   }
 
-
   @override
   NodeValue deleteValue(String nodeName, String key) {
     var oldNode = mapper.get(nodeName);
@@ -310,12 +290,10 @@ class GenericController implements StorageController, ChangeRegistrar {
     return oldValue;
   }
 
-
   @override
   List<Node> search(SearchCriteria criteria) {
     return mapper.search(criteria);
   }
-
 
   @override
   void close() {
@@ -328,21 +306,16 @@ class GenericController implements StorageController, ChangeRegistrar {
   }
 
   void checkListeners(final EventType event, final Node? oldNode,
-      final Node? newNode,
-      NodeValue? oldValue, NodeValue? newValue) {
+      final Node? newNode, NodeValue? oldValue, NodeValue? newValue) {
     if (oldNode == null || oldNode != newNode) {
       // synchronized(listeners) {
       for (var e in listeners.entries) {
         try {
-          if (
-          (
-              oldNode != null && newNode != null
-                  && (e.key.evaluate(oldNode) ||
-                  e.key.evaluate(newNode))
-          )
-              || (oldNode != null && e.key.evaluate(oldNode))
-              || (newNode != null && e.key.evaluate(newNode))
-          ) {
+          if ((oldNode != null &&
+                  newNode != null &&
+                  (e.key.evaluate(oldNode) || e.key.evaluate(newNode))) ||
+              (oldNode != null && e.key.evaluate(oldNode)) ||
+              (newNode != null && e.key.evaluate(newNode))) {
             Future.microtask(() {
               try {
                 e.value.gotStorageChange(event, oldNode, newNode);
@@ -351,8 +324,7 @@ class GenericController implements StorageController, ChangeRegistrar {
               }
             });
           }
-        }
-        on StorageException catch (se) {
+        } on StorageException catch (se) {
           // FIXME do something sensible (should not happen anyway)
         }
       }
@@ -360,21 +332,13 @@ class GenericController implements StorageController, ChangeRegistrar {
     }
   }
 
-
   @override
-  void registerChangeListener(StorageListener listener,
-      SearchCriteria criteria) {
-    if (listener == null) {
-      throw NullThrownError();
-    }
-    if (criteria == null) {
-      throw NullThrownError();
-    }
+  void registerChangeListener(
+      StorageListener listener, SearchCriteria criteria) {
     // synchronized(listeners) {
     listeners[criteria] = listener;
     // }
   }
-
 
   @override
   List<SearchCriteria> deregisterChangeListener(StorageListener listener) {
@@ -397,5 +361,4 @@ class GenericController implements StorageController, ChangeRegistrar {
     mapper.zap();
     initMapper();
   }
-
 }

@@ -8,24 +8,24 @@ import 'NodeValue.dart';
 abstract class Node /*with Serializer*/ {
   /// <p>Gets the name of the current node.</p>
   /// @return the name of the current node without the path prefix
-  String getName();
+  String? getName();
 
   /// <p>Gets the parent path of the node.</p>
   /// @return the parent path of the current node
-  String getParentPath();
+  String? getParentPath();
 
   /// <p>Gets the full path with name of the current node.</p>
   /// @return the fully qualified name of the current node
-  String getPath();
+  String? getPath();
 
   /// <p>Gets the owner of the current object.</p>
   /// @return string representation of the owner
-  String getOwner();
+  String? getOwner();
 
   /// <p>Sets the owner string.</p>
   /// @param newOwner the string representation of the previously set owner
   /// @return the previously set owner
-  String setOwner(String newOwner);
+  String? setOwner(String newOwner);
 
   /// <p>Gets the current visibility according to the TLP protocol.</p>
   /// @return the current visibility
@@ -49,21 +49,21 @@ abstract class Node /*with Serializer*/ {
   /// @param key the key to be looked up
   /// @return the requested value or null if not found
   /// @throws StorageException if the storage backend encounters a problem
-  NodeValue getValue(String key);
+  NodeValue? getValue(String key);
 
   /// <p>Update a specific value of the node.</p>
   ///
   /// @param value the key to be updated
   /// @return the requested value or null if not found
   /// @throws StorageException if the storage backend encounters a problem
-  NodeValue updateValue(NodeValue value);
+  NodeValue? updateValue(NodeValue value);
 
   /// <p>Removes a value from the node.</p>
   ///
   /// @param key the key of the value to be removed
   /// @return the removed node value or null if not found
   /// @throws StorageException if the storage backend encounters a problem
-  NodeValue removeValue(String key);
+  NodeValue? removeValue(String key);
 
   /// <p>Get a deep copy of all values stored in the node.</p>
   ///
@@ -81,7 +81,7 @@ abstract class Node /*with Serializer*/ {
   /// @param name the name of the child node to fetch
   /// @return the requested child node or null if the node does not exist
   /// @throws StorageException if the storage backend encounters a problem
-  Node getChild(String name);
+  Node? getChild(String name);
 
   /// <p>Removes a child node from this node.</p>
   ///
@@ -113,13 +113,13 @@ abstract class Node /*with Serializer*/ {
   /// <p>get the controller needed for materializing the node if required.</p>
   ///
   /// @return the controller
-  StorageController getController();
+  StorageController? getController();
 
   /// <p>Sets the controller needed for materializing the node if required.</p>
   ///
   /// @param controller the controller to be set
   /// @return the previously set controller
-  StorageController setController(StorageController controller);
+  StorageController? setController(StorageController controller);
 
   /// <p>Update all data of the node with the data of the given node.</p>
   ///

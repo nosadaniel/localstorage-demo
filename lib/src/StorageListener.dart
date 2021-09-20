@@ -1,6 +1,5 @@
-import 'dart:html';
-
 import 'EventType.dart';
+import 'db/data/Node.dart';
 
 /// <p>Listener interface for storage events.</p>
 abstract class StorageListener {
@@ -10,5 +9,5 @@ abstract class StorageListener {
   /// @param oldNode the old node content
   /// @param newNode the new node content
   /// @throws StorageException if the storage backend encounters a problem
-  void gotStorageChange(EventType event, Node oldNode, Node newNode);
+  void gotStorageChange(EventType event, Node? oldNode, Node? newNode);
 }
