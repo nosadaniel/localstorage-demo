@@ -1,68 +1,47 @@
+import 'dart:io';
+
+import 'package:localstorage/src/db/StorageMapper.dart';
+import 'package:localstorage/src/db/data/NodeImpl.dart';
+import 'package:localstorage/src/db/mapper/DummyMapper.dart';
+import 'package:localstorage/src/db/mapper/SqliteMapper.dart';
+import 'package:test/test.dart';
+
 class StorageMapper_test {}
 
-void main() {
-  //TODO: translate
+void _testPrep(List<StorageMapper> mapperList) {
+  for (final mapper in mapperList) {
+    mapper.zap();
+  }
+}
 
-  // private static final List<StorageMapper> mapperList = new Vector<>();
-  //
-  // /**
-  //  * SetUp clean in memory db before each Test.
-  //  */
-  // @BeforeClass
-  // public static void setupClass() {
-  //   // First test impplementation on dummy mapper
-  //   mapperList.add(new DummyMapper());
-  //   mapperList.add(new H2SqlMapper("jdbc:h2:./testdb;AUTO_SERVER=TRUE", "sa2", "1234"));
-  // }
-  //
-  // /**
-  //  * Destroy in memory db after every test.
-  //  *
-  //  * @throws StorageException in case of any problems
-  //  */
-  // @AfterClass
-  // public static void tearDownClass() throws StorageException {
-  //   for (StorageMapper mapper : mapperList) {
-  //     mapper.close();
-  //     new File("./testdb.mv.db").delete();
-  //   }
-  // }
-  //
-  // /**
-  //  * <p>Create test environment.</p>
-  //  */
-  // @Before
-  // public void setupTest() {
-  // // clear all mappers
-  // for (StorageMapper mapper : mapperList) {
-  // mapper.zap();
-  // }
-  // }
-  //
-  // /**
-  //  * Ter down test environment (and make sure that all remanences are cleaned).
-  //  */
-  // @After
-  // public void tearDownTest() {
-  // // write data to all mappers
-  // for (StorageMapper mapper : mapperList) {
-  // mapper.flush();
-  // }
-  // }
-  //
-  // @Test
-  // public void testAddRootNode() {
-  // for (StorageMapper mapper : mapperList) {
-  // System.out.println("## Testing mapper " + mapper + " in " + (new Object() {
-  // }).getClass().getEnclosingMethod().getName());
-  // NodeImpl node = new NodeImpl("testNode1", "");
-  //
-  // mapper.add(node);
-  //
-  // // make sure that lastupdated and owner is updated upon add
-  // mapper.get(":testNode1");
-  // }
-  // }
+void _testTearDown(List<StorageMapper> mapperList) {
+  for (final mapper in mapperList) {
+    mapper.flush();
+  }
+}
+
+void main() {
+  var mapperList = [
+    DummyMapper(),
+    SqliteMapper('jdbc:sqlite:./testdb.sqlite')
+  ];
+
+  _testPrep(mapperList);
+  test('Adding root node', () {
+    for (final mapper in mapperList) {
+      print('## Testing mapper $mapper in UNKNOWN' );
+      var node = NodeImpl('testNode1', '');
+      mapper.add(node);
+
+      // make sure that lastupdated and owner is updated upon add
+      mapper.get(':testNode1');
+
+      // todo: add tests
+    }
+  });
+  _testTearDown(mapperList);
+
+  // TODO: translate from java
   //
   // @Test
   // public void testAddRootNodeNull() {
@@ -246,5 +225,12 @@ void main() {
   // assertEquals("checking for child node count", 1, storedNode.getChildren().size());
   // }
   // }
+
+  // tear down all test data
+  for (final mapper in mapperList) {
+        mapper.close();
+  }
+  File('./testdb.mv.db').delete();
+  File('./testdb.sqlite').delete();
 }
 

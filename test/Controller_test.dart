@@ -19,14 +19,14 @@ void updateTests(final StorageController controller) {
     });
 
     test('Storage Node Create', () {
-      controller.add(NodeImpl('StorageNodeCreate1', ''));
+      controller.add(NodeImpl(':StorageNodeCreate1'));
       // fetch stored node
       var storedNode = controller.get(':StorageNodeCreate1');
 
       // check results
       expect(storedNode.getOwner(), 'testOwner');
-      expect(storedNode.getName(), 'testNode1');
-      expect(storedNode.getPath(), ':testNode1');
+      expect(storedNode.getName(), 'StorageNodeCreate1');
+      expect(storedNode.getPath(), ':StorageNodeCreate1');
       expect(storedNode.getVisibility(), Visibility.RED);
     });
 
@@ -40,21 +40,21 @@ void updateTests(final StorageController controller) {
       // check results
       expect(storedNode.getOwner(), 'testOwner');
       expect(storedNode.getName(), 'name2');
-      expect(storedNode.getPath(), 'parent1:name2');
+      expect(storedNode.getPath(), ':parent1:name2');
       expect(storedNode.getVisibility(), Visibility.RED);
     });
 
     // depends on correct functionality of the StorageController.create() function
     test('test storage node update', () {
       // create original node
-      controller.add(NodeImpl('parent1', ''));
+      controller.add(NodeImpl(':nodeUpdateTest'));
 
       // updated Node with different visibility children
-      var node = NodeImpl('testNode1', ':parent1', Visibility.GREEN);
+      var node = NodeImpl('testNode1', ':nodeUpdateTest', Visibility.GREEN);
       controller.add(node);
       expect(node.getOwner(), 'testOwner');
 
-      var sn = NodeImpl('testChild1', ':parent1:testNode1');
+      var sn = NodeImpl('testChild1', ':nodeUpdateTest:testNode1');
       controller.add(sn);
       node.setVisibility(Visibility.RED);
       node.addChild(sn);
@@ -63,23 +63,23 @@ void updateTests(final StorageController controller) {
       controller.update(node);
 
       // get the record
-      var storedNode = controller.get(':parent1:testNode1');
+      var storedNode = controller.get(':nodeUpdateTest:testNode1');
 
       // check results
       expect(storedNode.getOwner(), 'testOwner');
       expect(storedNode.getName(), 'testNode1');
-      expect(storedNode.getPath(), ':parent1:testNode1');
+      expect(storedNode.getPath(), ':nodeUpdateTest:testNode1');
       expect(storedNode.getChildNodesCsv(), 'testChild1');
       expect(storedNode.getVisibility(), Visibility.RED);
     });
 
     test('add node with missing parent', () {
-      expect(() => controller.add(NodeImpl('testNode1', ':parent1')),
+      expect(() => controller.add(NodeImpl('testNode1', ':nodeUpdateTest2')),
           throwsA(TypeMatcher<StorageException>()));
     });
 
     test('create new node', () {
-      var n = [NodeImpl('parent1', ''), NodeImpl('testNode1', ':parent1')];
+      var n = [NodeImpl(':nodeCreateTest'), NodeImpl('testNode1', ':nodeCreateTest')];
 
       for (final tn in n) {
         print(
@@ -90,16 +90,16 @@ void updateTests(final StorageController controller) {
       // add a value
       print('## adding value');
       controller.addValue(
-          ':parent1:testNode1', NodeValueImpl('key1', 'valueFirst'));
+          ':nodeCreateTest:testNode1', NodeValueImpl('key1', 'valueFirst'));
 
       // update value
       print('## updating value');
       var value2 = NodeValueImpl('key1', 'valueSecond');
-      controller.updateValue(':parent1:testNode1', value2);
+      controller.updateValue(':nodeCreateTest:testNode1', value2);
 
       // get the record
       print('## testing updated value');
-      var n2 = controller.get(':parent1:testNode1');
+      var n2 = controller.get(':nodeCreateTest:testNode1');
       expect(
           (n2.getValue(value2.getKey()) ??
               NodeValueImpl(value2.getKey(), 'INVALID'))
