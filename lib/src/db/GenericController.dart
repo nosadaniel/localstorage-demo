@@ -243,7 +243,7 @@ class GenericController implements StorageController, ChangeRegistrar {
   }
 
   @override
-  NodeValue getValue(String path, String key) {
+  NodeValue? getValue(String path, String key) {
     return mapper.getValue(path, key);
   }
 

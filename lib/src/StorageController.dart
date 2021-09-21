@@ -57,7 +57,7 @@ abstract class StorageController with ChangeRegistrar {
   /// @return a representation of the node value
   /// @throws StorageException if the node or the object does not exist or
   /// the storage backend encounters an error
-  NodeValue getValue(String path, String key);
+  NodeValue? getValue(String path, String key);
 
   /// <p>Add NodeValueObject to StorageNode.</p>
   /// @param path  the path of the node to add the value

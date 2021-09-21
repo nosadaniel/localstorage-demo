@@ -15,3 +15,13 @@ enum Visibility {
   /// <p>for all values to be shared with all entities of the cloud.</p>
   WHITE
 }
+
+extension VisibilityExtension on Visibility {
+  static Visibility? valueOf(String value) {
+    try {
+      return Visibility.values.firstWhere((e) => e.toString() == value);
+    } on StateError {
+      return null;
+    }
+  }
+}

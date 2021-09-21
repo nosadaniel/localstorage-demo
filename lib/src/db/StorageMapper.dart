@@ -52,7 +52,7 @@ abstract class StorageMapper
   /// @param key  the key to be fetched
   /// @return a representation of the node value
   /// @throws StorageException if the storage backend encounters a problem
-  NodeValue getValue(String path, String key);
+  NodeValue? getValue(String path, String key);
 
   /// <p>Renames or moves an existing node.</p>
   ///

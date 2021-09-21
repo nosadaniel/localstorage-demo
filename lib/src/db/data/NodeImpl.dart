@@ -249,12 +249,7 @@ class NodeImpl with Node {
   Visibility getVisibility() {
     try {
       var rawVisibility = get(Field.VISIBILITY);
-      try {
-        return Visibility.values
-            .firstWhere((e) => e.toString() == rawVisibility);
-      } on StateError {
-        return Visibility.RED;
-      }
+      return VisibilityExtension.valueOf(rawVisibility!) ?? Visibility.RED;
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
