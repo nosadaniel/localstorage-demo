@@ -79,7 +79,10 @@ void updateTests(final StorageController controller) {
     });
 
     test('create new node', () {
-      var n = [NodeImpl(':nodeCreateTest'), NodeImpl('testNode1', ':nodeCreateTest')];
+      var n = [
+        NodeImpl(':nodeCreateTest'),
+        NodeImpl('testNode1', ':nodeCreateTest')
+      ];
 
       for (final tn in n) {
         print(
@@ -102,7 +105,7 @@ void updateTests(final StorageController controller) {
       var n2 = controller.get(':nodeCreateTest:testNode1');
       expect(
           (n2.getValue(value2.getKey()) ??
-              NodeValueImpl(value2.getKey(), 'INVALID'))
+                  NodeValueImpl(value2.getKey(), 'INVALID'))
               .getValue(),
           value2.getValue());
 
@@ -125,7 +128,7 @@ void updateTests(final StorageController controller) {
       var nv = NodeValueImpl('key', 'value');
       node.addValue(nv);
       controller.add(node);
-      var removed = controller.delete(':parent1:name1');
+      var removed = controller.delete(':removalNode1:name1');
 
       // check nodes
       expect(node, removed);
@@ -139,22 +142,22 @@ void updateTests(final StorageController controller) {
     });
 
     test('Remove node with children', () {
-      controller.add(NodeImpl('parent1', ''));
-      var node = NodeImpl('name1', ':parent1');
+      controller.add(NodeImpl('removalNode2', ''));
+      var node = NodeImpl('name1', ':removalNode2');
       // add child
-      var childNode = NodeImpl('child1', ':parent1:name1');
+      var childNode = NodeImpl('child1', ':removalNode2:name1');
       node.addChild(childNode);
       controller.add(node);
       controller.add(childNode);
 
-      expect(() => controller.delete(':parent1:name1'),
+      expect(() => controller.delete(':removalNode2:name1'),
           throwsA(TypeMatcher<StorageException>()));
 
       // check if node still exists
-      expect(controller.get(':parent1:name1'), node);
+      expect(controller.get(':removalNode2:name1'), node);
     });
 
-    group('rename tests',() {
+    group('rename tests', () {
       test('rename node', () {
         var nodes = [
           NodeImpl('renameTests'),
@@ -192,12 +195,12 @@ void updateTests(final StorageController controller) {
             reason: 'renaming node seems unsuccessful (new node name wrong)');
 
         // check path
-        expect(
-            controller.get(':renameTests:name1a').getPath(), ':renameTests:name1a',
+        expect(controller.get(':renameTests:name1a').getPath(),
+            ':renameTests:name1a',
             reason: 'renaming node seems unsuccessful (new node path wrong)');
 
-        expect(
-            controller.get(':renameTests:name2a').getPath(), ':renameTests:name2a',
+        expect(controller.get(':renameTests:name2a').getPath(),
+            ':renameTests:name2a',
             reason: 'renaming node seems unsuccessful (new node path wrong)');
 
         // check child nodes
@@ -223,13 +226,17 @@ void updateTests(final StorageController controller) {
             reason: 'renaming node seems unsuccessful (sub-node path wrong)');
 
         // test rename of non existing nodes
-        expect(() => controller.rename(':renameTests:name4', ':renameTests:name4a'),
+        expect(
+            () =>
+                controller.rename(':renameTests:name4', ':renameTests:name4a'),
             throwsA(TypeMatcher<StorageException>()));
         expect(() => controller.rename(':renameTests:name4', 'name4a'),
             throwsA(TypeMatcher<StorageException>()));
 
         // test rename to an existing node
-        expect(() => controller.rename(':renameTests:name2a', ':renameTests:name3'),
+        expect(
+            () =>
+                controller.rename(':renameTests:name2a', ':renameTests:name3'),
             throwsA(TypeMatcher<StorageException>()));
         expect(() => controller.rename(':renameTests:name2a', 'name3'),
             throwsA(TypeMatcher<StorageException>()));
@@ -237,11 +244,11 @@ void updateTests(final StorageController controller) {
 
       test(' Rename node with values', () {
         var nodes = [
-          NodeImpl('renameTests'),
-          NodeImpl('name1', ':renameTests'),
-          NodeImpl('name2', ':renameTests'),
-          NodeImpl('name21', ':renameTests:name2'),
-          NodeImpl('name3', ':renameTests')
+          NodeImpl('renameTests3'),
+          NodeImpl('name1', ':renameTests3'),
+          NodeImpl('name2', ':renameTests3'),
+          NodeImpl('name21', ':renameTests3:name2'),
+          NodeImpl('name3', ':renameTests3')
         ];
 
         var nv = NodeValueImpl('key', 'value');
@@ -257,47 +264,62 @@ void updateTests(final StorageController controller) {
         for (final n in nodes) {
           controller.add(n);
         }
-        controller.rename(':renameTests:name2', ':renameTests:name2a');
+        controller.rename(':renameTests3:name2', ':renameTests3:name2a');
 
         // check old node
         expect(() => controller.get(':renameTests:name2'),
             throwsA(TypeMatcher<StorageException>()));
 
-        expect(
-            controller.get(':renameTests:name2a').getPath(), ':renameTests:name2a',
+        expect(controller.get(':renameTests3:name2a').getPath(),
+            ':renameTests3:name2a',
             reason: 'renaming node seems unsuccessful (new node missing)');
-        expect(controller.get(':renameTests:name2a').getName(), 'name2a',
+        expect(controller.get(':renameTests3:name2a').getName(), 'name2a',
             reason: 'renaming node seems unsuccessful (new node name wrong)');
-        expect(
-            controller.get(':renameTests:name2a').getPath(), ':renameTests:name2a',
+        expect(controller.get(':renameTests3:name2a').getPath(),
+            ':renameTests3:name2a',
             reason: 'renaming node seems unsuccessful (new node path wrong)');
-        expect(controller.get(':renameTests:name2a:name21'), isNotNull,
+        expect(controller.get(':renameTests3:name2a:name21'), isNotNull,
             reason: 'renaming node seems unsuccessful (sub-node missing)');
-        expect(controller.get(':renameTests:name2a:name21').getName(), 'name21',
+        expect(
+            controller.get(':renameTests3:name2a:name21').getName(), 'name21',
             reason: 'renaming node seems unsuccessful (sub-node missing)');
-        expect(controller.get(':renameTests:name2a:name21').getPath(),
-            ':renameTests:name2a:name21',
+        expect(controller.get(':renameTests3:name2a:name21').getPath(),
+            ':renameTests3:name2a:name21',
             reason: 'renaming node seems unsuccessful (sub-node path wrong)');
 
         // check values
-        expect(controller.get(':renameTests').getValue('key'), nv,
+        expect(
+            (controller.get(':renameTests3').getValue('key') ??
+                    NodeValueImpl('key2', ''))
+                .equals(nv),
+            true,
             reason: 'value lost on parent');
-        expect(controller.get(':renameTests:name1').getValue('key1'), nv1,
+        expect(
+            (controller.get(':renameTests3:name1').getValue('key1') ??
+                    NodeValueImpl('key2', ''))
+                .equals(nv1),
+            true,
             reason: 'value lost on sibling');
-        expect(controller.get(':renameTests:name2a').getValue('key2'), nv2,
+        expect(
+            (controller.get(':renameTests3:name2a').getValue('key2') ??
+                    NodeValueImpl('key2', ''))
+                .equals(nv2),
+            true,
             reason: 'value lost moved node');
-        expect(controller.get(':renameTests:name2a:name21').getValue('key21'), nv21,
+        expect(
+            (controller.get(':renameTests3:name2a:name21').getValue('key21') ??
+                    NodeValueImpl('key2', ''))
+                .equals(nv21),
+            true,
             reason: 'value lost on sub-node');
 
         // check old values
-        expect(() => controller.getValue(':renameTests:name2', 'key2'),
-            throwsA(TypeMatcher<NullThrownError>()));
-        expect(() => controller.getValue(':renameTests:name2:name21', 'key2'),
-            throwsA(TypeMatcher<NullThrownError>()));
+        expect(() => controller.getValue(':renameTests3:name2', 'key2'),
+            throwsA(TypeMatcher<StorageException>()));
+        expect(() => controller.getValue(':renameTests3:name2:name21', 'key2'),
+            throwsA(TypeMatcher<StorageException>()));
       });
-
     });
-
   });
 }
 
@@ -306,7 +328,6 @@ void main() {
       GenericController('testOwner', DummyMapper());
 
   updateTests(controller);
-
 
   test('Storage node search', () {
     // TODO
@@ -319,5 +340,4 @@ void main() {
   test('notify change listener', () {
     // TODO
   });
-
 }

@@ -217,8 +217,9 @@ class NodeValueImpl with NodeValue {
     return sb.toString();
   }
 
-  bool equals(Object o) {
-    if (!(o is NodeValueImpl)) {
+  @override
+  bool equals(Object? o) {
+    if (o==null || !(o is NodeValueImpl)) {
       return false;
     }
     return toString() == o.toString();

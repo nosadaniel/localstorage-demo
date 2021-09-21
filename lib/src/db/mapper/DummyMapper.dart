@@ -118,7 +118,7 @@ class DummyMapper extends AbstractMapper {
   NodeValue getValue(String path, String key) {
     var ret = get(path);
     if (ret.isTombstone()) {
-      throw StorageException('Not does not exist');
+      throw StorageException('node does not exist');
     }
     return ret.getValues()[key]!;
   }
