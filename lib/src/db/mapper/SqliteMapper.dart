@@ -188,21 +188,21 @@ class SqliteMapper extends AbstractSqlMapper {
     if (node.isSkeleton()) {
       throw StorageException('Skeleton nodes cannot be added.');
     }
-    checkPath(node.getPath()!);
+    checkPath(node.getPath());
     try {
-      get(node.getPath()!);
+      get(node.getPath());
     } catch (e) {
       if (!(e is StorageException)) {
         throw StorageException('Node already exists');
       }
     }
     if (node.getParentPath() != null && '' != node.getParentPath()) {
-      if (get(node.getParentPath()!) == null) {
+      if (get(node.getParentPath()) == null) {
         throw StorageException('Parent node \"' +
-            (node.getParentPath() ?? 'null') +
+            (node.getParentPath()) +
             '\" does not exist');
       }
-      var parent = get(node.getParentPath()!);
+      var parent = get(node.getParentPath());
       parent.addChild(node);
       update(parent);
     }
@@ -224,7 +224,7 @@ class SqliteMapper extends AbstractSqlMapper {
       throw StorageException('Could not add new node', e);
     }
     for (var nv in node.getValues().values) {
-      addValue(node.getPath()!, nv);
+      addValue(node.getPath(), nv);
     }
   }
 
@@ -234,8 +234,8 @@ class SqliteMapper extends AbstractSqlMapper {
       throw StorageException('Skeleton nodes cannot be added, '
           'please materialize before adding');
     }
-    checkPath(node.getPath()!);
-    get(node.getPath()!);
+    checkPath(node.getPath());
+    get(node.getPath());
     var sqlStatement =
         ('UPDATE storage_node SET owner = ?, visibility = ?, children = ?, '
             'tombstone = ? WHERE path = ?');
@@ -250,10 +250,10 @@ class SqliteMapper extends AbstractSqlMapper {
             node.getPath()
           ]));
       for (var entry in node.getValues().entries) {
-        if (getValue(node.getPath()!, entry.key) == null) {
-          addValue(node.getPath()!, entry.value);
+        if (getValue(node.getPath(), entry.key) == null) {
+          addValue(node.getPath(), entry.value);
         } else {
-          updateValue(node.getPath()!, entry.value);
+          updateValue(node.getPath(), entry.value);
         }
       }
     } on StorageException catch (e) {
@@ -275,8 +275,8 @@ class SqliteMapper extends AbstractSqlMapper {
     deletedNode.setVisibility(oldNode.getVisibility());
     update(deletedNode);
     if (!('' == oldNode.getParentPath())) {
-      var parentNode = get(oldNode.getParentPath()!);
-      parentNode.removeChild(oldNode.getName()!);
+      var parentNode = get(oldNode.getParentPath());
+      parentNode.removeChild(oldNode.getName());
       update(parentNode);
     }
     return oldNode;
@@ -479,15 +479,15 @@ class SqliteMapper extends AbstractSqlMapper {
       newNode = NodeImpl.fromPath(newPathOrName, isTombstone: true);
     } else {
       newNode = NodeImpl(newPathOrName, oldNode.getOwner(),
-          vis: oldNode.getVisibility());
+          oldNode.getVisibility());
     }
     for (var nv in oldNode.getValues().values) {
       newNode.addValue(nv);
     }
     add(newNode);
     for (var n in oldNode.getChildren().values) {
-      rename(n.getPath()!,
-          newNode.getPath()! + GenericController.PATH_DELIMITER + n.getName()!);
+      rename(n.getPath(),
+          newNode.getPath()+ GenericController.PATH_DELIMITER + n.getName());
     }
     delete(oldPath);
   }

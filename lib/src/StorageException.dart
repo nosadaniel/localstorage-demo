@@ -1,7 +1,8 @@
 import 'dart:io';
 
 /// <p>Exception to be raised on any problems related to the local storage.</p>
-class StorageException with /*Serializer,*/ IOException {
+class StorageException implements IOException /*,Serializer*/{
+
   /// private static class SerializedException extends Throwable implements Serializer {
   /// private static final long serialversionUID = 721364991234L;
   /// private final String exceptionName;
@@ -70,11 +71,25 @@ class StorageException with /*Serializer,*/ IOException {
   final Exception? _cause;
   final StackTrace? _stackTrace;
 
-  /// <p>Creates a StorageException with message and root cause.</p>
+  Exception? get cause {
+    return _cause;
+  }
+
+  StackTrace? get stacktrace {
+    return _stackTrace;
+  }
+
+  /// Creates a StorageException with message and root cause.
   ///
-  /// @param txt the message
-  /// @param e the root cause
+  /// A storageException contains always a descriptive string [_message] and may contain additional information such as another exception [_cause] and a [_stackTrace].
   StorageException(this._message, [this._cause, this._stackTrace]);
+
+  @override
+  String toString() {
+    return 'StorageException: $_message';
+  }
+
+
 
 /* void toByteArrayStream(java_io_ByteArrayOutputStream out)
   {

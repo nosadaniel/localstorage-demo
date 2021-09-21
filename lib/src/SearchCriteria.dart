@@ -104,11 +104,11 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
   /// @throws StorageException if the storage backend encounters a problem
   bool evaluate(Node node) {
     var path = getNodePath();
-    if (path == null || !node.getPath()!.startsWith(path)) {
+    if (path == null || !node.getPath().startsWith(path)) {
       return false;
     }
     var owner = values[Field.OWNER];
-    if ((owner != null) && (!regexEvalString(owner, node.getOwner()!))) {
+    if ((owner != null) && (!regexEvalString(owner, node.getOwner()))) {
       return false;
     }
     var visibility = values[Field.VISIBILITY];
@@ -132,9 +132,6 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
     } else {
       if (values[Field.KEY] != null) {
         var nv = nodeValues[get(Field.KEY)]!;
-        if (nv == null) {
-          return false;
-        }
         if (!regexEvalString(values[Field.TYPE]!, nv.getType()!)) {
           return false;
         }
@@ -147,9 +144,6 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
   }
 
   bool regexEvalString(String regex, String value) {
-    if (regex == null) {
-      return true;
-    }
     return RegExp(regex).hasMatch(value);
   }
 
@@ -236,6 +230,7 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
     }
   }*/
 
+  @override
   int compareTo(SearchCriteria o) {
     return toString().compareTo(o.toString());
   }

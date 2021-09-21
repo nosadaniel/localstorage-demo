@@ -37,7 +37,7 @@ class DummyMapper extends AbstractMapper {
   }
 
   void add(Node node) {
-    checkPath(node.getPath()!);
+    checkPath(node.getPath());
     // synchronized(nodes, {
     if (nodes[node.getPath()] != null) {
       throw StorageException('Node does already exist');
@@ -48,17 +48,17 @@ class DummyMapper extends AbstractMapper {
     if ((node.getParentPath() != null) && (!('' == node.getParentPath()))) {
       if (nodes[node.getParentPath()] == null) {
         throw StorageException(
-            ('Parent node \"' + (node.getParentPath() ?? 'null')) +
+            ('Parent node \"' + (node.getParentPath())) +
                 '\" does not exist');
       }
       nodes[node.getParentPath()]?.addChild(node);
     }
-    nodes[node.getPath()!] = node.shallowClone();
+    nodes[node.getPath()] = node.shallowClone();
     // });
   }
 
   void update(Node node) {
-    checkPath(node.getPath()!);
+    checkPath(node.getPath());
     // synchronized(nodes, {
     if ((!('' == node.getParentPath())) &&
         (nodes[node.getParentPath()] == null)) {
@@ -86,11 +86,11 @@ class DummyMapper extends AbstractMapper {
     add(newNode);
     for (var n in oldNode.getChildren().values) {
       rename(
-          n.getPath()!,
-          (newNode.getPath()! + GenericController.PATH_DELIMITER) +
-              n.getName()!);
+          n.getPath(),
+          (newNode.getPath() + GenericController.PATH_DELIMITER) +
+              n.getName());
     }
-    delete(oldNode.getPath()!);
+    delete(oldNode.getPath());
     // });
   }
 
@@ -105,11 +105,11 @@ class DummyMapper extends AbstractMapper {
           'Node does have children... cannot remove ' + nodeName);
     }
     nodes.remove(node);
-    Node tombstone = NodeImpl.fromPath(node.getPath()!, isTombstone: true);
+    Node tombstone = NodeImpl.fromPath(node.getPath(), isTombstone: true);
     tombstone.setVisibility(node.getVisibility());
-    nodes[node.getPath()!] = tombstone;
+    nodes[node.getPath()] = tombstone;
     if ((node.getParentPath() != null) && (!("" == node.getParentPath()))) {
-      nodes[node.getParentPath()]!.removeChild(node.getName()!);
+      nodes[node.getParentPath()]!.removeChild(node.getName());
     }
     return node;
     // });

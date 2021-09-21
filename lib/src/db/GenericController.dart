@@ -71,7 +71,7 @@ class GenericController implements StorageController, ChangeRegistrar {
       try {
 // for correct path generation creation of a Node is needed
         Node tmp = NodeImpl.fromPath(nodeName);
-        mapper.get(tmp.getPath()!);
+        mapper.get(tmp.getPath());
       } on StorageException {
 // node does not exist and therefore we create it
         Node tmp = NodeImpl.fromPath(nodeName);
@@ -134,7 +134,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     } else if (node.isSkeleton()) {
       return false;
     } else if (node.isTombstone()) {
-      delete(node.getPath()!);
+      delete(node.getPath());
       return false;
     } else {
       var ret = false;
@@ -162,7 +162,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     var l = List<String>.empty(growable: true);
     for (var cn in n.getChildren().values) {
       if (cn.isTombstone()) {
-        l.add(cn.getName()!);
+        l.add(cn.getName());
       }
     }
     for (var name in l) {
@@ -202,7 +202,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     }
 
 // get old node for update events
-    var oldNode = mapper.get(node.getPath()!);
+    var oldNode = mapper.get(node.getPath());
 
 // write node
     mapper.update(node);
@@ -235,7 +235,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     var newPath = newPathOrName;
     if (!newPathOrName.startsWith(PATH_DELIMITER)) {
 // create path from name
-      newPath = oldNode.getParentPath()! + PATH_DELIMITER + newPathOrName;
+      newPath = oldNode.getParentPath() + PATH_DELIMITER + newPathOrName;
     }
     mapper.rename(oldPath, newPath);
     var newNode = mapper.get(newPath) as NodeImpl;

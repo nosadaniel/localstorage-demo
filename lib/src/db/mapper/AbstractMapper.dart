@@ -1,5 +1,4 @@
 import 'package:localstorage/src/StorageException.dart';
-import 'package:localstorage/src/db/data/Node.dart';
 
 import '../GenericController.dart';
 import '../StorageMapper.dart';

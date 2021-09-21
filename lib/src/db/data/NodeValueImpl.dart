@@ -102,6 +102,9 @@ class NodeValueImpl with NodeValue {
   }
 
   static Locale lookupLocale(Map<String, String> map, String languageRange) {
+    if(map.isEmpty) {
+      return DEFAULT_LOCALE;
+    }
     var l = map.keys.first;
     // TODO: implement lookup with language range
     // Locale.lookupTag(Locale.LanguageRange.parse(languageRange), map.keys);

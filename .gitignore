@@ -18,3 +18,4 @@ pubspec.lock
 /localstorage/testdb.trace.db
 /**/target
 /test.sqlite
+/local.properties

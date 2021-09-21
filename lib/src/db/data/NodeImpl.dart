@@ -94,10 +94,13 @@ class NodeImpl with Node {
   /// @param name   the name for the node
   /// @param parent the parent of the node (may be null if root node is the parent)
   /// @param vis    visibility of the node
-  NodeImpl(String name, String? parent, {Visibility vis = Visibility.RED}) {
-    parent ??= '';
+  NodeImpl(String name, [String? parent, Visibility vis = Visibility.RED]) {
+    if(parent==null) {
+      parent = getParentFromPath(name);
+      name = getNameFromPath(name) ?? '';
+    }
     try {
-      set(Field.PATH, (parent + GenericController.PATH_DELIMITER) + name);
+      set(Field.PATH, '$parent${GenericController.PATH_DELIMITER}$name');
       set(Field.VISIBILITY, vis.toString());
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
@@ -109,7 +112,7 @@ class NodeImpl with Node {
   void init() {
     // synchronized(skeleton, {
     if (skeleton.get()) {
-      update(controller!.get(getPath()!));
+      update(controller!.get(getPath()));
       skeleton.set(false);
       controller = null;
     }
@@ -162,7 +165,7 @@ class NodeImpl with Node {
     if (ret == null) {
       throw StorageException(
           (('Value ' + value.getKey()) + ' not found in node ') +
-              (getName() ?? 'null'));
+              (getName()));
     }
     // synchronized(values, {
     values[value.getKey()] = value;
@@ -195,51 +198,51 @@ class NodeImpl with Node {
     init();
     // synchronized(childNodes, {
     if (!childNodes.containsKey(node.getName())) {
-      childNodes[node.getName()!] = node;
+      childNodes[node.getName()] = node;
     }
     // });
   }
 
   @override
-  String? getOwner() {
+  String getOwner() {
     try {
-      return get(Field.OWNER);
+      return get(Field.OWNER) ?? '';
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String? setOwner(String newOwner) {
+  String setOwner(String newOwner) {
     try {
-      return set(Field.OWNER, newOwner);
+      return set(Field.OWNER, newOwner) ?? '';
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String? getName() {
+  String getName() {
     try {
-      return getNameFromPath(get(Field.PATH));
+      return getNameFromPath(get(Field.PATH)) ?? '';
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String? getParentPath() {
+  String getParentPath() {
     try {
-      return getParentFromPath(get(Field.PATH));
+      return getParentFromPath(get(Field.PATH)) ?? '';
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String? getPath() {
+  String getPath() {
     try {
-      return get(Field.PATH);
+      return get(Field.PATH) ?? '';
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -351,7 +354,7 @@ class NodeImpl with Node {
   }
 
   void addChildNode(Node n) {
-    childNodes[n.getName()!] = n;
+    childNodes[n.getName()] = n;
   }
 
   @override
@@ -416,7 +419,9 @@ class NodeImpl with Node {
       try {
         init();
         n2.init();
-      } on StorageException {}
+      } on StorageException {
+        // I do not care if init fails....
+      }
       if (ordinals.length != n2.ordinals.length) {
         return false;
       }
@@ -491,7 +496,7 @@ class NodeImpl with Node {
           childNodes[e.key] = e.value.deepClone();
         } else {
           childNodes[e.key] =
-              NodeImpl.createSkeleton(e.value.getPath()!, controller);
+              NodeImpl.createSkeleton(e.value.getPath(), controller);
         }
       }
       // });
@@ -510,7 +515,7 @@ class NodeImpl with Node {
 
   @override
   Node shallowClone() {
-    var ret = NodeImpl.fromPath(getPath()!);
+    var ret = NodeImpl.fromPath(getPath());
     ret.update(this, deepClone: false);
     return ret;
   }
