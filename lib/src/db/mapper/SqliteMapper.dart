@@ -10,7 +10,6 @@ import 'package:localstorage/src/db/data/NodeImpl.dart';
 import 'package:localstorage/src/db/data/NodeValue.dart';
 import 'package:localstorage/src/db/data/NodeValueImpl.dart';
 import 'package:sqlite3/sqlite3.dart';
-
 import '../../SearchCriteria.dart';
 import '../GenericController.dart';
 import 'AbstractSqlMapper.dart';

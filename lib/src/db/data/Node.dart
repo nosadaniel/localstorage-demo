@@ -146,4 +146,7 @@ abstract class Node /*with Serializer*/ {
   /// @return the cloned node
   /// @throws StorageException if the storage backend encounters a problem
   Node shallowClone();
+
+  /// Checks if two NodeValue are equivalent in values.
+  bool equals(Object? nodeValue);
 }

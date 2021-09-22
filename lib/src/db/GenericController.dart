@@ -343,17 +343,18 @@ class GenericController implements StorageController, ChangeRegistrar {
   @override
   List<SearchCriteria> deregisterChangeListener(StorageListener listener) {
     var remove = List<SearchCriteria>.empty(growable: true);
-    // synchronized(listeners) {
     for (var e in listeners.entries) {
       if (e.value == listener) {
         remove.add(e.key);
       }
     }
+    if(remove.length==0) {
+      throw StorageException('Listener not registered');
+    }
     for (var c in remove) {
       listeners.remove(c);
     }
     return remove;
-    // }
   }
 
   @override

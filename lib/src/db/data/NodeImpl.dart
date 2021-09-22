@@ -410,8 +410,8 @@ class NodeImpl with Node {
     return ret;
   }
 
-  bool equals(Object o) {
-    if (!(o is NodeImpl)) {
+  bool equals(Object? o) {
+    if (o==null || !(o is NodeImpl)) {
       return false;
     }
     var n2 = o;
