@@ -1,13 +1,12 @@
-/// <p>A boolean valuable offering atomic toggling.</p>
+/// A boolean valuable offering atomic toggling.
 class SwitchableBoolean {
   bool value;
 
   SwitchableBoolean(this.value);
 
-  /// <p>sets the value of the boolean.</p>
+  /// sets the value of the boolean.
   ///
-  /// @param newValue the new value to be set
-  /// @return the previously set value
+  /// accepts a [newValue] to be set and returns the previously set value.
   bool set(bool newValue) {
     bool ret;
     // synchronized(semaphore, {
@@ -17,24 +16,24 @@ class SwitchableBoolean {
     return ret;
   }
 
-  /// <p>gets the currently set value.</p>
+  /// Gets the currently set value.
   ///
-  /// @return the currently set value
+  /// Returns the currently set value of the boolean.
   bool get() {
     // synchronized(semaphore, {
     return value;
     // });
   }
 
-  /// <p>Toggles the currently set value.</p>
+  /// Toggles the currently set value.
   ///
-  /// @return the previously set value
+  /// Returns the new set value.
   bool toggle() {
     bool ret;
     // synchronized(semaphore, {
     ret = get();
     value = (!ret);
     // });
-    return ret;
+    return value;
   }
 }
