@@ -24,9 +24,13 @@ void _testTearDown(List<StorageMapper> mapperList) {
 }
 
 void main() {
-  var mapperList = [DummyMapper(), SqliteMapper('jdbc:sqlite:./testdb.sqlite')];
+  late List<StorageMapper> mapperList;
 
-  _testPrep(mapperList);
+  setUp(() {
+    mapperList = [DummyMapper(), SqliteMapper('./testdb.sqlite')];
+    _testPrep(mapperList);
+  });
+
   test('Adding root node', () {
     for (final mapper in mapperList) {
       print('## Testing mapper $mapper in UNKNOWN');
@@ -93,14 +97,14 @@ void main() {
   });
   test('add parent-less node', () {
     for (final mapper in mapperList) {
-      print('## Testing mapper ' + mapper.toString() + " in INVALID");
+      print('## Testing mapper ' + mapper.toString() + ' in INVALID');
       var node = NodeImpl('testNode1', ':notAValidParent');
       expect(() => mapper.add(node), throwsA(TypeMatcher<StorageException>()));
     }
   });
   test('node getter tests', () {
     for (final mapper in mapperList) {
-      print('## Testing mapper ' + mapper.toString() + " in INVALID");
+      print('## Testing mapper ' + mapper.toString() + ' in INVALID');
       var node = NodeImpl('testNode1', '');
       var childNode = NodeImpl('testNode1a', ':testNode1');
       var nv = NodeValueImpl('key', 'value', 'type', 'description', 1);
@@ -145,7 +149,7 @@ void main() {
       var childNode = NodeImpl('testNode1a', ':testNode1');
       node.addChild(childNode);
       node.addValue(nv);
-      print("## Stored " + node.toString());
+      print('## Stored ' + node.toString());
 
       // write data
       var node2 = NodeImpl('testNode2', '');
@@ -175,12 +179,13 @@ void main() {
           reason: 'checking for child node count');
     }
   });
-  _testTearDown(mapperList);
+  tearDown(() {
+    _testTearDown(mapperList);
 
-  // tear down all test data
-  for (final mapper in mapperList) {
-    mapper.close();
-  }
-  File('./testdb.mv.db').delete();
-  File('./testdb.sqlite').delete();
+    // tear down all test data
+    for (final mapper in mapperList) {
+      mapper.close();
+    }
+    File('./testdb.sqlite').deleteSync();
+  });
 }

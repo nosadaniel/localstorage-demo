@@ -112,7 +112,7 @@ void updateTests(final StorageController controller) {
       print(
           '## testing removal of node with child nodes (${n[n.length - 1].getPath()})');
 
-      expect(() => controller.delete(n[0].getPath()),
+      expect(() => controller.delete(n[0].getPath()!),
           throwsA(TypeMatcher<StorageException>()));
 
       for (final tn in List.from(n.reversed)) {
@@ -137,12 +137,12 @@ void removeTests(StorageController controller) {
       // check nodes
       expect(node.equals(removed), true,
           reason: 'removed node does not match added node');
-      expect(() => controller.get(removed.getPath()),
+      expect(() => controller.get(removed.getPath()!),
           throwsA(TypeMatcher<StorageException>()));
 
       // check values
       expect(removed.getValue('key'), nv);
-      expect(() => controller.getValue(removed.getPath(), 'key'),
+      expect(() => controller.getValue(removed.getPath()!, 'key'),
           throwsA(TypeMatcher<StorageException>()));
     });
 

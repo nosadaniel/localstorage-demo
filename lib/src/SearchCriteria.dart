@@ -104,11 +104,11 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
   /// @throws StorageException if the storage backend encounters a problem
   bool evaluate(Node node) {
     var path = getNodePath();
-    if (path == null || !node.getPath().startsWith(path)) {
+    if (path == null || !node.getPath()!.startsWith(path)) {
       return false;
     }
     var owner = values[Field.OWNER];
-    if ((owner != null) && (!regexEvalString(owner, node.getOwner()))) {
+    if ((owner != null) && (!regexEvalString(owner, node.getOwner()!))) {
       return false;
     }
     var visibility = values[Field.VISIBILITY];

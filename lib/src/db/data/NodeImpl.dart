@@ -112,7 +112,7 @@ class NodeImpl with Node {
   void init() {
     // synchronized(skeleton, {
     if (skeleton.get()) {
-      update(controller!.get(getPath()));
+      update(controller!.get(getPath()!));
       skeleton.set(false);
       controller = null;
     }
@@ -163,8 +163,10 @@ class NodeImpl with Node {
     init();
     var ret = getValue(value.getKey());
     if (ret == null) {
-      throw StorageException(
-          (('Value ' + value.getKey()) + ' not found in node ') + (getName()));
+      throw StorageException('Value ' +
+          value.getKey() +
+          ' not found in node ' +
+          (getName() ?? 'null'));
     }
     // synchronized(values, {
     values[value.getKey()] = value;
@@ -196,52 +198,53 @@ class NodeImpl with Node {
   void addChild(Node node) {
     init();
     // synchronized(childNodes, {
-    if (!childNodes.containsKey(node.getName())) {
-      childNodes[node.getName()] = node;
+    var key = node.getName()!;
+    if (!childNodes.containsKey(key)) {
+      childNodes[key] = node;
     }
     // });
   }
 
   @override
-  String getOwner() {
+  String? getOwner() {
     try {
-      return get(Field.OWNER) ?? '';
+      return get(Field.OWNER);
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String setOwner(String newOwner) {
+  String? setOwner(String newOwner) {
     try {
-      return set(Field.OWNER, newOwner) ?? '';
+      return set(Field.OWNER, newOwner);
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String getName() {
+  String? getName() {
     try {
-      return getNameFromPath(get(Field.PATH)) ?? '';
+      return getNameFromPath(get(Field.PATH));
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String getParentPath() {
+  String? getParentPath() {
     try {
-      return getParentFromPath(get(Field.PATH)) ?? '';
+      return getParentFromPath(get(Field.PATH));
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
   }
 
   @override
-  String getPath() {
+  String? getPath() {
     try {
-      return get(Field.PATH) ?? '';
+      return get(Field.PATH);
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -353,7 +356,7 @@ class NodeImpl with Node {
   }
 
   void addChildNode(Node n) {
-    childNodes[n.getName()] = n;
+    childNodes[n.getName()!] = n;
   }
 
   @override
@@ -498,7 +501,7 @@ class NodeImpl with Node {
           childNodes[e.key] = e.value.deepClone();
         } else {
           childNodes[e.key] =
-              NodeImpl.createSkeleton(e.value.getPath(), controller);
+              NodeImpl.createSkeleton(e.value.getPath()!, controller);
         }
       }
       // });
@@ -517,7 +520,7 @@ class NodeImpl with Node {
 
   @override
   Node shallowClone() {
-    var ret = NodeImpl.fromPath(getPath());
+    var ret = NodeImpl.fromPath(getPath()!);
     ret.update(this, deepClone: false);
     return ret;
   }
@@ -545,20 +548,16 @@ class NodeImpl with Node {
     if (isSkeleton()) {
       sb.write('{<skeletonized>}');
     } else {
-      if (values != null) {
-        for (var e in values.entries) {
-          if (i > 0) {
-            sb.write(', ');
-            sb.write('\n');
-          }
-          sb.write(e.value.toString('  '));
-          i++;
+      for (var e in values.entries) {
+        if (i > 0) {
+          sb.write(', ');
+          sb.write('\n');
         }
-        sb.write('\n');
-        sb.write('}');
-      } else {
-        sb.write('{}');
+        sb.write(e.value.toString('  '));
+        i++;
       }
+      sb.write('\n');
+      sb.write('}');
     }
     return sb.toString();
   }

@@ -7,7 +7,7 @@ class Node_test {}
 void main() {
   test('node defaults', () {
     var node = NodeImpl('name', 'path');
-    expect(node.getOwner(), '', reason: 'test predefined owner');
+    expect(node.getOwner(), null, reason: 'test predefined owner');
     expect(node.getVisibility(), Visibility.RED,
         reason: 'test predefined owner');
   });

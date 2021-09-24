@@ -17,9 +17,11 @@ enum Visibility {
 }
 
 extension VisibilityExtension on Visibility {
+  String toValueString() => toString().split('.').last;
+
   static Visibility? valueOf(String value) {
     try {
-      return Visibility.values.firstWhere((e) => e.toString() == value);
+      return Visibility.values.firstWhere((e) => e.toValueString() == value);
     } on StateError {
       return null;
     }

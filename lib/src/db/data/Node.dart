@@ -10,29 +10,29 @@ abstract class Node /*with Serializer*/ {
   /// Gets the name of the current node.
   ///
   /// Returns the name of the current node without the path prefix.
-  String getName();
+  String? getName();
 
   /// Gets the parent path of the node.
   ///
   /// Returns the parent path of the current node.
-  String getParentPath();
+  String? getParentPath();
 
   /// Gets the full path with name of the current node.
   ///
   /// Returns the fully qualified name of the current node.
-  String getPath();
+  String? getPath();
 
   /// Gets the owner of the current object.
   ///
   /// Returns string representation of the owner.
-  String getOwner();
+  String? getOwner();
 
   /// Sets the owner string.
   ///
   /// Sets tho owner string of the node to [newOwner].
   ///
   /// Returns the previously set owner owner string.
-  String setOwner(String newOwner);
+  String? setOwner(String newOwner);
 
   /// <p>Gets the current visibility according to the TLP protocol.</p>
   /// @return the current visibility
