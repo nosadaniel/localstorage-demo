@@ -95,7 +95,7 @@ class NodeImpl with Node {
   /// @param parent the parent of the node (may be null if root node is the parent)
   /// @param vis    visibility of the node
   NodeImpl(String name, [String? parent, Visibility vis = Visibility.RED]) {
-    if(parent==null) {
+    if (parent == null) {
       parent = getParentFromPath(name);
       name = getNameFromPath(name) ?? '';
     }
@@ -164,8 +164,7 @@ class NodeImpl with Node {
     var ret = getValue(value.getKey());
     if (ret == null) {
       throw StorageException(
-          (('Value ' + value.getKey()) + ' not found in node ') +
-              (getName()));
+          (('Value ' + value.getKey()) + ' not found in node ') + (getName()));
     }
     // synchronized(values, {
     values[value.getKey()] = value;
@@ -410,12 +409,15 @@ class NodeImpl with Node {
     return ret;
   }
 
+  @override
+  bool operator ==(Object other) => equals(other);
+
   bool equals(Object? o) {
-    if (o==null || !(o is NodeImpl)) {
+    if (o == null || !(o is NodeImpl)) {
       return false;
     }
     var n2 = o;
-    if ((!isSkeleton()) || (isSkeleton() && (!n2.isSkeleton()))) {
+    if (!isSkeleton() || (isSkeleton() && (!n2.isSkeleton()))) {
       try {
         init();
         n2.init();
@@ -440,7 +442,7 @@ class NodeImpl with Node {
       }
       for (var e in values.entries) {
         try {
-          if (!(e.value == n2.getValue(e.key))) {
+          if (!(e.value.equals(n2.getValue(e.key)))) {
             return false;
           }
         } on StorageException {

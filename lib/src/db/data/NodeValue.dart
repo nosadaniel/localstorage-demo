@@ -4,7 +4,7 @@ import 'package:intl/locale.dart';
 /// <p>Interface for accessing key/value pairs in nodes.</p>
 ///
 /// <p>All values supporting locales must have at least an english [Locale.ENGLISH] locale.</p>
-abstract class NodeValue/* with Serializer*/ {
+abstract class NodeValue /* with Serializer*/ {
   /// <p>Gets the key of the K/V tuple.</p>
   ///
   /// @return the string representation of the key

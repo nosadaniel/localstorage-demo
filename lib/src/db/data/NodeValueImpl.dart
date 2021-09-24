@@ -102,7 +102,7 @@ class NodeValueImpl with NodeValue {
   }
 
   static Locale lookupLocale(Map<String, String> map, String languageRange) {
-    if(map.isEmpty) {
+    if (map.isEmpty) {
       return DEFAULT_LOCALE;
     }
     var l = map.keys.first;
@@ -218,8 +218,11 @@ class NodeValueImpl with NodeValue {
   }
 
   @override
+  bool operator ==(Object other) => equals(other);
+
+  @override
   bool equals(Object? o) {
-    if (o==null || !(o is NodeValueImpl)) {
+    if (o == null || !(o is NodeValueImpl)) {
       return false;
     }
     return toString() == o.toString();
