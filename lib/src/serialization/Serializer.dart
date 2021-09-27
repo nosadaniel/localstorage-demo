@@ -10,7 +10,7 @@ abstract class Serializer
     /// @throws IOException if not overridden or reached unexpectedly the end of stream
     static Serializer fromByteArrayStream(Stream<List<int>> in_)
     {
-        throw new java_io_IOException("Not implemented... ");
+        throw new UnimplementedError("Not implemented... ");
     }
 
     /// <p>Writes the current object to the output stream.</p>
@@ -27,7 +27,7 @@ abstract class Serializer
             Sink<List<int>> out = new Sink<List<int>>();
             obj.toByteArrayStream(out);
             return out.toByteArray();
-        } on java_io_IOException catch (ioe) {
+        } on UnimplementedError catch (ioe) {
             return null;
         }
     }
@@ -40,7 +40,7 @@ abstract class Serializer
         try {
             Stream<List<int>> in_ = new Stream<List<int>>(buf);
             return fromByteArrayStream(in_);
-        } on java_io_IOException catch (ioe) {
+        } on UnimplementedError catch (ioe) {
             ioe.printStackTrace();
             return null;
         }
