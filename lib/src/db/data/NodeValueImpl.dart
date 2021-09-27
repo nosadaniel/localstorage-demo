@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:intl/locale.dart';
 
+import 'LanguageRange.dart';
 import 'NodeValue.dart';
 
 /// <p>This abstract class defines the common attributes for all NodeValueObjects.</p>
@@ -105,23 +106,26 @@ class NodeValueImpl with NodeValue {
     if (map.isEmpty) {
       return DEFAULT_LOCALE;
     }
-    var l = map.keys.first;
-    // TODO: implement lookup with language range
-    // Locale.lookupTag(Locale.LanguageRange.parse(languageRange), map.keys);
-    if (l != null) {
-      return Locale.parse(l);
-    } else {
-      return DEFAULT_LOCALE;
-    }
+
+    // Get Language Range
+    var lr = LanguageRange.parse(languageRange);
+
+    // extending range list with locale only
+    return Locale.parse(lr.getBestLanguage(map));
   }
 
-  static String? getLocalizedString(
-      Map<String, String> map, String languageRange) {
+  static String? getLocalizedString
+      (Map<String, String> map,
+      String
+      languageRange) {
     return map[lookupLocale(map, languageRange).toLanguageTag()];
   }
 
-  static void setLocalizedString(
-      Map<String, String> map, String value, Locale locale) {
+  static void setLocalizedString
+      (Map<String, String> map, String
+  value,
+
+      Locale locale) {
     if ((getLocalizedString(map, DEFAULT_LOCALE.toLanguageTag()) == null) &&
         (!(locale.toLanguageTag() == DEFAULT_LOCALE.toLanguageTag()))) {
       throw Exception('undefined string for locale ' +
@@ -163,7 +167,9 @@ class NodeValueImpl with NodeValue {
   }
 
   void updateLastModified() {
-    lastModified = DateTime.now().millisecondsSinceEpoch;
+    lastModified = DateTime
+        .now()
+        .millisecondsSinceEpoch;
   }
 
   @override
@@ -218,7 +224,11 @@ class NodeValueImpl with NodeValue {
   }
 
   @override
-  bool operator ==(Object other) => equals(other);
+  bool operator
+  ==
+      (Object other) =>
+
+      equals(other);
 
   @override
   bool equals(Object? o) {
