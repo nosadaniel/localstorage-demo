@@ -1,6 +1,5 @@
 library ch.fhnw.geiger.serialization;
 
-import 'java.dart';
 /// <p>Serializer interface for the serialization of value related objects.</p>
 abstract class Serializer
 {

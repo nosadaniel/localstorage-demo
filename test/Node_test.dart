@@ -1,5 +1,5 @@
-import 'package:localstorage/src/Visibility.dart';
-import 'package:localstorage/src/db/data/NodeImpl.dart';
+import 'package:geiger_localstorage/src/Visibility.dart';
+import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
 import 'package:test/test.dart';
 
 class Node_test {}

@@ -1,3 +1,3 @@
-## 1.0.0
+## 0.5.0
 
-- Initial version.
+- Initial dart version for consortium internal testing.

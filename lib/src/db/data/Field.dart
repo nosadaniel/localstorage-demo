@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:localstorage/src/SearchCriteria.dart';
+import '../../../geiger_localstorage.dart';
 
 /// <p>Field reflects the available ordinals in a node.</p>
 class Field {

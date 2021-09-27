@@ -1,6 +1,6 @@
 import 'package:intl/locale.dart';
-import 'package:localstorage/localstorage.dart';
-import 'package:localstorage/src/db/data/NodeValueImpl.dart';
+import 'package:geiger_localstorage/geiger_localstorage.dart';
+import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
 
 class LanguageRange {
 

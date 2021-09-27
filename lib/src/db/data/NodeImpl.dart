@@ -39,14 +39,13 @@ class NodeImpl with Node {
   ///
   /// @param path       the path of the node
   /// @param controller the controller to fetch the full node
-  NodeImpl.createSkeleton(String path, StorageController? controller) {
+  NodeImpl.createSkeleton(String path, StorageController? this.controller) {
     skeleton.set(true);
     try {
       set(Field.PATH, path);
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
-    this.controller = controller;
   }
 
   NodeImpl.fromNode(Node node) {
@@ -415,11 +414,12 @@ class NodeImpl with Node {
   @override
   bool operator ==(Object other) => equals(other);
 
-  bool equals(Object? o) {
-    if (o == null || !(o is NodeImpl)) {
+  @override
+  bool equals(Object? object) {
+    if (object == null || object is! NodeImpl) {
       return false;
     }
-    var n2 = o;
+    var n2 = object;
     if (!isSkeleton() || (isSkeleton() && (!n2.isSkeleton()))) {
       try {
         init();

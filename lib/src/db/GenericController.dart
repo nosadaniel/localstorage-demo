@@ -1,7 +1,7 @@
 import 'dart:collection';
 
-import 'package:localstorage/src/SearchCriteria.dart';
-import 'package:localstorage/src/StorageListener.dart';
+import 'package:geiger_localstorage/src/SearchCriteria.dart';
+import 'package:geiger_localstorage/src/StorageListener.dart';
 import 'package:uuid/uuid.dart';
 
 import '../ChangeRegistrar.dart';
@@ -80,7 +80,7 @@ class GenericController implements StorageController, ChangeRegistrar {
       }
     }
 
-// check if current user exists
+    // check if current user exists
     var localNode = mapper.get(':Local');
     var uuid = localNode.getValue('currentUser');
     if (uuid == null) {
@@ -89,15 +89,14 @@ class GenericController implements StorageController, ChangeRegistrar {
       localNode.setOwner(owner);
       mapper.update(localNode);
     }
-    if (uuid == null) {
-// create new default user
-      uuid = NodeValueImpl('currentUser', Uuid().v4());
-      localNode.addValue(uuid);
-      localNode.setOwner(owner);
-      mapper.update(localNode);
-    }
 
-// check if current user node exists
+    // create new default user
+    uuid = NodeValueImpl('currentUser', Uuid().v4());
+    localNode.addValue(uuid);
+    localNode.setOwner(owner);
+    mapper.update(localNode);
+
+    // check if current user node exists
     var userNodeName = ':Users:' + uuid.getValue()!;
     try {
       mapper.get(userNodeName);
@@ -144,10 +143,8 @@ class GenericController implements StorageController, ChangeRegistrar {
       } on StorageException {
         update(node);
       }
-      if (node.getChildren() != null) {
-        for (var n2 in node.getChildren().values) {
-          ret |= addOrUpdate(n2);
-        }
+      for (var n2 in node.getChildren().values) {
+        ret |= addOrUpdate(n2);
       }
       return ret;
     }
@@ -156,7 +153,7 @@ class GenericController implements StorageController, ChangeRegistrar {
   @override
   Node get(String path) {
     var n = getNodeOrTombstone(path);
-    if (n == null || n.isTombstone()) {
+    if (n.isTombstone()) {
       throw StorageException('Node does not exist');
     }
     var l = List<String>.empty(growable: true);
@@ -253,7 +250,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     var oldValue = oldNode.getValue(newValue.getKey());
     if (oldValue != null) {
       throw StorageException(
-          'value \"' + newValue.getKey() + '\" is already set');
+          'value "' + newValue.getKey() + '" is already set');
     }
     var newNode = oldNode.deepClone();
     newNode.addValue(newValue);
@@ -267,7 +264,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     var oldValue = oldNode.getValue(newValue.getKey());
     if (oldValue == null) {
       throw StorageException(
-          'value \"' + newValue.getKey() + '\" does not yet exist');
+          'value "' + newValue.getKey() + '" does not yet exist');
     }
     var newNode = oldNode.deepClone();
     newNode.removeValue(newValue.getKey());
@@ -281,7 +278,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     var oldNode = mapper.get(nodeName);
     var oldValue = oldNode.getValue(key);
     if (oldValue == null) {
-      throw StorageException('value \"' + key + '\" does not yet exist');
+      throw StorageException('value "' + key + '" does not yet exist');
     }
     var newNode = oldNode.deepClone();
     newNode.removeValue(key);
@@ -348,7 +345,7 @@ class GenericController implements StorageController, ChangeRegistrar {
         remove.add(e.key);
       }
     }
-    if(remove.length==0) {
+    if (remove.isEmpty) {
       throw StorageException('Listener not registered');
     }
     for (var c in remove) {

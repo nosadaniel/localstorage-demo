@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:intl/locale.dart';
-import 'package:localstorage/src/StorageException.dart';
-import 'package:localstorage/src/db/StorageMapper.dart';
-import 'package:localstorage/src/db/data/NodeImpl.dart';
-import 'package:localstorage/src/db/data/NodeValueImpl.dart';
-import 'package:localstorage/src/db/mapper/DummyMapper.dart';
-import 'package:localstorage/src/db/mapper/SqliteMapper.dart';
+import 'package:geiger_localstorage/src/StorageException.dart';
+import 'package:geiger_localstorage/src/db/StorageMapper.dart';
+import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
+import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
+import 'package:geiger_localstorage/src/db/mapper/DummyMapper.dart';
+import 'package:geiger_localstorage/src/db/mapper/SqliteMapper.dart';
 import 'package:test/test.dart';
 
 class StorageMapper_test {}

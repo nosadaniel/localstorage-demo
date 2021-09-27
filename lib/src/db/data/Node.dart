@@ -1,5 +1,5 @@
-import 'package:localstorage/src/Visibility.dart';
-// import 'package:localstorage/src/serialization/Serializer.dart';
+import 'package:geiger_localstorage/src/Visibility.dart';
+// import 'package:geiger_localstorage/src/serialization/Serializer.dart';
 
 import '../../StorageController.dart';
 import 'NodeValue.dart';

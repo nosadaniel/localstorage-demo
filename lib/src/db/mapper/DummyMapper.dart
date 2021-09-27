@@ -1,9 +1,9 @@
 import 'dart:collection';
 
-import 'package:localstorage/src/StorageException.dart';
-import 'package:localstorage/src/db/data/Node.dart';
-import 'package:localstorage/src/db/data/NodeImpl.dart';
-import 'package:localstorage/src/db/data/NodeValue.dart';
+import 'package:geiger_localstorage/src/StorageException.dart';
+import 'package:geiger_localstorage/src/db/data/Node.dart';
+import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
+import 'package:geiger_localstorage/src/db/data/NodeValue.dart';
 
 import '../../SearchCriteria.dart';
 import '../../StorageController.dart';
@@ -36,6 +36,7 @@ class DummyMapper extends AbstractMapper {
     return ret.deepClone();
   }
 
+  @override
   void add(Node node) {
     checkPath(node.getPath()!);
     // synchronized(nodes, {
@@ -48,8 +49,8 @@ class DummyMapper extends AbstractMapper {
     if ((node.getParentPath() != null) && (!('' == node.getParentPath()))) {
       if (nodes[node.getParentPath()] == null) {
         throw StorageException(
-            ('Parent node \"' + (node.getParentPath()!)) +
-                '\" does not exist');
+            ('Parent node "' + (node.getParentPath()!)) +
+                '" does not exist');
       }
       nodes[node.getParentPath()]?.addChild(node);
     }
@@ -57,6 +58,7 @@ class DummyMapper extends AbstractMapper {
     // });
   }
 
+  @override
   void update(Node node) {
     checkPath(node.getPath()!);
     // synchronized(nodes, {
@@ -68,15 +70,16 @@ class DummyMapper extends AbstractMapper {
     // });
   }
 
-  void rename(String oldPath, String newPath) {
+  @override
+  void rename(String oldPath, String newPathOrName) {
     checkPath(oldPath);
-    checkPath(newPath);
+    checkPath(newPathOrName);
     // synchronized(nodes, {
     var oldNode = nodes[oldPath];
     if (oldNode == null) {
       throw StorageException('Node does not exist');
     }
-    var newNode = NodeImpl.fromPath(newPath);
+    var newNode = NodeImpl.fromPath(newPathOrName);
     var owner = oldNode.getOwner();
     if (owner != null) newNode.setOwner(owner);
     newNode.setVisibility(oldNode.getVisibility());
@@ -94,27 +97,29 @@ class DummyMapper extends AbstractMapper {
     // });
   }
 
-  Node delete(String nodeName) {
+  @override
+  Node delete(String path) {
     // synchronized(nodes, {
-    var node = nodes[nodeName];
+    var node = nodes[path];
     if (node == null) {
       throw StorageException('Node does not exist');
     }
     if (!('' == node.getChildNodesCsv())) {
       throw StorageException(
-          'Node does have children... cannot remove ' + nodeName);
+          'Node does have children... cannot remove ' + path);
     }
     nodes.remove(node);
     Node tombstone = NodeImpl.fromPath(node.getPath()!, isTombstone: true);
     tombstone.setVisibility(node.getVisibility());
     nodes[node.getPath()!] = tombstone;
-    if ((node.getParentPath() != null) && (!("" == node.getParentPath()))) {
+    if ((node.getParentPath() != null) && (!('' == node.getParentPath()))) {
       nodes[node.getParentPath()]!.removeChild(node.getName()!);
     }
     return node;
     // });
   }
 
+  @override
   NodeValue getValue(String path, String key) {
     var ret = get(path);
     if (ret.isTombstone()) {
@@ -123,6 +128,7 @@ class DummyMapper extends AbstractMapper {
     return ret.getValues()[key]!;
   }
 
+  @override
   List<Node> search(SearchCriteria criteria) {
     var l = List<Node>.empty(growable: true);
     for (var e in nodes.entries) {
@@ -133,10 +139,13 @@ class DummyMapper extends AbstractMapper {
     return l;
   }
 
+  @override
   void close() {}
 
+  @override
   void flush() {}
 
+  @override
   void zap() {
     // synchronized(nodes, {
     nodes.clear();

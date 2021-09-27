@@ -137,10 +137,10 @@ class NodeValueImpl with NodeValue {
   }
 
   @override
-  String? setDescription(String value, [Locale? locale]) {
+  String? setDescription(String description, [Locale? locale]) {
     locale ??= DEFAULT_LOCALE;
-    var ret = getLocalizedString(description, locale.toLanguageTag());
-    setLocalizedString(description, value, locale);
+    var ret = getLocalizedString(this.description, locale.toLanguageTag());
+    setLocalizedString(this.description, description, locale);
     updateLastModified();
     return ret;
   }
@@ -195,13 +195,13 @@ class NodeValueImpl with NodeValue {
     sb.write('={');
     if (value.length == 1) {
       sb.write(DEFAULT_LOCALE.toLanguageTag());
-      sb.write('=>\"');
+      sb.write('=>"');
       sb.write(value[DEFAULT_LOCALE.toLanguageTag()]);
-      sb.write('\"}');
+      sb.write('"}');
     } else {
       sb.write('\n');
       var i = 0;
-      var keyList = List.from(value.keys);
+      List<String> keyList = List.from(value.keys);
       keyList.sort();
       for (String l in keyList) {
         if (i > 0) {
@@ -211,9 +211,9 @@ class NodeValueImpl with NodeValue {
         sb.write(prefix);
         sb.write('  ');
         sb.write(Locale.parse(l).toLanguageTag());
-        sb.write('=>\"');
+        sb.write('=>"');
         sb.write(value[l]);
-        sb.write('\"');
+        sb.write('"');
         i++;
       }
       sb.write('\n');
@@ -232,7 +232,7 @@ class NodeValueImpl with NodeValue {
 
   @override
   bool equals(Object? o) {
-    if (o == null || !(o is NodeValueImpl)) {
+    if (o == null || o is! NodeValueImpl) {
       return false;
     }
     return toString() == o.toString();

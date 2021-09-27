@@ -1,4 +1,4 @@
-import 'package:localstorage/src/StorageException.dart';
+import 'package:geiger_localstorage/src/StorageException.dart';
 
 import '../GenericController.dart';
 import '../StorageMapper.dart';
@@ -17,7 +17,7 @@ abstract class AbstractMapper with StorageMapper {
     }
     if (!RegExp('(' + GenericController.PATH_DELIMITER + '[a-zA-Z0-9\\-]+)*')
         .hasMatch(path)) {
-      throw StorageException(('illegal path detected in \"' + path) + '\"');
+      throw StorageException(('illegal path detected in "' + path) + '"');
     }
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:localstorage/src/db/data/Field.dart';
+import 'package:geiger_localstorage/src/db/data/Field.dart';
 
 import 'db/data/Node.dart';
 
@@ -231,12 +231,12 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
   }*/
 
   @override
-  int compareTo(SearchCriteria o) {
-    return toString().compareTo(o.toString());
+  int compareTo(SearchCriteria object) {
+    return toString().compareTo(object.toString());
   }
 
   bool equals(Object o) {
-    if (!(o is SearchCriteria)) {
+    if (o is! SearchCriteria) {
       return false;
     }
     return toString() == o.toString();

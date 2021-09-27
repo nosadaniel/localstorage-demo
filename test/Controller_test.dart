@@ -1,10 +1,10 @@
-import 'package:localstorage/src/StorageController.dart';
-import 'package:localstorage/src/StorageException.dart';
-import 'package:localstorage/src/Visibility.dart';
-import 'package:localstorage/src/db/GenericController.dart';
-import 'package:localstorage/src/db/data/NodeImpl.dart';
-import 'package:localstorage/src/db/data/NodeValueImpl.dart';
-import 'package:localstorage/src/db/mapper/DummyMapper.dart';
+import 'package:geiger_localstorage/src/StorageController.dart';
+import 'package:geiger_localstorage/src/StorageException.dart';
+import 'package:geiger_localstorage/src/Visibility.dart';
+import 'package:geiger_localstorage/src/db/GenericController.dart';
+import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
+import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
+import 'package:geiger_localstorage/src/db/mapper/DummyMapper.dart';
 import 'package:test/test.dart';
 
 class Controller_test {}
@@ -118,7 +118,7 @@ void updateTests(final StorageController controller) {
       for (final tn in List.from(n.reversed)) {
         print(
             '## removing node ${tn.getPath()} (parent of ${tn.getParentPath()})');
-        controller.delete(tn.getPath());
+        controller.delete(tn.getPath() as String);
       }
     });
   });

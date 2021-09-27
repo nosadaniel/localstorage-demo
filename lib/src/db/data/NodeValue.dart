@@ -1,5 +1,5 @@
 import 'package:intl/locale.dart';
-// import 'package:localstorage/src/serialization/Serializer.dart';
+// import 'package:geiger_localstorage/src/serialization/Serializer.dart';
 
 /// <p>Interface for accessing key/value pairs in nodes.</p>
 ///

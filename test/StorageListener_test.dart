@@ -1,12 +1,12 @@
-import 'package:localstorage/src/EventType.dart';
-import 'package:localstorage/src/SearchCriteria.dart';
-import 'package:localstorage/src/StorageController.dart';
-import 'package:localstorage/src/StorageException.dart';
-import 'package:localstorage/src/StorageListener.dart';
-import 'package:localstorage/src/db/GenericController.dart';
-import 'package:localstorage/src/db/data/Node.dart';
-import 'package:localstorage/src/db/data/NodeImpl.dart';
-import 'package:localstorage/src/db/mapper/DummyMapper.dart';
+import 'package:geiger_localstorage/src/EventType.dart';
+import 'package:geiger_localstorage/src/SearchCriteria.dart';
+import 'package:geiger_localstorage/src/StorageController.dart';
+import 'package:geiger_localstorage/src/StorageException.dart';
+import 'package:geiger_localstorage/src/StorageListener.dart';
+import 'package:geiger_localstorage/src/db/GenericController.dart';
+import 'package:geiger_localstorage/src/db/data/Node.dart';
+import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
+import 'package:geiger_localstorage/src/db/mapper/DummyMapper.dart';
 import 'package:test/test.dart';
 
 class StorageListener_test {}
@@ -16,8 +16,8 @@ void _setupTest(StorageController controller) {
 }
 
 class NodeListener with StorageListener {
-  Node _oldNode = NodeImpl('');
-  Node _newNode = NodeImpl('');
+  final Node _oldNode = NodeImpl('');
+  final Node _newNode = NodeImpl('');
 
   Node get oldnode {
     return _oldNode.deepClone();
@@ -49,15 +49,12 @@ void _testRegisterDeRegisterListener(StorageController controller) {
     var scr = controller.deregisterChangeListener(sl);
 
     // check return values
-    expect(scr != null, true,
-        reason:
-            "Returned array is unexpectedly NULL when de-registering an known listener");
     expect(scr.length, 1,
         reason:
-            "returned array does not contain only one search criteria when de-registering an known listener");
+            'returned array does not contain only one search criteria when de-registering an known listener');
     expect(scr.first, sc,
         reason:
-            "returned array does not contain only one search criteria when de-registering a known listener");
+            'returned array does not contain only one search criteria when de-registering a known listener');
 
     // check de-registering unregistered listener
     expect(() => controller.deregisterChangeListener(sl),

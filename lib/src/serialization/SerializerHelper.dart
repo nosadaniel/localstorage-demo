@@ -1,6 +1,5 @@
 library ch.fhnw.geiger.serialization;
 
-import 'java.dart';
 /// <p>Helper class for serialization serializes important java primitives.</p>
 class SerializerHelper
 {

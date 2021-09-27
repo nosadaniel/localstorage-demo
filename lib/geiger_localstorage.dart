@@ -1,14 +1,14 @@
 /// Contains all classes for accessing a local, hierarchically structured database.
 ///
 /// The database provided in this class is suitable for partial replication.
-library localstorage;
+library geiger_localstorage;
 
 export 'src/db/data/Field.dart';
 export 'src/db/data/Node.dart';
 export 'src/db/data/NodeImpl.dart';
 export 'src/db/data/NodeValue.dart';
 export 'src/db/data/NodeValueImpl.dart';
-export 'src/db/data/SwitchableBoolean.dart';
+//export 'src/db/data/SwitchableBoolean.dart';
 
 export 'src/db/mapper/AbstractMapper.dart';
 export 'src/db/mapper/AbstractSqlMapper.dart';
