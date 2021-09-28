@@ -17,7 +17,7 @@ class SerializerHelper
         out.add(result);
     }
 
-    static Long readIntLong(Stream<List<int>> in_)
+    static int readIntLong(Stream<List<int>> in_)
     {
         int size = Long_.BYTES;
         List<int> arr = new List<int>(size);
@@ -30,7 +30,7 @@ class SerializerHelper
         return result;
     }
 
-    static void writeIntInt(Sink<List<int>> out, Integer l)
+    static void writeIntInt(Sink<List<int>> out, int l)
     {
         int size = Integer_.BYTES;
         List<int> result = new List<int>.empty(true);
@@ -41,7 +41,7 @@ class SerializerHelper
         out.add(result);
     }
 
-    static Integer readIntInt(Stream<List<int>> in_)
+    static int readIntInt(Stream<List<int>> in_)
     {
         int size = Integer_.BYTES;
         List<int> arr = new List<int>(size);
@@ -68,7 +68,7 @@ class SerializerHelper
     /// @param in the stream to be read
     /// @return the deserialized long value
     /// @throws IOException if an exception occurs while writing to the stream
-    static Long readLong(Stream<List<int>> in_)
+    static int readLong(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != LONG_UID) {
             throw new ClassCastException();
@@ -80,7 +80,7 @@ class SerializerHelper
     /// @param out the stream to be read
     /// @param i   the value to be deserialized
     /// @throws IOException if an exception occurs while writing to the stream
-    static void writeInt(Sink<List<int>> out, Integer i)
+    static void writeInt(Sink<List<int>> out, int i)
     {
         writeIntLong(out, INT_UID);
         writeIntInt(out, i);
@@ -90,7 +90,7 @@ class SerializerHelper
     /// @param in the stream to be read
     /// @return the deserialized integer value
     /// @throws IOException if an exception occurs while writing to the stream
-    static Integer readInt(Stream<List<int>> in_)
+    static int readInt(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != INT_UID) {
             throw new ClassCastException();
