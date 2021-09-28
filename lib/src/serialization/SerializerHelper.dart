@@ -8,24 +8,28 @@ class SerializerHelper
     static const int LONG_UID = 1221312393;
     static const int INT_UID = 122134568793;
     static const int STACKTRACES_UID = 9012350123956;
+
+    static const int INT_SIZE = 4;
+    static const int BYTE_SIZE = 1;
+
     static void writeIntLong(Sink<List<int>> out, int l)
     {
         List<int> result = new List<int>.empty(growable: true);
-        for (int i = (Long_.BYTES - 1); i >= 0; i--) {
+        for (int i = (INT_SIZE - 1); i >= 0; i--) {
             result[i] = (l & 15);
-            l >>= Byte.SIZE;
+            l >>= BYTE_SIZE;
         }
         out.add(result);
     }
 
     static int readIntLong(Stream<List<int>> in_)
     {
-        int size = Long_.BYTES;
-        List<int> arr = new List<int>(size);
-        in_.read(arr);
+        int size = INT_SIZE;
+        Future<List> f_arr = in_.toList();
+        List arr = await f_arr;
         int result = 0;
         for (int i = 0; i < size; i++) {
-            result <<= Byte.SIZE;
+            result <<= BYTE_SIZE;
             result |= (arr[i] & 15);
         }
         return result;
@@ -33,23 +37,23 @@ class SerializerHelper
 
     static void writeIntInt(Sink<List<int>> out, int l)
     {
-        int size = Integer_.BYTES;
+        int size = INT_SIZE;
         List<int> result = new List<int>.empty(growable: true);
         for (int i = (size - 1); i >= 0; i--) {
             result[i] = (l & 15);
-            l >>= Byte.SIZE;
+            l >>= BYTE_SIZE;
         }
         out.add(result);
     }
 
     static int readIntInt(Stream<List<int>> in_)
     {
-        int size = Integer_.BYTES;
+        int size = INT_SIZE;
         List<int> arr = new List<int>(size);
         in_.read(arr);
         int result = 0;
         for (int i = 0; i < size; i++) {
-            result <<= Byte.SIZE;
+            result <<= BYTE_SIZE;
             result |= (arr[i] & 15);
         }
         return result;
