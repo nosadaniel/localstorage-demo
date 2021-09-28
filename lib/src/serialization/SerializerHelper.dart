@@ -145,10 +145,7 @@ class SerializerHelper
         } else {
             writeIntInt(out, ste.length);
             for (StackTrace st in ste) {
-                writeString(out, st.getClassName());
-                writeString(out, st.getMethodName());
-                writeString(out, st.getFileName());
-                writeInt(out, st.getLineNumber());
+                writeString(out, st.toString());
             }
         }
     }
