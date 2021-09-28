@@ -33,7 +33,7 @@ class SerializerHelper
     static void writeIntInt(Sink<List<int>> out, Integer l)
     {
         int size = Integer_.BYTES;
-        List<int> result = new List<int>(size);
+        List<int> result = new List<int>.empty(true);
         for (int i = (size - 1); i >= 0; i--) {
             result[i] = (l & 15);
             l >>= Byte.SIZE;
