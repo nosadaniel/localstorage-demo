@@ -199,7 +199,7 @@ class SerializerHelper
     /// @throws IOException if object cannot be written
     static void writeObject(Sink<List<int>> out, Object o)
     {
-        switch (o.getClass().getName()) {
+        switch (o.runtimeType) {
             case "String":
                 writeString(out, o);
                 break;
