@@ -7,7 +7,7 @@ class SerializerHelper
     static const int LONG_UID = 1221312393;
     static const int INT_UID = 122134568793;
     static const int STACKTRACES_UID = 9012350123956;
-    static void writeIntLong(Sink<List<int>> out, Long l)
+    static void writeIntLong(Sink<List<int>> out, int l)
     {
         List<int> result = new List<int>(Long_.BYTES);
         for (int i = (Long_.BYTES - 1); i >= 0; i--) {
