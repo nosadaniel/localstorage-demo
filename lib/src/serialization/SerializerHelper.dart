@@ -1,4 +1,5 @@
 library ch.fhnw.geiger.serialization;
+import 'dart:convert' show utf8;
 
 /// <p>Helper class for serialization serializes important java primitives.</p>
 class SerializerHelper
@@ -33,7 +34,7 @@ class SerializerHelper
     static void writeIntInt(Sink<List<int>> out, int l)
     {
         int size = Integer_.BYTES;
-        List<int> result = new List<int>.empty(true);
+        List<int> result = new List<int>.empty(growable: true);
         for (int i = (size - 1); i >= 0; i--) {
             result[i] = (l & 15);
             l >>= Byte.SIZE;
@@ -58,7 +59,7 @@ class SerializerHelper
     /// @param out the stream to be read
     /// @param l   the value to be deserialized
     /// @throws IOException if an exception occurs while writing to the stream
-    static void writeLong(Sink<List<int>> out, Long l)
+    static void writeLong(Sink<List<int>> out, int l)
     {
         writeIntLong(out, LONG_UID);
         writeIntLong(out, l);
@@ -109,7 +110,7 @@ class SerializerHelper
             writeIntInt(out, -1);
         } else {
             writeIntInt(out, s.length);
-            out.write(s.getBytes(StandardCharsets.UTF_8));
+            out.add(s.getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -136,14 +137,14 @@ class SerializerHelper
     /// @param out the stream to be read
     /// @param ste the value to be deserialized
     /// @throws IOException if an exception occurs while writing to the stream
-    static void writeStackTraces(Sink<List<int>> out, List<StackTraceElement> ste)
+    static void writeStackTraces(Sink<List<int>> out, List<StackTrace> ste)
     {
         writeIntLong(out, STACKTRACES_UID);
         if (ste == null) {
             writeIntInt(out, -1);
         } else {
             writeIntInt(out, ste.length);
-            for (StackTraceElement st in ste) {
+            for (StackTrace st in ste) {
                 writeString(out, st.getClassName());
                 writeString(out, st.getMethodName());
                 writeString(out, st.getFileName());
@@ -156,7 +157,7 @@ class SerializerHelper
     /// @param in the stream to be read
     /// @return the deserialized array
     /// @throws IOException if an exception occurs while writing to the stream
-    static List<StackTraceElement> readStackTraces(Stream<List<int>> in_)
+    static List<StackTrace> readStackTraces(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != STACKTRACES_UID) {
             throw new ClassCastException();
@@ -165,7 +166,7 @@ class SerializerHelper
         if (length == (-1)) {
             return null;
         } else {
-            List<StackTraceElement> arr = new List<StackTraceElement>(length);
+            List arr = [];
             for (int i = 0; i < length; i++) {
                 arr[i] = new StackTraceElement(readString(in_), readString(in_), readString(in_), readInt(in_));
             }
