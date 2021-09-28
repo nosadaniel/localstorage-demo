@@ -38,7 +38,7 @@ class SerializerHelper
             result[i] = (l & 15);
             l >>= Byte.SIZE;
         }
-        out.write(result);
+        out.add(result);
     }
 
     static Integer readIntInt(Stream<List<int>> in_)
