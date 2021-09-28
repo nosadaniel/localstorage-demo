@@ -49,8 +49,7 @@ class SerializerHelper
     static int readIntInt(Stream<List<int>> in_)
     {
         int size = INT_SIZE;
-        List<int> arr = new List<int>(size);
-        in_.read(arr);
+        Future List<int> arr = in_.toList();
         int result = 0;
         for (int i = 0; i < size; i++) {
             result <<= BYTE_SIZE;
@@ -125,7 +124,7 @@ class SerializerHelper
     static String? readString(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != STRING_UID) {
-            throw new ClassCastException();
+            throw new Exception("Cannot cast");
         }
         int length = readIntInt(in_);
         if (length == (-1)) {
