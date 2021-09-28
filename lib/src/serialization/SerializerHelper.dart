@@ -117,7 +117,7 @@ class SerializerHelper
     /// @param in the stream to be read
     /// @return the deserialized string
     /// @throws IOException if an exception occurs while writing to the stream
-    static String readString(Stream<List<int>> in_)
+    static String? readString(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != STRING_UID) {
             throw new ClassCastException();
