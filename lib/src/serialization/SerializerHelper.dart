@@ -76,7 +76,7 @@ class SerializerHelper
     static int readLong(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != LONG_UID) {
-            throw new ClassCastException();
+            throw new Exception("Cannot cast");
         }
         return readIntLong(in_);
     }
@@ -98,7 +98,7 @@ class SerializerHelper
     static int readInt(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != INT_UID) {
-            throw new ClassCastException();
+            throw new Exception("Cannot cast");
         }
         return readIntInt(in_);
     }
@@ -161,7 +161,7 @@ class SerializerHelper
     static List<StackTrace> readStackTraces(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != STACKTRACES_UID) {
-            throw new ClassCastException();
+            throw new Exception("Cannot cast");
         }
         int length = readIntInt(in_);
         if (length == (-1)) {
@@ -189,7 +189,7 @@ class SerializerHelper
             case ("" + LONG_UID):
                 return readIntLong(in_);
             default:
-                throw new ClassCastException();
+                throw new Exception("Cannot cast");
         }
     }
 
@@ -210,7 +210,7 @@ class SerializerHelper
                 writeInt(out, o);
                 break;
             default:
-                throw new ClassCastException();
+                throw new Exception("Cannot cast");
         }
     }
 
