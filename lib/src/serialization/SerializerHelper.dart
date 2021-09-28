@@ -110,7 +110,7 @@ class SerializerHelper
             writeIntInt(out, -1);
         } else {
             writeIntInt(out, s.length);
-            out.add(s.getBytes(StandardCharsets.UTF_8));
+            out.add(utf8.encode(s));
         }
     }
 
@@ -129,7 +129,7 @@ class SerializerHelper
         } else {
             List<int> arr = new List<int>(length);
             in_.read(arr);
-            return new String(arr, StandardCharsets.UTF_8);
+            return utf8.encode(arr);
         }
     }
 
@@ -181,7 +181,7 @@ class SerializerHelper
             case ("" + STRING_UID):
                 List<int> arr = new List<int>(readIntInt(in_));
                 in_.read(arr);
-                return new String(arr, StandardCharsets.UTF_8);
+                return utf8.encode(arr);
             case ("" + LONG_UID):
                 return readIntLong(in_);
             default:
