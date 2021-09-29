@@ -25,8 +25,7 @@ class SerializerHelper
     static int readIntLong(Stream<List<int>> in_)
     {
         int size = INT_SIZE;
-        Future<List> f_arr = in_.toList();
-        List arr = await f_arr;
+        List<int> f_arr = in_.first();
         int result = 0;
         for (int i = 0; i < size; i++) {
             result <<= BYTE_SIZE;
@@ -157,7 +156,7 @@ class SerializerHelper
     /// @param in the stream to be read
     /// @return the deserialized array
     /// @throws IOException if an exception occurs while writing to the stream
-    static List<StackTrace> readStackTraces(Stream<List<int>> in_)
+    static List<StackTrace>? readStackTraces(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != STACKTRACES_UID) {
             throw new Exception("Cannot cast");
