@@ -1,11 +1,9 @@
-import 'dart:collection';
+library geiger_localstorage;
 
-import 'package:geiger_localstorage/src/db/data/Field.dart';
-
-import 'db/data/Node.dart';
+import 'package:geiger_localstorage/geiger_localstorage.dart';
 
 /// <p>Defines the type of comparator to be used when accessing an ordinal.</p>
-enum ComparatorType { STRING, DATETIME, BOOLEAN }
+enum ComparatorType { string, datetime, boolean }
 
 /// <p>An object that can hold all possible search criteria.</p>
 ///
@@ -31,54 +29,54 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
     }
   }
 
-  final Map<Field, String> values = HashMap();
+  final Map<Field, String> values = {};
 
   String? getNodeOwner() {
-    return values[Field.OWNER];
+    return values[Field.owner];
   }
 
   String setNodeOwner(String nodeOwner) {
-    return values[Field.OWNER] = nodeOwner;
+    return values[Field.owner] = nodeOwner;
   }
 
   String? getNodeName() {
-    return values[Field.NAME];
+    return values[Field.name];
   }
 
   String setNodeName(String nodeName) {
-    return values[Field.NAME] = nodeName;
+    return values[Field.name] = nodeName;
   }
 
   String? getNodePath() {
-    return values[Field.PATH];
+    return values[Field.path];
   }
 
   String setNodePath(String nodePath) {
-    return values[Field.PATH] = nodePath;
+    return values[Field.path] = nodePath;
   }
 
   String? getNodeValueKey() {
-    return values[Field.KEY];
+    return values[Field.key];
   }
 
   String setNodeValueKey(String nodeValueKey) {
-    return values[Field.KEY] = nodeValueKey;
+    return values[Field.key] = nodeValueKey;
   }
 
   String? getNodeValueValue() {
-    return values[Field.VALUE];
+    return values[Field.value];
   }
 
   String setNodeValueValue(String nodeValue) {
-    return values[Field.OWNER] = nodeValue;
+    return values[Field.owner] = nodeValue;
   }
 
   String? getNodeValueType() {
-    return values[Field.TYPE];
+    return values[Field.type];
   }
 
   String setNodeValueType(String nodeValueType) {
-    return values[Field.OWNER] = nodeValueType;
+    return values[Field.owner] = nodeValueType;
   }
 
   String? get(Field f) {
@@ -90,11 +88,11 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
   }
 
   String? getNodeValueLastModified() {
-    return values[Field.LAST_MODIFIED];
+    return values[Field.lastModified];
   }
 
   String setNodeValueLastModified(String nodeValueLastModified) {
-    return values[Field.LAST_MODIFIED] = nodeValueLastModified;
+    return values[Field.lastModified] = nodeValueLastModified;
   }
 
   /// <p>Evaluates a provided node against this criteria.</p>
@@ -107,22 +105,22 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
     if (path == null || !node.getPath()!.startsWith(path)) {
       return false;
     }
-    var owner = values[Field.OWNER];
+    var owner = values[Field.owner];
     if ((owner != null) && (!regexEvalString(owner, node.getOwner()!))) {
       return false;
     }
-    var visibility = values[Field.VISIBILITY];
+    var visibility = values[Field.visibility];
     if ((visibility != null) &&
         (!regexEvalString(visibility, node.getVisibility().toString()))) {
       return false;
     }
     var nodeValues = node.getValues();
-    if ((values[Field.KEY] == null) &&
-        ((values[Field.VALUE] != null) || (values[Field.TYPE] != null))) {
+    if ((values[Field.key] == null) &&
+        ((values[Field.value] != null) || (values[Field.type] != null))) {
       for (var e in nodeValues.entries) {
-        var type = values[Field.TYPE];
+        var type = values[Field.type];
         var r3 = type == null || !regexEvalString(type, e.value.getType()!);
-        var value = values[Field.VALUE];
+        var value = values[Field.value];
         var r2 = value == null || !regexEvalString(value, e.value.getValue()!);
         if (r2 && r3) {
           return true;
@@ -130,12 +128,12 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
       }
       return false;
     } else {
-      if (values[Field.KEY] != null) {
-        var nv = nodeValues[get(Field.KEY)]!;
-        if (!regexEvalString(values[Field.TYPE]!, nv.getType()!)) {
+      if (values[Field.key] != null) {
+        var nv = nodeValues[get(Field.key)]!;
+        if (!regexEvalString(values[Field.type]!, nv.getType()!)) {
           return false;
         }
-        if (!regexEvalString(values[Field.VALUE]!, nv.getValue()!)) {
+        if (!regexEvalString(values[Field.value]!, nv.getValue()!)) {
           return false;
         }
       }

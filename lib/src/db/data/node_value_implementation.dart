@@ -1,17 +1,16 @@
+library geiger_localstorage;
+
 import 'dart:collection';
 
 import 'package:intl/locale.dart';
 
-import 'LanguageRange.dart';
-import 'NodeValue.dart';
+import 'language_range.dart';
+import 'node_value.dart';
 
-/// <p>This abstract class defines the common attributes for all NodeValueObjects.</p>
-///
-/// @author Sacha
-/// @version 0.1
+/// This abstract class defines the common attributes for all NodeValueObjects.
 class NodeValueImpl with NodeValue {
   static const int serialversionUID = 871283188;
-  static final Locale DEFAULT_LOCALE = Locale.fromSubtags(languageCode: 'en');
+  static final Locale defaultLocale = Locale.fromSubtags(languageCode: 'en');
 
   /// They key is used to identify the NodeValueObject inside a StorageNode,
   /// therefore, the key is unique within one StorageNode.
@@ -36,9 +35,9 @@ class NodeValueImpl with NodeValue {
   /// @param lastModified the last modified date to be set
   NodeValueImpl(this.key, String value,
       [this.type, String? description, int? lastModified]) {
-    setLocalizedString(this.value, value, DEFAULT_LOCALE);
+    setLocalizedString(this.value, value, defaultLocale);
     if (description != null) {
-      setLocalizedString(this.description, description, DEFAULT_LOCALE);
+      setLocalizedString(this.description, description, defaultLocale);
     }
     this.lastModified = lastModified ?? 0;
   }
@@ -56,7 +55,7 @@ class NodeValueImpl with NodeValue {
   @override
   String? getValue([String? languageRange]) {
     return getLocalizedString(
-        value, languageRange ?? DEFAULT_LOCALE.toLanguageTag());
+        value, languageRange ?? defaultLocale.toLanguageTag());
   }
 
   @override
@@ -70,7 +69,7 @@ class NodeValueImpl with NodeValue {
 
   @override
   void setValue(String value, [Locale? locale]) {
-    setLocalizedString(this.value, value, locale ?? DEFAULT_LOCALE);
+    setLocalizedString(this.value, value, locale ?? defaultLocale);
     updateLastModified();
   }
 
@@ -90,7 +89,7 @@ class NodeValueImpl with NodeValue {
   @override
   String? getDescription([String? languageRange]) {
     return getLocalizedString(
-        description, languageRange ?? DEFAULT_LOCALE.toLanguageTag());
+        description, languageRange ?? defaultLocale.toLanguageTag());
   }
 
   @override
@@ -104,7 +103,7 @@ class NodeValueImpl with NodeValue {
 
   static Locale lookupLocale(Map<String, String> map, String languageRange) {
     if (map.isEmpty) {
-      return DEFAULT_LOCALE;
+      return defaultLocale;
     }
 
     // Get Language Range
@@ -126,10 +125,10 @@ class NodeValueImpl with NodeValue {
   value,
 
       Locale locale) {
-    if ((getLocalizedString(map, DEFAULT_LOCALE.toLanguageTag()) == null) &&
-        (!(locale.toLanguageTag() == DEFAULT_LOCALE.toLanguageTag()))) {
+    if ((getLocalizedString(map, defaultLocale.toLanguageTag()) == null) &&
+        (!(locale.toLanguageTag() == defaultLocale.toLanguageTag()))) {
       throw Exception('undefined string for locale ' +
-          DEFAULT_LOCALE.toString() +
+          defaultLocale.toString() +
           ' Locale ' +
           locale.toLanguageTag());
     }
@@ -138,7 +137,7 @@ class NodeValueImpl with NodeValue {
 
   @override
   String? setDescription(String description, [Locale? locale]) {
-    locale ??= DEFAULT_LOCALE;
+    locale ??= defaultLocale;
     var ret = getLocalizedString(this.description, locale.toLanguageTag());
     setLocalizedString(this.description, description, locale);
     updateLastModified();
@@ -194,9 +193,9 @@ class NodeValueImpl with NodeValue {
     }
     sb.write('={');
     if (value.length == 1) {
-      sb.write(DEFAULT_LOCALE.toLanguageTag());
+      sb.write(defaultLocale.toLanguageTag());
       sb.write('=>"');
-      sb.write(value[DEFAULT_LOCALE.toLanguageTag()]);
+      sb.write(value[defaultLocale.toLanguageTag()]);
       sb.write('"}');
     } else {
       sb.write('\n');
@@ -231,12 +230,16 @@ class NodeValueImpl with NodeValue {
       equals(other);
 
   @override
-  bool equals(Object? o) {
-    if (o == null || o is! NodeValueImpl) {
+  bool equals(Object? object) {
+    if (object == null || object is! NodeValueImpl) {
       return false;
     }
-    return toString() == o.toString();
+    return toString() == object.toString();
   }
+
+  @override
+  int get hashCode => super.hashCode;
+
 
 /*void toByteArrayStream(Sink<List<int>> out) {
     SerializerHelper.writeLong(out, serialversionUID);

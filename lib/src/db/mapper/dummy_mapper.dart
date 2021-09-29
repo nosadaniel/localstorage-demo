@@ -1,18 +1,8 @@
-import 'dart:collection';
-
-import 'package:geiger_localstorage/src/StorageException.dart';
-import 'package:geiger_localstorage/src/db/data/Node.dart';
-import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
-import 'package:geiger_localstorage/src/db/data/NodeValue.dart';
-
-import '../../SearchCriteria.dart';
-import '../../StorageController.dart';
-import '../GenericController.dart';
-import 'AbstractMapper.dart';
+import 'package:geiger_localstorage/geiger_localstorage.dart';
 
 /// <p>A non-persisting dummy mapper for test purposes.</p>
 class DummyMapper extends AbstractMapper {
-  final Map<String, Node> nodes = HashMap();
+  final Map<String, Node> nodes = {};
   StorageController? controller;
 
   @override
@@ -64,7 +54,7 @@ class DummyMapper extends AbstractMapper {
     // synchronized(nodes, {
     if ((!('' == node.getParentPath())) &&
         (nodes[node.getParentPath()] == null)) {
-      throw StorageException('Node does not exist');
+      throw StorageException('Parent node ${node.getParentPath()} does not exist');
     }
     nodes[node.getPath()]?.update(node);
     // });
@@ -77,7 +67,7 @@ class DummyMapper extends AbstractMapper {
     // synchronized(nodes, {
     var oldNode = nodes[oldPath];
     if (oldNode == null) {
-      throw StorageException('Node does not exist');
+      throw StorageException('Old node "$oldPath" does not exist.. teherefore unable to rename to "$newPathOrName"');
     }
     var newNode = NodeImpl.fromPath(newPathOrName);
     var owner = oldNode.getOwner();
@@ -90,7 +80,7 @@ class DummyMapper extends AbstractMapper {
     for (var n in oldNode.getChildren().values) {
       rename(
           n.getPath()!,
-          (newNode.getPath()! + GenericController.PATH_DELIMITER) +
+          (newNode.getPath()! + GenericController.pathDelimiter) +
               n.getName()!);
     }
     delete(oldNode.getPath()!);
@@ -102,7 +92,7 @@ class DummyMapper extends AbstractMapper {
     // synchronized(nodes, {
     var node = nodes[path];
     if (node == null) {
-      throw StorageException('Node does not exist');
+      throw StorageException('unable to delete node "$path"... does not exist');
     }
     if (!('' == node.getChildNodesCsv())) {
       throw StorageException(

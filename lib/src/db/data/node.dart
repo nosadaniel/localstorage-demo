@@ -1,8 +1,6 @@
-import 'package:geiger_localstorage/src/Visibility.dart';
-// import 'package:geiger_localstorage/src/serialization/Serializer.dart';
+library geiger_localstorage;
 
-import '../../StorageController.dart';
-import 'NodeValue.dart';
+import 'package:geiger_localstorage/geiger_localstorage.dart';
 
 /// Interface representing a single node in the storage.
 abstract class Node /*with Serializer*/ {
@@ -43,13 +41,15 @@ abstract class Node /*with Serializer*/ {
   /// @return the visibility set previously
   Visibility setVisibility(Visibility newVisibility);
 
-  /// <p>Add a key/value pair to the node.</p>
+  /// Add a key/value pair to the node.
   ///
-  /// <p>Adds a K/V tuple to the node. The key must not
-  /// exist prior adding.</p>
-  /// @param value a NodeValue object representing the K/V pair
-  /// @throws StorageException if key already exists
+  /// Adds a K/V tuple to the node. The key must not exist prior adding.
   void addValue(NodeValue value);
+
+  /// Add a key/value pair to the node.
+  ///
+  /// Adds a K/V tuple to the node. The key must not exist prior adding.
+  void addOrUpdateValue(NodeValue value);
 
   /// <p>Get a specific value of the node.</p>
   ///

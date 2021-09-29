@@ -17,5 +17,5 @@ StorageController controller = GenericController('theOwner',DummyMapper());
 ```
 ### Create a persistent storage with a controller  
 ```Dart
-StorageController controller = GenericController('theOwner',SqliteMapper('jdbc:sqlite:./dbFileName.sqlite'));
+StorageController controller = GenericController('theOwner',SqliteMapper('./dbFileName.sqlite'));
 ```

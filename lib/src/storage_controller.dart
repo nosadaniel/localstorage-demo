@@ -1,7 +1,7 @@
-import 'ChangeRegistrar.dart';
-import 'SearchCriteria.dart';
-import 'db/data/Node.dart';
-import 'db/data/NodeValue.dart';
+import 'change_registrar.dart';
+import 'search_criteria.dart';
+import 'db/data/node.dart';
+import 'db/data/node_value.dart';
 
 /// <p>Generic implementation of a convenient storage controller providing persistence to a
 /// mapper backend.</p>

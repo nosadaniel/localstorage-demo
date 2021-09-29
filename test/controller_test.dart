@@ -1,13 +1,13 @@
-import 'package:geiger_localstorage/src/StorageController.dart';
-import 'package:geiger_localstorage/src/StorageException.dart';
-import 'package:geiger_localstorage/src/Visibility.dart';
-import 'package:geiger_localstorage/src/db/GenericController.dart';
-import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
-import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
-import 'package:geiger_localstorage/src/db/mapper/DummyMapper.dart';
+import 'package:geiger_localstorage/src/storage_controller.dart';
+import 'package:geiger_localstorage/src/storage_exception.dart';
+import 'package:geiger_localstorage/src/visibility.dart';
+import 'package:geiger_localstorage/src/db/generic_controller.dart';
+import 'package:geiger_localstorage/src/db/data/node_implementation.dart';
+import 'package:geiger_localstorage/src/db/data/node_value_implementation.dart';
+import 'package:geiger_localstorage/src/db/mapper/dummy_mapper.dart';
 import 'package:test/test.dart';
 
-class Controller_test {}
+class ControllerTest {}
 
 void updateTests(final StorageController controller) {
   group('controller update tests', () {
@@ -27,7 +27,7 @@ void updateTests(final StorageController controller) {
       expect(storedNode.getOwner(), 'testOwner');
       expect(storedNode.getName(), 'StorageNodeCreate1');
       expect(storedNode.getPath(), ':StorageNodeCreate1');
-      expect(storedNode.getVisibility(), Visibility.RED);
+      expect(storedNode.getVisibility(), Visibility.red);
     });
 
     test('Test Storage Node Add', () {
@@ -41,7 +41,7 @@ void updateTests(final StorageController controller) {
       expect(storedNode.getOwner(), 'testOwner');
       expect(storedNode.getName(), 'name2');
       expect(storedNode.getPath(), ':parent1:name2');
-      expect(storedNode.getVisibility(), Visibility.RED);
+      expect(storedNode.getVisibility(), Visibility.red);
     });
 
     // depends on correct functionality of the StorageController.create() function
@@ -50,13 +50,13 @@ void updateTests(final StorageController controller) {
       controller.add(NodeImpl(':nodeUpdateTest'));
 
       // updated Node with different visibility children
-      var node = NodeImpl('testNode1', ':nodeUpdateTest', Visibility.GREEN);
+      var node = NodeImpl('testNode1', ':nodeUpdateTest', Visibility.green);
       controller.add(node);
       expect(node.getOwner(), 'testOwner');
 
       var sn = NodeImpl('testChild1', ':nodeUpdateTest:testNode1');
       controller.add(sn);
-      node.setVisibility(Visibility.RED);
+      node.setVisibility(Visibility.red);
       node.addChild(sn);
 
       // update with node from above
@@ -70,7 +70,7 @@ void updateTests(final StorageController controller) {
       expect(storedNode.getName(), 'testNode1');
       expect(storedNode.getPath(), ':nodeUpdateTest:testNode1');
       expect(storedNode.getChildNodesCsv(), 'testChild1');
-      expect(storedNode.getVisibility(), Visibility.RED);
+      expect(storedNode.getVisibility(), Visibility.red);
     });
 
     test('add node with missing parent', () {

@@ -1,33 +1,31 @@
+library geiger_localstorage;
+
 import 'dart:collection';
 
-import 'package:geiger_localstorage/src/SearchCriteria.dart';
-import 'package:geiger_localstorage/src/StorageListener.dart';
+import 'package:geiger_localstorage/src/search_criteria.dart';
+import 'package:geiger_localstorage/src/storage_listener.dart';
 import 'package:uuid/uuid.dart';
 
-import '../ChangeRegistrar.dart';
-import '../EventType.dart';
-import '../SearchCriteria.dart';
-import '../StorageController.dart';
-import '../StorageException.dart';
-import 'StorageMapper.dart';
-import 'data/Node.dart';
-import 'data/NodeImpl.dart';
-import 'data/NodeValue.dart';
-import 'data/NodeValueImpl.dart';
+import '../change_registrar.dart';
+import '../event_type.dart';
+import '../search_criteria.dart';
+import '../storage_controller.dart';
+import '../storage_exception.dart';
+import 'storage_mapper.dart';
+import 'data/node.dart';
+import 'data/node_implementation.dart';
+import 'data/node_value.dart';
+import 'data/node_value_implementation.dart';
 
-/// <p>This Class Acts as an intermediate class to relay storageRequests to the
-/// StorageMapper.</p>
+/// This Class Acts as an intermediate class to relay storageRequests to the StorageMapper.
 ///
-/// <p>This class contains the interaction API every actor (sensor, shields, UI,...)
-/// calls methods from this controller to manipulate data.</p>
-///
-/// @author Sacha
-/// @version 0.1
+/// This class contains the interaction API every actor (sensor, shields, UI,...)
+/// calls methods from this controller to manipulate data.
 class GenericController implements StorageController, ChangeRegistrar {
   static StorageController? defaultController;
 
   /// the path delimiter.
-  static final String PATH_DELIMITER = ':';
+  static final String pathDelimiter = ':';
 
   /// the default owner of all newly created nodes.
   final String owner;
@@ -60,20 +58,20 @@ class GenericController implements StorageController, ChangeRegistrar {
   void initMapper() {
     final baseNodes = <String>[
       '',
-      ':Devices',
-      ':Users',
-      ':Enterprise',
-      ':Keys',
-      ':Global',
-      ':Local'
+      '${pathDelimiter}Devices',
+      '${pathDelimiter}Users',
+      '${pathDelimiter}Enterprise',
+      '${pathDelimiter}Keys',
+      '${pathDelimiter}Global',
+      '${pathDelimiter}Local'
     ];
     for (var nodeName in baseNodes) {
       try {
-// for correct path generation creation of a Node is needed
+        // for correct path generation creation of a Node is needed
         Node tmp = NodeImpl.fromPath(nodeName);
         mapper.get(tmp.getPath()!);
       } on StorageException {
-// node does not exist and therefore we create it
+        // node does not exist and therefore we create it
         Node tmp = NodeImpl.fromPath(nodeName);
         tmp.setOwner(owner);
         mapper.add(tmp);
@@ -81,23 +79,23 @@ class GenericController implements StorageController, ChangeRegistrar {
     }
 
     // check if current user exists
-    var localNode = mapper.get(':Local');
+    var localNode = mapper.get('${pathDelimiter}Local');
     var uuid = localNode.getValue('currentUser');
     if (uuid == null) {
       uuid = NodeValueImpl('currentUser', Uuid().v4());
-      localNode.addValue(uuid);
+      localNode.addOrUpdateValue(uuid);
       localNode.setOwner(owner);
       mapper.update(localNode);
     }
 
     // create new default user
     uuid = NodeValueImpl('currentUser', Uuid().v4());
-    localNode.addValue(uuid);
+    localNode.addOrUpdateValue(uuid);
     localNode.setOwner(owner);
     mapper.update(localNode);
 
     // check if current user node exists
-    var userNodeName = ':Users:' + uuid.getValue()!;
+    var userNodeName = '${pathDelimiter}Users$pathDelimiter' + uuid.getValue()!;
     try {
       mapper.get(userNodeName);
     } on StorageException {
@@ -106,19 +104,19 @@ class GenericController implements StorageController, ChangeRegistrar {
       mapper.add(n);
     }
 
-// check if current device exists
-    localNode = mapper.get(':Local');
+    // check if current device exists
+    localNode = mapper.get('${pathDelimiter}Local');
     uuid = localNode.getValue('currentDevice');
     if (uuid == null) {
-// create new default device
+      // create new default device
       uuid = NodeValueImpl('currentDevice', Uuid().v4());
-      localNode.addValue(uuid);
+      localNode.addOrUpdateValue(uuid);
       localNode.setOwner(owner);
       mapper.update(localNode);
     }
 
-// check if current device node exists
-    var deviceNodeName = ':Devices:' + uuid.getValue()!;
+    // check if current device node exists
+    var deviceNodeName = '${pathDelimiter}Devices$pathDelimiter' + uuid.getValue()!;
     try {
       mapper.get(deviceNodeName);
     } on StorageException {
@@ -154,7 +152,7 @@ class GenericController implements StorageController, ChangeRegistrar {
   Node get(String path) {
     var n = getNodeOrTombstone(path);
     if (n.isTombstone()) {
-      throw StorageException('Node does not exist');
+      throw StorageException('Node "$path" does not exist (but exited in the past; It is a tombstone now)');
     }
     var l = List<String>.empty(growable: true);
     for (var cn in n.getChildren().values) {
@@ -175,44 +173,44 @@ class GenericController implements StorageController, ChangeRegistrar {
 
   @override
   void add(Node node) {
-// make sure that there is an owner set
+    // make sure that there is an owner set
     if (node.getOwner() == null || '' == node.getOwner()) {
       node.setOwner(owner);
     }
 
-// add object
+    // add object
     mapper.add(node);
 
-// add child nodes
+    // add child nodes
     for (var n in node.getChildren().values) {
       mapper.add(n);
     }
 
-    checkListeners(EventType.CREATE, null, node, null, null);
+    checkListeners(EventType.create, null, node, null, null);
   }
 
   @override
   void update(Node node) {
-// make sure that there is an owner set
+    // make sure that there is an owner set
     if (node.getOwner() == null || '' == node.getOwner()) {
       node.setOwner(owner);
     }
 
-// get old node for update events
+    // get old node for update events
     var oldNode = mapper.get(node.getPath()!);
 
-// write node
+    // write node
     mapper.update(node);
 
-    checkListeners(EventType.UPDATE, oldNode, node, null, null);
+    checkListeners(EventType.update, oldNode, node, null, null);
 
-// any child that is not a skeleton will be handled as new or changed
+    // any child that is not a skeleton will be handled as new or changed
     for (var child in node.getChildren().values) {
       if (!child.isSkeleton()) {
         try {
           add(child);
         } on StorageException {
-// node already exists, therefore it was changed
+          // node already exists, therefore it was changed
           update(child);
         }
       }
@@ -222,7 +220,7 @@ class GenericController implements StorageController, ChangeRegistrar {
   @override
   Node delete(String path) {
     var ret = mapper.delete(path);
-    checkListeners(EventType.DELETE, ret, null, null, null);
+    checkListeners(EventType.delete, ret, null, null, null);
     return ret;
   }
 
@@ -230,13 +228,13 @@ class GenericController implements StorageController, ChangeRegistrar {
   void rename(String oldPath, String newPathOrName) {
     var oldNode = mapper.get(oldPath) as NodeImpl;
     var newPath = newPathOrName;
-    if (!newPathOrName.startsWith(PATH_DELIMITER)) {
-// create path from name
-      newPath = oldNode.getParentPath()! + PATH_DELIMITER + newPathOrName;
+    if (!newPathOrName.startsWith(pathDelimiter)) {
+      // create path from name
+      newPath = oldNode.getParentPath()! + pathDelimiter + newPathOrName;
     }
     mapper.rename(oldPath, newPath);
     var newNode = mapper.get(newPath) as NodeImpl;
-    checkListeners(EventType.RENAME, oldNode, newNode, null, null);
+    checkListeners(EventType.rename, oldNode, newNode, null, null);
   }
 
   @override
@@ -255,7 +253,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     var newNode = oldNode.deepClone();
     newNode.addValue(newValue);
     mapper.update(newNode);
-    checkListeners(EventType.UPDATE, oldNode, newNode, null, newValue);
+    checkListeners(EventType.update, oldNode, newNode, null, newValue);
   }
 
   @override
@@ -270,7 +268,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     newNode.removeValue(newValue.getKey());
     newNode.addValue(newValue);
     mapper.update(newNode);
-    checkListeners(EventType.UPDATE, oldNode, newNode, oldValue, newValue);
+    checkListeners(EventType.update, oldNode, newNode, oldValue, newValue);
   }
 
   @override
@@ -283,7 +281,7 @@ class GenericController implements StorageController, ChangeRegistrar {
     var newNode = oldNode.deepClone();
     newNode.removeValue(key);
     mapper.update(newNode);
-    checkListeners(EventType.UPDATE, oldNode, newNode, oldValue, null);
+    checkListeners(EventType.update, oldNode, newNode, oldValue, null);
     return oldValue;
   }
 

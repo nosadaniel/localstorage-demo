@@ -1,5 +1,6 @@
+library geiger_localstorage;
+
 import 'package:intl/locale.dart';
-// import 'package:geiger_localstorage/src/serialization/Serializer.dart';
 
 /// <p>Interface for accessing key/value pairs in nodes.</p>
 ///
@@ -65,17 +66,13 @@ abstract class NodeValue /* with Serializer*/ {
   /// @return a value reflecting the epoch of the last change
   int getLastModified();
 
-  /// <p>Copies the all values of the given node to the current node.</p>
-  ///
-  /// @param n2 the K/V tuple to be copied
-  void update(NodeValue n2);
+  /// Copies the all values of the given node to the current node value.
+  void update(NodeValue nodeValue);
 
-  /// <p>Creates a deep clone of the K/V tuple.</p>
-  ///
-  /// @return a copy of the current node value
+  /// Creates a deep clone of the K/V tuple.
   NodeValue deepClone();
 
-  /// <p>prints a space prefixed representation of the NodeValue.</p>
+  /// prints a space prefixed representation of the NodeValue.
   ///
   /// @param prefix a prefix (typically a series of spaces
   /// @return the string representation

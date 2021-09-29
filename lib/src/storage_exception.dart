@@ -86,7 +86,14 @@ class StorageException implements IOException /*,Serializer*/{
 
   @override
   String toString() {
-    return 'StorageException: $_message';
+    String ret='StorageException: $_message';
+    if(_cause!=null) {
+      ret += '\nnested cause:\n${_cause.toString()}';
+    }
+    if(_stackTrace!=null)  {
+      ret += '\nOffending stacktrace of nested cause:\n${_stackTrace.toString()}';
+    }
+    return ret;
   }
 
 

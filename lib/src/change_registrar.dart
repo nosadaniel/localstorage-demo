@@ -1,5 +1,6 @@
-import 'SearchCriteria.dart';
-import 'StorageListener.dart';
+library geiger_localstorage;
+
+import 'package:geiger_localstorage/geiger_localstorage.dart';
 
 /// <p>Interface for registrar support for change listeners.</p>
 abstract class ChangeRegistrar {

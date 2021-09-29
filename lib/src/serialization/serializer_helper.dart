@@ -1,5 +1,4 @@
-library ch.fhnw.geiger.serialization;
-import 'dart:convert' show utf8;
+library geiger_localstorage;
 
 /// <p>Helper class for serialization serializes important java primitives.</p>
 class SerializerHelper
@@ -12,7 +11,7 @@ class SerializerHelper
     static const int INT_SIZE = 4;
     static const int BYTE_SIZE = 1;
 
-    static void writeIntLong(Sink<List<int>> out, int l)
+    static void _writeIntLong(Sink<List<int>> out, int l)
     {
         List<int> result = new List<int>.empty(growable: true);
         for (int i = (INT_SIZE - 1); i >= 0; i--) {
@@ -22,7 +21,7 @@ class SerializerHelper
         out.add(result);
     }
 
-    static int readIntLong(Stream<List<int>> in_)
+    static int _readIntLong(Stream<List<int>> in_)
     {
         int size = INT_SIZE;
         Future<List> f_arr = in_.toList();
@@ -35,7 +34,7 @@ class SerializerHelper
         return result;
     }
 
-    static void writeIntInt(Sink<List<int>> out, int l)
+    static void _writeIntInt(Sink<List<int>> out, int l)
     {
         int size = INT_SIZE;
         List<int> result = new List<int>.empty(growable: true);
@@ -64,8 +63,8 @@ class SerializerHelper
     /// @throws IOException if an exception occurs while writing to the stream
     static void writeLong(Sink<List<int>> out, int l)
     {
-        writeIntLong(out, LONG_UID);
-        writeIntLong(out, l);
+        _writeIntLong(out, LONG_UID);
+        _writeIntLong(out, l);
     }
 
     /// <p>Deserialize a long variable.</p>
@@ -74,10 +73,10 @@ class SerializerHelper
     /// @throws IOException if an exception occurs while writing to the stream
     static int readLong(Stream<List<int>> in_)
     {
-        if (readIntLong(in_) != LONG_UID) {
+        if (_readIntLong(in_) != LONG_UID) {
             throw new Exception("Cannot cast");
         }
-        return readIntLong(in_);
+        return _readIntLong(in_);
     }
 
     /// <p>Serialize an int variable.</p>
@@ -86,8 +85,8 @@ class SerializerHelper
     /// @throws IOException if an exception occurs while writing to the stream
     static void writeInt(Sink<List<int>> out, int i)
     {
-        writeIntLong(out, INT_UID);
-        writeIntInt(out, i);
+        _writeIntLong(out, INT_UID);
+        _writeIntInt(out, i);
     }
 
     /// <p>Deserialize an int variable.</p>
@@ -108,11 +107,11 @@ class SerializerHelper
     /// @throws IOException if an exception occurs while writing to the stream
     static void writeString(Sink<List<int>> out, String s)
     {
-        writeIntLong(out, STRING_UID);
+        _writeIntLong(out, STRING_UID);
         if (s == null) {
-            writeIntInt(out, -1);
+            _writeIntInt(out, -1);
         } else {
-            writeIntInt(out, s.length);
+            _writeIntInt(out, s.length);
             out.add(utf8.encode(s));
         }
     }
@@ -123,7 +122,7 @@ class SerializerHelper
     /// @throws IOException if an exception occurs while writing to the stream
     static String? readString(Stream<List<int>> in_)
     {
-        if (readIntLong(in_) != STRING_UID) {
+        if (_readIntLong(in_) != STRING_UID) {
             throw new Exception("Cannot cast");
         }
         int length = readIntInt(in_);
@@ -142,11 +141,11 @@ class SerializerHelper
     /// @throws IOException if an exception occurs while writing to the stream
     static void writeStackTraces(Sink<List<int>> out, List<StackTrace> ste)
     {
-        writeIntLong(out, STACKTRACES_UID);
+        _writeIntLong(out, STACKTRACES_UID);
         if (ste == null) {
-            writeIntInt(out, -1);
+            _writeIntInt(out, -1);
         } else {
-            writeIntInt(out, ste.length);
+            _writeIntInt(out, ste.length);
             for (StackTrace st in ste) {
                 writeString(out, st.toString());
             }
