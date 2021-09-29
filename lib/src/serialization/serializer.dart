@@ -1,5 +1,4 @@
-library ch.fhnw.geiger.serialization;
-import 'dart:convert' show utf8;
+library geiger_localstorage;
 
 /// <p>Serializer interface for the serialization of value related objects.</p>
 abstract class Serializer

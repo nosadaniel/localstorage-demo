@@ -1,6 +1,8 @@
+library geiger_localstorage;
+
 import 'package:intl/locale.dart';
 import 'package:geiger_localstorage/geiger_localstorage.dart';
-import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
+import 'package:geiger_localstorage/src/db/data/node_value_implementation.dart';
 
 class LanguageRange {
 
@@ -22,7 +24,7 @@ class LanguageRange {
   }
 
   String? getLocalizedString(Map<String,String>? map) {
-    if(map==null || map[NodeValueImpl.DEFAULT_LOCALE]==null) {
+    if(map==null || map[NodeValueImpl.defaultLocale]==null) {
       return null;
     }
 
@@ -38,7 +40,7 @@ class LanguageRange {
         return t.toLanguageTag();
       }
     }
-    return NodeValueImpl.DEFAULT_LOCALE.toLanguageTag();
+    return NodeValueImpl.defaultLocale.toLanguageTag();
   }
 
   /// Factory for creating languageRange objects.

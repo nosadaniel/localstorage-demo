@@ -1,15 +1,15 @@
 import 'dart:io';
 
 import 'package:intl/locale.dart';
-import 'package:geiger_localstorage/src/StorageException.dart';
-import 'package:geiger_localstorage/src/db/StorageMapper.dart';
-import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
-import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
-import 'package:geiger_localstorage/src/db/mapper/DummyMapper.dart';
-import 'package:geiger_localstorage/src/db/mapper/SqliteMapper.dart';
+import 'package:geiger_localstorage/src/storage_exception.dart';
+import 'package:geiger_localstorage/src/db/storage_mapper.dart';
+import 'package:geiger_localstorage/src/db/data/node_implementation.dart';
+import 'package:geiger_localstorage/src/db/data/node_value_implementation.dart';
+import 'package:geiger_localstorage/src/db/mapper/dummy_mapper.dart';
+import 'package:geiger_localstorage/src/db/mapper/sqlite_mapper.dart';
 import 'package:test/test.dart';
 
-class StorageMapper_test {}
+class StorageMapperTest {}
 
 void _testPrep(List<StorageMapper> mapperList) {
   for (final mapper in mapperList) {
@@ -31,15 +31,18 @@ void main() {
     _testPrep(mapperList);
   });
 
-  test('Adding root node', () {
+  test('Adding node', () {
     for (final mapper in mapperList) {
       print('## Testing mapper $mapper in UNKNOWN');
       var node = NodeImpl('testNode1', '');
       node.setOwner('myOwner');
+      print("### adding new node");
       mapper.add(node);
 
       // make sure that lastupdated and owner is not updated upon add
+      print("### retrieving previously written node");
       var node2 = mapper.get(':testNode1');
+      print("### testing node content");
       expect(node2.equals(node), true,
           reason: 'Last updated was unexpectedly updated');
     }
@@ -129,10 +132,10 @@ void main() {
           reason: 'Node :testNode1 may not be a skeleton if fetched');
 
       // compare data
-      expect(node.equals(storedNode), true, reason: 'comparing parent node');
+      expect(node.equals(storedNode), true, reason: 'comparing parent node failed (expected: ${storedNode.toString()}; got: ${node.toString()}');
       expect(childNode.equals(storedChildNode), true,
           reason: 'comparing child node');
-      expect(node2.equals(storedNode2), true, reason: 'comparing parent node2');
+      expect(node2.equals(storedNode2), true, reason: 'comparing parent node2 ');
       expect(storedNode.getChildren().length, 1,
           reason: 'checking for child node count');
     }
@@ -171,7 +174,7 @@ void main() {
       print('## got    ' + storedNode.toString());
 
       // compare data
-      expect(node.equals(storedNode), true, reason: 'comparing parent node');
+      expect(node.equals(storedNode), true, reason: 'comparing parent node (expected: ${node.toString()}(${node.toString().hashCode}); got: ${storedNode.toString()}(${storedNode.toString().hashCode})');
       expect(childNode.equals(storedChildNode), true,
           reason: 'comparing child node');
       expect(node2.equals(storedNode2), true, reason: 'comparing parent node2');

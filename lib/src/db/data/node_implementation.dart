@@ -1,13 +1,7 @@
-import 'dart:collection';
+library geiger_localstorage;
 
-import '../../StorageController.dart';
-import '../../StorageException.dart';
-import '../../Visibility.dart';
-import '../GenericController.dart';
-import 'Field.dart';
-import 'Node.dart';
-import 'NodeValue.dart';
-import 'SwitchableBoolean.dart';
+import 'package:geiger_localstorage/geiger_localstorage.dart';
+import 'package:geiger_localstorage/src/db/data/switchable_boolean.dart';
 
 /// <p>The implementation of the node interface.</p>
 ///
@@ -26,23 +20,23 @@ class NodeImpl with Node {
   StorageController? controller;
 
   /// contains the ordinals of a node
-  final Map<Field, String> ordinals = HashMap();
+  final Map<Field, String> ordinals = <Field,String>{ Field.owner:'' };
 
   /// contains the key/value pairs of a node
-  final Map<String, NodeValue> values = HashMap();
+  final Map<String, NodeValue> values = {};
 
   /// Holds all child nodes as tuples, where the name is used as a key and
   /// the value is of type StorageNode
-  final Map<String, Node> childNodes = HashMap();
+  final Map<String, Node> childNodes = {};
 
   /// <p>Constructor creating a skeleton node.</p>
   ///
   /// @param path       the path of the node
   /// @param controller the controller to fetch the full node
-  NodeImpl.createSkeleton(String path, StorageController? this.controller) {
+  NodeImpl.createSkeleton(String path, this.controller) {
     skeleton.set(true);
     try {
-      set(Field.PATH, path);
+      set(Field.path, path);
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -52,7 +46,7 @@ class NodeImpl with Node {
     update(node);
   }
 
-  /// <p>create a empty node for the given path.</p>
+  /// Create a empty node for the given path.
   ///
   /// @param path the node path
   /// @param isTombstone true if the node is a tombstone node
@@ -67,7 +61,7 @@ class NodeImpl with Node {
     var node = NodeImpl(getNameFromPath(path)!, getParentFromPath(path));
     try {
       if (isTombstone != null) {
-        node.set(Field.TOMBSTONE, isTombstone ? 'true' : 'false');
+        node.set(Field.tombstone, isTombstone ? 'true' : 'false');
       }
       if (visibility != null) {
         node.setVisibility(visibility);
@@ -93,14 +87,14 @@ class NodeImpl with Node {
   /// @param name   the name for the node
   /// @param parent the parent of the node (may be null if root node is the parent)
   /// @param vis    visibility of the node
-  NodeImpl(String name, [String? parent, Visibility vis = Visibility.RED]) {
+  NodeImpl(String name, [String? parent, Visibility vis = Visibility.red]) {
     if (parent == null) {
       parent = getParentFromPath(name);
       name = getNameFromPath(name) ?? '';
     }
     try {
-      set(Field.PATH, '$parent${GenericController.PATH_DELIMITER}$name');
-      set(Field.VISIBILITY, vis.toString());
+      set(Field.path, '$parent${GenericController.pathDelimiter}$name');
+      set(Field.visibility, vis.toString());
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -127,7 +121,7 @@ class NodeImpl with Node {
       return null;
     }
     return path
-        .substring(path.lastIndexOf(GenericController.PATH_DELIMITER) + 1);
+        .substring(path.lastIndexOf(GenericController.pathDelimiter) + 1);
   }
 
   /// <p>Returns the fully qualified node path of the parental node.</p>
@@ -138,11 +132,11 @@ class NodeImpl with Node {
     if (path == null) {
       return null;
     }
-    if (!path.contains(GenericController.PATH_DELIMITER)) {
+    if (!path.contains(GenericController.pathDelimiter)) {
       return '';
     }
     return path.substring(
-        0, path.lastIndexOf(GenericController.PATH_DELIMITER));
+        0, path.lastIndexOf(GenericController.pathDelimiter));
   }
 
   @override
@@ -178,11 +172,14 @@ class NodeImpl with Node {
   void addValue(NodeValue value) {
     init();
     if (getValue(value.getKey()) != null) {
-      throw StorageException('value does already exist');
+      throw StorageException('value "${value.getKey()}" does already exist in the node "${getPath()}"');
     }
-    // synchronized(values, {
     values[value.getKey()] = value;
-    // });
+  }
+
+  @override
+  void addOrUpdateValue(NodeValue value) {
+    values[value.getKey()] = value;
   }
 
   @override
@@ -207,7 +204,7 @@ class NodeImpl with Node {
   @override
   String? getOwner() {
     try {
-      return get(Field.OWNER);
+      return get(Field.owner)??'';
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -216,7 +213,7 @@ class NodeImpl with Node {
   @override
   String? setOwner(String newOwner) {
     try {
-      return set(Field.OWNER, newOwner);
+      return set(Field.owner, newOwner);
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -225,7 +222,7 @@ class NodeImpl with Node {
   @override
   String? getName() {
     try {
-      return getNameFromPath(get(Field.PATH));
+      return getNameFromPath(get(Field.path));
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -234,7 +231,7 @@ class NodeImpl with Node {
   @override
   String? getParentPath() {
     try {
-      return getParentFromPath(get(Field.PATH));
+      return getParentFromPath(get(Field.path));
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -243,7 +240,7 @@ class NodeImpl with Node {
   @override
   String? getPath() {
     try {
-      return get(Field.PATH);
+      return get(Field.path);
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -252,8 +249,8 @@ class NodeImpl with Node {
   @override
   Visibility getVisibility() {
     try {
-      var rawVisibility = get(Field.VISIBILITY);
-      return VisibilityExtension.valueOf(rawVisibility!) ?? Visibility.RED;
+      var rawVisibility = get(Field.visibility);
+      return VisibilityExtension.valueOf(rawVisibility!) ?? Visibility.red;
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }
@@ -263,7 +260,7 @@ class NodeImpl with Node {
   Visibility setVisibility(Visibility newVisibility) {
     try {
       var ret = getVisibility();
-      set(Field.VISIBILITY, newVisibility.toString());
+      set(Field.visibility, newVisibility.toString());
       return ret;
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
@@ -272,7 +269,7 @@ class NodeImpl with Node {
 
   @override
   Map<String, NodeValue> getValues() {
-    return HashMap.from(values);
+    return Map.from(values);
   }
 
   /// <p>Gets an ordinal field of the node.</p>
@@ -281,22 +278,22 @@ class NodeImpl with Node {
   /// @throws StorageException if a field does not exist
   String? get(Field field) {
     // synchronized(skeleton, {
-    if (((field != Field.PATH) && (field != Field.NAME)) &&
-        (field != Field.TOMBSTONE)) {
+    if (((field != Field.path) && (field != Field.name)) &&
+        (field != Field.tombstone)) {
       init();
     }
     // });
 
     switch (field) {
-      case Field.OWNER:
-      case Field.PATH:
-      case Field.VISIBILITY:
-      case Field.LAST_MODIFIED:
-      case Field.EXPIRY:
-      case Field.TOMBSTONE:
+      case Field.owner:
+      case Field.path:
+      case Field.visibility:
+      case Field.lastModified:
+      case Field.expiry:
+      case Field.tombstone:
         return ordinals[field];
-      case Field.NAME:
-        return getNameFromPath(ordinals[Field.PATH]);
+      case Field.name:
+        return getNameFromPath(ordinals[Field.path]);
       default:
         throw StorageException('unable to fetch field ' + field.toString());
     }
@@ -310,31 +307,31 @@ class NodeImpl with Node {
   /// @throws StorageException if a field does not exist
   String? set(Field field, String? value) {
     // synchronized(skeleton, {
-    if (field != Field.PATH) {
+    if (field != Field.path) {
       init();
     }
     // });
 
     var current = ordinals[field];
 
-    if (field != Field.LAST_MODIFIED &&
+    if (field != Field.lastModified &&
         ((current != null && current != value) ||
             (current == null && value != null))) {
       touch();
     }
     switch (field) {
-      case Field.OWNER:
-      case Field.PATH:
-      case Field.VISIBILITY:
-      case Field.LAST_MODIFIED:
-      case Field.EXPIRY:
+      case Field.owner:
+      case Field.path:
+      case Field.visibility:
+      case Field.lastModified:
+      case Field.expiry:
         if (value == null) {
           return ordinals.remove(field);
         }
         var prev = ordinals[field];
         ordinals[field] = value;
         return prev;
-      case Field.TOMBSTONE:
+      case Field.tombstone:
         var prev = ordinals[field] ?? 'false';
         ordinals[field] = ('true' == value) ? 'true' : 'false';
         return prev;
@@ -348,7 +345,7 @@ class NodeImpl with Node {
   @override
   bool isTombstone() {
     try {
-      return 'true' == get(Field.TOMBSTONE);
+      return 'true' == get(Field.tombstone);
     } on StorageException {
       throw Exception('OOPS! Unexpected exception... please contact developer');
     }
@@ -367,7 +364,7 @@ class NodeImpl with Node {
   Map<String, Node> getChildren() {
     init();
     // synchronized(childNodes, {
-    Map<String, Node> ret = HashMap();
+    Map<String, Node> ret = {};
     for (var entry in childNodes.entries) {
       ret[entry.key] = entry.value.deepClone();
     }
@@ -475,9 +472,9 @@ class NodeImpl with Node {
   void update(Node n2, {bool deepClone = true}) {
     controller = n2.getController();
     skeleton.set(n2.isSkeleton());
-    var path = (n2 as NodeImpl).ordinals[Field.PATH];
+    var path = (n2 as NodeImpl).ordinals[Field.path];
     if (path != null) {
-      ordinals[Field.PATH] = path;
+      ordinals[Field.path] = path;
     }
     if (!n2.isSkeleton()) {
       // synchronized(ordinals, {
@@ -507,9 +504,9 @@ class NodeImpl with Node {
       // });
     }
 
-    var lastModified = n2.ordinals[Field.LAST_MODIFIED];
+    var lastModified = n2.ordinals[Field.lastModified];
     if (lastModified != null) {
-      ordinals[Field.LAST_MODIFIED] = lastModified;
+      ordinals[Field.lastModified] = lastModified;
     }
   }
 
@@ -561,6 +558,10 @@ class NodeImpl with Node {
     }
     return sb.toString();
   }
+
+  @override
+  int get hashCode => toString().hashCode;
+
 
 /* void toByteArrayStream(Sink<List<int>> out) {
     SerializerHelper.writeLong(out, serialversionUID);

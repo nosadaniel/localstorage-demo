@@ -1,9 +1,9 @@
 
 import 'package:intl/locale.dart';
-import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
+import 'package:geiger_localstorage/src/db/data/node_value_implementation.dart';
 import 'package:test/test.dart';
 
-class NodeValue_test {}
+class NodeValueTest {}
 
 void main() {
 

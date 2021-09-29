@@ -1,3 +1,5 @@
+library geiger_localstorage;
+
 /// A boolean valuable offering atomic toggling.
 class SwitchableBoolean {
   bool value;

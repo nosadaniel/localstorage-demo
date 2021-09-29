@@ -1,14 +1,14 @@
-import 'package:geiger_localstorage/src/Visibility.dart';
-import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
+import 'package:geiger_localstorage/src/visibility.dart';
+import 'package:geiger_localstorage/src/db/data/node_implementation.dart';
 import 'package:test/test.dart';
 
-class Node_test {}
+class NodeTest {}
 
 void main() {
   test('node defaults', () {
     var node = NodeImpl('name', 'path');
     expect(node.getOwner(), null, reason: 'test predefined owner');
-    expect(node.getVisibility(), Visibility.RED,
+    expect(node.getVisibility(), Visibility.red,
         reason: 'test predefined owner');
   });
 

@@ -1,7 +1,9 @@
-import '../SearchCriteria.dart';
-import '../StorageController.dart';
-import 'data/Node.dart';
-import 'data/NodeValue.dart';
+library geiger_localstorage;
+
+import '../search_criteria.dart';
+import '../storage_controller.dart';
+import 'data/node.dart';
+import 'data/node_value.dart';
 
 /// <p>Generic interface to define the common methods between databases.</p>
 ///

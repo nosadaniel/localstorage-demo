@@ -3,25 +3,25 @@
 /// The database provided in this class is suitable for partial replication.
 library geiger_localstorage;
 
-export 'src/db/data/Field.dart';
-export 'src/db/data/Node.dart';
-export 'src/db/data/NodeImpl.dart';
-export 'src/db/data/NodeValue.dart';
-export 'src/db/data/NodeValueImpl.dart';
-//export 'src/db/data/SwitchableBoolean.dart';
+export 'src/db/data/field.dart';
+export 'src/db/data/node.dart';
+export 'src/db/data/node_implementation.dart';
+export 'src/db/data/node_value.dart';
+export 'src/db/data/node_value_implementation.dart';
+//export 'src/db/data/switchable_boolean.dart';
 
-export 'src/db/mapper/AbstractMapper.dart';
-export 'src/db/mapper/AbstractSqlMapper.dart';
-export 'src/db/mapper/DummyMapper.dart';
-export 'src/db/mapper/SqliteMapper.dart';
+export 'src/db/mapper/abstract_mapper.dart';
+export 'src/db/mapper/abstract_sql_mapper.dart';
+export 'src/db/mapper/dummy_mapper.dart';
+export 'src/db/mapper/sqlite_mapper.dart';
 
-export 'src/db/GenericController.dart';
-export 'src/db/StorageMapper.dart';
+export 'src/db/generic_controller.dart';
+export 'src/db/storage_mapper.dart';
 
-export 'src/ChangeRegistrar.dart';
-export 'src/EventType.dart';
-export 'src/SearchCriteria.dart';
-export 'src/StorageController.dart';
-export 'src/StorageException.dart';
-export 'src/StorageListener.dart';
-export 'src/Visibility.dart';
+export 'src/change_registrar.dart';
+export 'src/event_type.dart';
+export 'src/search_criteria.dart';
+export 'src/storage_controller.dart';
+export 'src/storage_exception.dart';
+export 'src/storage_listener.dart';
+export 'src/visibility.dart';

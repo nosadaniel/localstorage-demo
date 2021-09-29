@@ -1,5 +1,7 @@
-import 'EventType.dart';
-import 'db/data/Node.dart';
+library geiger_localstorage;
+
+import 'event_type.dart';
+import 'db/data/node.dart';
 
 /// <p>Listener interface for storage events.</p>
 abstract class StorageListener {

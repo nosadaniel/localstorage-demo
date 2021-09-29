@@ -1,39 +1,28 @@
-import 'dart:collection';
+library geiger_localstorage;
 
-import 'package:geiger_localstorage/src/StorageController.dart';
-import 'package:geiger_localstorage/src/StorageException.dart';
-import 'package:geiger_localstorage/src/Visibility.dart';
-import 'package:geiger_localstorage/src/db/data/Field.dart';
-import 'package:geiger_localstorage/src/db/data/Node.dart';
-import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
-import 'package:geiger_localstorage/src/db/data/NodeValue.dart';
-import 'package:geiger_localstorage/src/db/data/NodeValueImpl.dart';
+import 'package:geiger_localstorage/geiger_localstorage.dart';
 import 'package:intl/locale.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-import '../../SearchCriteria.dart';
-import '../GenericController.dart';
-import 'AbstractSqlMapper.dart';
-
 /// This class maps the DBinterface functions to a SQLite database
 class SqliteMapper extends AbstractSqlMapper {
-  static const int MAXFIELDSIZE = 1024;
+  static const int maxFieldSize = 1024;
   static final String initString = 'CREATE TABLE IF NOT EXISTS storage_node (\n'
           'path TEXT CHECK( LENGTH(path) <=' +
-      MAXFIELDSIZE.toString() +
+      maxFieldSize.toString() +
       ') PRIMARY KEY,\n'
           'owner TEXT CHECK( LENGTH(owner) <= 40),\n'
           'name TEXT CHECK( LENGTH(name) <= 40) NOT NULL,\n'
-          "visibility TEXT CHECK(visibility IN ('RED', 'AMBER', 'GREEN', 'WHITE')) NOT NULL DEFAULT 'RED',\n"
+          "visibility TEXT CHECK(visibility IN ('black', 'red', 'amber', 'green', 'white')) NOT NULL DEFAULT 'red',\n"
           'children TEXT CHECK( LENGTH(children) <=' +
-      MAXFIELDSIZE.toString() +
+      maxFieldSize.toString() +
       ') NULL,\n'
           "tombstone TEXT CHECK( tombstone IN ('TRUE', 'FALSE')) DEFAULT 'FALSE'\n"
           ');\n';
   static final String initNodeValueString =
       'CREATE TABLE IF NOT EXISTS node_value (\n'
               'path TEXT CHECK( LENGTH(path) <=' +
-          MAXFIELDSIZE.toString() +
+          maxFieldSize.toString() +
           ') NOT NULL,\n'
               'key TEXT CHECK( LENGTH(key) <= 40) NOT NULL,\n'
               'value TEXT CHECK( LENGTH(value) <= 16384),\n'
@@ -46,13 +35,13 @@ class SqliteMapper extends AbstractSqlMapper {
   static final String initTranslationString =
       'CREATE TABLE IF NOT EXISTS translation (\n'
               'path TEXT CHECK( LENGTH(path) <=' +
-          MAXFIELDSIZE.toString() +
+          maxFieldSize.toString() +
           ') NOT NULL,\n'
               'key TEXT CHECK( LENGTH(key) <= 40) NOT NULL,\n'
               "identifier TEXT CHECK(identifier IN ('VALUE', 'DESCRIPTION')) NOT NULL,\n"
               'locale TEXT CHECK( LENGTH(locale) <= 10) NOT NULL,\n'
               'translation TEXT CHECK( LENGTH(translation) <=' +
-          MAXFIELDSIZE.toString() +
+          maxFieldSize.toString() +
           ') NOT NULL,\n'
               'PRIMARY KEY (path, key, identifier, locale),\n'
               'FOREIGN KEY (path, key) REFERENCES node_value(path, key)\n'
@@ -109,21 +98,22 @@ class SqliteMapper extends AbstractSqlMapper {
     try {
       ResultSet resultSet = requestResult(sqlStatement, [path]);
       if (resultSet.isEmpty) {
-        throw StorageException('Node does not exist');
+        throw StorageException('Node "$path" does not exist on sqlite backed');
       } else {
         if ('true' == resultSet.first['tombstone'].toLowerCase()) {
           res = NodeImpl.fromPath(resultSet.first['path'] as String,
               isTombstone: true);
           res.setVisibility(VisibilityExtension.valueOf(
                   resultSet.first['visibility']! as String) ??
-              Visibility.RED);
+              Visibility.red);
           return res;
         }
         res = NodeImpl.fromPath(resultSet.first['path'] as String);
-        String? owner = resultSet.first['owner'] as String;
+        String owner = (resultSet.first['owner'] ??'') as String;
         res.setOwner(owner);
-        res.setVisibility(
-            VisibilityExtension.valueOf(resultSet.first['visibility'] as String)?? Visibility.RED);
+        res.setVisibility(VisibilityExtension.valueOf(
+                resultSet.first['visibility'] as String) ??
+            Visibility.red);
         String children = resultSet.first['children'] as String;
         if (!('' == children)) {
           for (var childName in children.split(',')) {
@@ -144,8 +134,12 @@ class SqliteMapper extends AbstractSqlMapper {
     try {
       for (var valueRow in resultSetValues) {
         key = valueRow['key'] as String;
-        NodeValue value = NodeValueImpl(key, valueRow['value'] as String,
-            valueRow['type'] as String, '', int.parse(valueRow['last_modified'] as String));
+        NodeValue value = NodeValueImpl(
+            key,
+            valueRow['value'] as String,
+            (valueRow['type']??'') as String,
+            '',
+            int.parse(valueRow['last_modified'] as String));
         var sqlStatementTranslations =
             'SELECT path, key, identifier, locale, translation '
             'FROM translation WHERE (path = ? AND key = ?)';
@@ -192,15 +186,10 @@ class SqliteMapper extends AbstractSqlMapper {
       get(node.getPath()!);
     } catch (e) {
       if ((e is! StorageException)) {
-        throw StorageException('Node already exists');
+        throw StorageException('Node "${node.getPath()}" already exists');
       }
     }
     if (node.getParentPath() != null && '' != node.getParentPath()) {
-      if (get(node.getParentPath()!) == null) {
-        throw StorageException('Parent node "' +
-            (node.getParentPath() ?? 'null') +
-            '" does not exist');
-      }
       var parent = get(node.getParentPath()!);
       parent.addChild(node);
       update(parent);
@@ -218,7 +207,8 @@ class SqliteMapper extends AbstractSqlMapper {
         node.isTombstone().toString().toUpperCase()
       ]);
     } on StorageException catch (e) {
-      throw StorageException('Could not add new node', e);
+      print(e.toString());
+      throw StorageException('Could not add new node "${node.getPath()}"', e);
     }
     for (var nv in node.getValues().values) {
       addValue(node.getPath()!, nv);
@@ -259,9 +249,10 @@ class SqliteMapper extends AbstractSqlMapper {
   @override
   Node delete(String path) {
     var oldNode = get(path);
-    if (!('' == oldNode.getChildNodesCsv())) {
+    if (oldNode.getChildren().isNotEmpty) {
       throw StorageException(
-          'Node does have children... cannot remove ' + path);
+          'Node does have ${oldNode.getChildren().length} children... cannot remove ' +
+              path);
     }
     for (var nv in oldNode.getValues().values) {
       deleteValue(path, nv.getKey());
@@ -285,7 +276,7 @@ class SqliteMapper extends AbstractSqlMapper {
     checkPath(path);
     var ret = get(path);
     if (ret.isTombstone()) {
-      throw StorageException('Node does not exists: ' + path);
+      throw StorageException('unable to get value... Node "$path" does not exists. Node is a tombstone.');
     }
     var sqlSelectStatement = ('SELECT path,key,value,type,locale,last_modified '
         'FROM node_value WHERE (path = ? and key = ?)');
@@ -298,7 +289,7 @@ class SqliteMapper extends AbstractSqlMapper {
       value = NodeValueImpl(
           resultSet.first['key'] as String,
           resultSet.first['value'] as String,
-          resultSet.first['type'] as String,
+          (resultSet.first['type']??'') as String,
           '',
           int.parse(resultSet.first['last_modified'] as String));
     } catch (e) {
@@ -319,7 +310,7 @@ class SqliteMapper extends AbstractSqlMapper {
         String identifier = rsTranslation['identifier'] as String;
         if ('VALUE' == identifier) {
           value.setValue(rsTranslation['translation'] as String,
-              Locale.parse(rsTranslation['locale']as String));
+              Locale.parse(rsTranslation['locale'] as String));
         } else {
           if ('DESCRIPTION' == identifier) {
             value.setDescription(rsTranslation['translation'] as String,
@@ -343,7 +334,7 @@ class SqliteMapper extends AbstractSqlMapper {
     checkPath(path);
     get(path);
     if (getValue(path, value.getKey()) != null) {
-      throw StorageException('Value already exists');
+      throw StorageException('Value "${value.getKey()}" already exists');
     }
     var sqlStatement =
         ('INSERT INTO node_value (path, key, value, type, locale, '
@@ -359,7 +350,7 @@ class SqliteMapper extends AbstractSqlMapper {
       ]);
     } on StorageException catch (e) {
       throw StorageException(
-          'Could not create value "' + value.getKey() + '"', e);
+          'Could not create value "${value.getKey()}"', e);
     }
     var sqlStatementTrl =
         ('INSERT INTO translation (path, key, identifier, locale, translation)'
@@ -411,9 +402,6 @@ class SqliteMapper extends AbstractSqlMapper {
     if ('' == path) {
       throw NullThrownError();
     }
-    // if (get(path) == null) {
-    //   throw StorageException('Node does not exist');
-    // }
     if (getValue(path, value.getKey()) == null) {
       throw StorageException(('Key "' + value.getKey()) + '" does not exist');
     }
@@ -449,11 +437,7 @@ class SqliteMapper extends AbstractSqlMapper {
       requestResult(sqlDeleteStatement, [path, key]);
     } on StorageException catch (e) {
       throw StorageException(
-          'Could not delete value for key "' +
-              key +
-              '" in node "' +
-              path +
-              '"',
+          'Could not delete value for key "' + key + '" in node "' + path + '"',
           e);
     }
     return value;
@@ -477,7 +461,7 @@ class SqliteMapper extends AbstractSqlMapper {
     add(newNode);
     for (var n in oldNode.getChildren().values) {
       rename(n.getPath()!,
-          newNode.getPath()! + GenericController.PATH_DELIMITER + n.getName()!);
+          newNode.getPath()! + GenericController.pathDelimiter + n.getName()!);
     }
     delete(oldPath);
   }
@@ -490,16 +474,16 @@ class SqliteMapper extends AbstractSqlMapper {
     var sqlValueSearch = 'SELECT path,key,value,type,locale,last_modified '
         'FROM node_value WHERE (path = ? and key = ? and value = ? and type = ? '
         'and last_modified = ?)';
-    Map<String, Node> nodes = HashMap();
-    Map<String, NodeValue> values = HashMap();
+    Map<String, Node> nodes = {};
+    Map<String, NodeValue> values = {};
     try {
       var resultSetNodes = requestResult(sqlNodeSearch, [
         ('' == criteria.getNodePath()) ? '*' : criteria.getNodePath(),
         ('' == criteria.getNodeOwner()) ? '*' : criteria.getNodeOwner(),
         ('' == criteria.getNodeName()) ? '*' : criteria.getNodeName(),
-        ('' == criteria.get(Field.VISIBILITY))
+        ('' == criteria.get(Field.visibility))
             ? '*'
-            : criteria.get(Field.VISIBILITY)
+            : criteria.get(Field.visibility)
       ]);
       for (var node in resultSetNodes) {
         String path = node['path'] as String;
@@ -575,12 +559,9 @@ class SqliteMapper extends AbstractSqlMapper {
   ResultSet requestResult(String sqlStatement, List<Object?> args) {
     try {
       return conn.select(sqlStatement, args);
-    } on SqliteException catch (_, st) {
+    } on SqliteException catch (e, st) {
       print(st);
-      throw StorageException('Could not execute query: ' +
-          sqlStatement +
-          ' with args: ' +
-          args.toString());
+      throw StorageException('Could not execute query: "$sqlStatement" with args: ${args.toString()} [${e.toString()}]');
     }
   }
 }

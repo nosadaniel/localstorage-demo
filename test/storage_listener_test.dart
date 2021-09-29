@@ -1,15 +1,15 @@
-import 'package:geiger_localstorage/src/EventType.dart';
-import 'package:geiger_localstorage/src/SearchCriteria.dart';
-import 'package:geiger_localstorage/src/StorageController.dart';
-import 'package:geiger_localstorage/src/StorageException.dart';
-import 'package:geiger_localstorage/src/StorageListener.dart';
-import 'package:geiger_localstorage/src/db/GenericController.dart';
-import 'package:geiger_localstorage/src/db/data/Node.dart';
-import 'package:geiger_localstorage/src/db/data/NodeImpl.dart';
-import 'package:geiger_localstorage/src/db/mapper/DummyMapper.dart';
+import 'package:geiger_localstorage/src/event_type.dart';
+import 'package:geiger_localstorage/src/search_criteria.dart';
+import 'package:geiger_localstorage/src/storage_controller.dart';
+import 'package:geiger_localstorage/src/storage_exception.dart';
+import 'package:geiger_localstorage/src/storage_listener.dart';
+import 'package:geiger_localstorage/src/db/generic_controller.dart';
+import 'package:geiger_localstorage/src/db/data/node.dart';
+import 'package:geiger_localstorage/src/db/data/node_implementation.dart';
+import 'package:geiger_localstorage/src/db/mapper/dummy_mapper.dart';
 import 'package:test/test.dart';
 
-class StorageListener_test {}
+class StorageListenerTest {}
 
 void _setupTest(StorageController controller) {
   controller.zap();
