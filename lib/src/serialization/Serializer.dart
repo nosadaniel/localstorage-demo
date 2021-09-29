@@ -1,4 +1,5 @@
 library ch.fhnw.geiger.serialization;
+import 'dart:convert' show utf8;
 
 /// <p>Serializer interface for the serialization of value related objects.</p>
 abstract class Serializer
@@ -26,7 +27,7 @@ abstract class Serializer
         try {
             Sink<List<int>> out = new Sink<List<int>>();
             obj.toByteArrayStream(out);
-            return out.toByteArray();
+            return utf8.encode(out.toString());
         } on UnimplementedError catch (ioe) {
             return null;
         }
