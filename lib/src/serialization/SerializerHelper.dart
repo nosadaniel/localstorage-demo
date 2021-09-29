@@ -165,7 +165,7 @@ class SerializerHelper
         if (length == (-1)) {
             return null;
         } else {
-            List arr = [];
+            List<StackTrace> arr = [];
             for (int i = 0; i < length; i++) {
                 arr[i] = new StackTraceElement(readString(in_), readString(in_), readString(in_), readInt(in_));
             }
