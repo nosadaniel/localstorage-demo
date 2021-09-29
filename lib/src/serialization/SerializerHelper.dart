@@ -24,14 +24,15 @@ class SerializerHelper
 
     static int readIntLong(Stream<List<int>> in_)
     {
-        int size = INT_SIZE;
+/*        int size = INT_SIZE;
         List<int> f_arr = in_.first();
         int result = 0;
         for (int i = 0; i < size; i++) {
             result <<= BYTE_SIZE;
             result |= (arr[i] & 15);
         }
-        return result;
+        return result;*/
+    return (await in_.elementAt(0))[0];
     }
 
     static void writeIntInt(Sink<List<int>> out, int l)
@@ -181,7 +182,8 @@ class SerializerHelper
     {
         switch (("" + readIntLong(in_))) {
             case ("" + STRING_UID):
-                List<int?> arr = new List<int>(readIntInt(in_));
+                List?<int?> arr = [];
+                arr = readIntInt(in_);
                 in_.read(arr);
                 return utf8.encode(arr);
             case ("" + LONG_UID):
