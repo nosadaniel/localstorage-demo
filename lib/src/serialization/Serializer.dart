@@ -41,8 +41,8 @@ abstract class Serializer
         try {
             Stream<List<int>> in_ = new Stream<List<int>>(buf);
             return fromByteArrayStream(in_);
-        } on UnimplementedError catch (ioe) {
-            ioe.printStackTrace();
+        } on UnimplementedError catch (e, s) {
+            print("StackTrace $s");
             return null;
         }
     }
