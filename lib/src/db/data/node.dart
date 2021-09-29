@@ -148,5 +148,5 @@ abstract class Node /*with Serializer*/ {
   Node shallowClone();
 
   /// Checks if two NodeValue are equivalent in values.
-  bool equals(Object? nodeValue);
+  bool equals(Object? object);
 }

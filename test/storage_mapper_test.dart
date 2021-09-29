@@ -132,10 +132,10 @@ void main() {
           reason: 'Node :testNode1 may not be a skeleton if fetched');
 
       // compare data
-      expect(node.equals(storedNode), true, reason: 'comparing parent node');
+      expect(node.equals(storedNode), true, reason: 'comparing parent node failed (expected: ${storedNode.toString()}; got: ${node.toString()}');
       expect(childNode.equals(storedChildNode), true,
           reason: 'comparing child node');
-      expect(node2.equals(storedNode2), true, reason: 'comparing parent node2');
+      expect(node2.equals(storedNode2), true, reason: 'comparing parent node2 ');
       expect(storedNode.getChildren().length, 1,
           reason: 'checking for child node count');
     }
@@ -174,7 +174,7 @@ void main() {
       print('## got    ' + storedNode.toString());
 
       // compare data
-      expect(node.equals(storedNode), true, reason: 'comparing parent node');
+      expect(node.equals(storedNode), true, reason: 'comparing parent node (expected: ${node.toString()}(${node.toString().hashCode}); got: ${storedNode.toString()}(${storedNode.toString().hashCode})');
       expect(childNode.equals(storedChildNode), true,
           reason: 'comparing child node');
       expect(node2.equals(storedNode2), true, reason: 'comparing parent node2');

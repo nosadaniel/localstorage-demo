@@ -1,12 +1,9 @@
 name: geiger_localstorage
 description: A local storage for the GEIGER project providing an internationalized and event driven data storage.
-version: 0.5.0
+version: 0.5.1
 #homepage: https://github.com/cyber-geiger/toolbox-storage
 repository: https://github.com/cyber-geiger/toolbox-storage
 documentation: https://github.com/cyber-geiger/toolbox-storage/wiki
-
-
-
 
 environment:
   sdk: '>=2.12.0 <3.0.0'

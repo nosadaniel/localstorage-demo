@@ -80,5 +80,5 @@ abstract class NodeValue /* with Serializer*/ {
   String toString([String prefix]);
 
   /// Checks if two NodeValue are equivalent in values.
-  bool equals(Object? nodeValue);
+  bool equals(Object? object);
 }

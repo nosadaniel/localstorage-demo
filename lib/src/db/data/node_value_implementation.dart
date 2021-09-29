@@ -150,8 +150,8 @@ class NodeValueImpl with NodeValue {
   }
 
   @override
-  void update(NodeValue node) {
-    var n2 = node as NodeValueImpl;
+  void update(NodeValue nodeValue) {
+    NodeValueImpl n2 = nodeValue as NodeValueImpl;
     key = n2.getKey();
     value.clear();
     for (var e in n2.value.entries) {
@@ -238,7 +238,7 @@ class NodeValueImpl with NodeValue {
   }
 
   @override
-  int get hashCode => super.hashCode;
+  int get hashCode => toString().hashCode;
 
 
 /*void toByteArrayStream(Sink<List<int>> out) {

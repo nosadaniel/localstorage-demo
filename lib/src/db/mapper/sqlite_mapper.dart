@@ -13,7 +13,7 @@ class SqliteMapper extends AbstractSqlMapper {
       ') PRIMARY KEY,\n'
           'owner TEXT CHECK( LENGTH(owner) <= 40),\n'
           'name TEXT CHECK( LENGTH(name) <= 40) NOT NULL,\n'
-          "visibility TEXT CHECK(visibility IN ('RED', 'AMBER', 'GREEN', 'WHITE')) NOT NULL DEFAULT 'RED',\n"
+          "visibility TEXT CHECK(visibility IN ('black', 'red', 'amber', 'green', 'white')) NOT NULL DEFAULT 'red',\n"
           'children TEXT CHECK( LENGTH(children) <=' +
       maxFieldSize.toString() +
       ') NULL,\n'
@@ -109,7 +109,7 @@ class SqliteMapper extends AbstractSqlMapper {
           return res;
         }
         res = NodeImpl.fromPath(resultSet.first['path'] as String);
-        String? owner = resultSet.first['owner'] as String;
+        String owner = (resultSet.first['owner'] ??'') as String;
         res.setOwner(owner);
         res.setVisibility(VisibilityExtension.valueOf(
                 resultSet.first['visibility'] as String) ??
@@ -137,7 +137,7 @@ class SqliteMapper extends AbstractSqlMapper {
         NodeValue value = NodeValueImpl(
             key,
             valueRow['value'] as String,
-            valueRow['type'] as String,
+            (valueRow['type']??'') as String,
             '',
             int.parse(valueRow['last_modified'] as String));
         var sqlStatementTranslations =
@@ -186,7 +186,7 @@ class SqliteMapper extends AbstractSqlMapper {
       get(node.getPath()!);
     } catch (e) {
       if ((e is! StorageException)) {
-        throw StorageException('Node already exists');
+        throw StorageException('Node "${node.getPath()}" already exists');
       }
     }
     if (node.getParentPath() != null && '' != node.getParentPath()) {
@@ -289,7 +289,7 @@ class SqliteMapper extends AbstractSqlMapper {
       value = NodeValueImpl(
           resultSet.first['key'] as String,
           resultSet.first['value'] as String,
-          resultSet.first['type'] as String,
+          (resultSet.first['type']??'') as String,
           '',
           int.parse(resultSet.first['last_modified'] as String));
     } catch (e) {
@@ -559,12 +559,9 @@ class SqliteMapper extends AbstractSqlMapper {
   ResultSet requestResult(String sqlStatement, List<Object?> args) {
     try {
       return conn.select(sqlStatement, args);
-    } on SqliteException catch (_, st) {
+    } on SqliteException catch (e, st) {
       print(st);
-      throw StorageException('Could not execute query: ' +
-          sqlStatement +
-          ' with args: ' +
-          args.toString());
+      throw StorageException('Could not execute query: "$sqlStatement" with args: ${args.toString()} [${e.toString()}]');
     }
   }
 }

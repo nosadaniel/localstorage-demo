@@ -20,7 +20,7 @@ class NodeImpl with Node {
   StorageController? controller;
 
   /// contains the ordinals of a node
-  final Map<Field, String> ordinals = <Field,String>{};
+  final Map<Field, String> ordinals = <Field,String>{ Field.owner:'' };
 
   /// contains the key/value pairs of a node
   final Map<String, NodeValue> values = {};
@@ -204,7 +204,7 @@ class NodeImpl with Node {
   @override
   String? getOwner() {
     try {
-      return get(Field.owner);
+      return get(Field.owner)??'';
     } on StorageException {
       throw Exception('Oops.... this should not happen... contact developer');
     }

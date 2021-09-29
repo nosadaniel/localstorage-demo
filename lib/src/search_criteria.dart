@@ -229,8 +229,8 @@ class SearchCriteria with /*Serializer,*/ Comparable<SearchCriteria> {
   }*/
 
   @override
-  int compareTo(SearchCriteria object) {
-    return toString().compareTo(object.toString());
+  int compareTo(SearchCriteria other) {
+    return toString().compareTo(other.toString());
   }
 
   bool equals(Object o) {
