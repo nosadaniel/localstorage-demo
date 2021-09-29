@@ -24,8 +24,7 @@ class SerializerHelper
     static int _readIntLong(Stream<List<int>> in_)
     {
         int size = INT_SIZE;
-        Future<List> f_arr = in_.toList();
-        List arr = await f_arr;
+        List<int> f_arr = in_.first();
         int result = 0;
         for (int i = 0; i < size; i++) {
             result <<= BYTE_SIZE;
@@ -129,7 +128,7 @@ class SerializerHelper
         if (length == (-1)) {
             return null;
         } else {
-            List<int> arr = new List<int>(length);
+            List<int?> arr = List<int?>.filled(length, null, growable: false);
             in_.read(arr);
             return utf8.encode(arr);
         }
@@ -156,7 +155,7 @@ class SerializerHelper
     /// @param in the stream to be read
     /// @return the deserialized array
     /// @throws IOException if an exception occurs while writing to the stream
-    static List<StackTrace> readStackTraces(Stream<List<int>> in_)
+    static List<StackTrace>? readStackTraces(Stream<List<int>> in_)
     {
         if (readIntLong(in_) != STACKTRACES_UID) {
             throw new Exception("Cannot cast");
@@ -165,7 +164,7 @@ class SerializerHelper
         if (length == (-1)) {
             return null;
         } else {
-            List arr = [];
+            List<StackTrace> arr = [];
             for (int i = 0; i < length; i++) {
                 arr[i] = new StackTraceElement(readString(in_), readString(in_), readString(in_), readInt(in_));
             }
@@ -181,7 +180,7 @@ class SerializerHelper
     {
         switch (("" + readIntLong(in_))) {
             case ("" + STRING_UID):
-                List<int> arr = new List<int>(readIntInt(in_));
+                List<int?> arr = new List<int>(readIntInt(in_));
                 in_.read(arr);
                 return utf8.encode(arr);
             case ("" + LONG_UID):
@@ -197,7 +196,7 @@ class SerializerHelper
     /// @throws IOException if object cannot be written
     static void writeObject(Sink<List<int>> out, Object o)
     {
-        switch (o.runtimeType) {
+        switch (o.runtimeType.toString()) {
             case "String":
                 writeString(out, o);
                 break;
