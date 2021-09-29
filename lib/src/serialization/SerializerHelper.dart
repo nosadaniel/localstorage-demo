@@ -130,7 +130,7 @@ class SerializerHelper
         if (length == (-1)) {
             return null;
         } else {
-            List<int> arr = new List<int>(length);
+            List<int?> arr = List<int?>.filled(length, null, growable: false);
             in_.read(arr);
             return utf8.encode(arr);
         }
@@ -182,7 +182,7 @@ class SerializerHelper
     {
         switch (("" + readIntLong(in_))) {
             case ("" + STRING_UID):
-                List<int> arr = new List<int>(readIntInt(in_));
+                List<int?> arr = new List<int>(readIntInt(in_));
                 in_.read(arr);
                 return utf8.encode(arr);
             case ("" + LONG_UID):
@@ -198,7 +198,7 @@ class SerializerHelper
     /// @throws IOException if object cannot be written
     static void writeObject(Sink<List<int>> out, Object o)
     {
-        switch (o.runtimeType) {
+        switch (o.runtimeType.toString()) {
             case "String":
                 writeString(out, o);
                 break;
