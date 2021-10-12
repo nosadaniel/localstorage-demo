@@ -3,10 +3,11 @@ import 'dart:developer';
 import 'package:example/model/threat.dart';
 import 'package:flutter/material.dart';
 import 'package:geiger_localstorage/geiger_localstorage.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
   runApp(const MyApp());
 }
 
@@ -20,13 +21,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Threats From that Database'),
+      home: const MyHomePage(title: 'Threats From that Database'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -47,8 +48,13 @@ class _MyHomePageState extends State<MyHomePage> {
   };
 
   void populateDatabase() {
-    createNodeAndNodeValue.addThreatMap(threatMap);
-    createNodeAndNodeValue.populateGlobalThreatsNode(controller!);
+    try {
+      createNodeAndNodeValue.addThreatMap(threatMap);
+      createNodeAndNodeValue.populateGlobalThreatsNode(controller!);
+    } catch (e) {
+      log("controller late test: $e");
+      //controller = GenericController('uiTest1', DummyMapper());
+    }
   }
 
   void getThreatFromDataBase() {
@@ -59,13 +65,31 @@ class _MyHomePageState extends State<MyHomePage> {
     log(threats.length.toString());
   }
 
+  void initDatabase() async {
+    //create path for database file
+    String dbPath = join(await getDatabasesPath(), 'doggie_database.db');
+    //using dummyMapper
+    //controller = GenericController('uiTest1', DummyMapper());
+    //using persistent database
+    controller = GenericController('uiTest2', SqliteMapper(dbPath));
+    log(dbPath.toString());
+    populateDatabase();
+  }
+
   @override
   void initState() {
-    controller = GenericController('uiTest1', DummyMapper());
-    populateDatabase();
+    initDatabase();
     super.initState();
   }
 
+  @override
+  void dispose() {
+    //close database connection
+    controller!.close();
+    super.dispose();
+  }
+
+  // build the ui
   @override
   Widget build(BuildContext context) {
     //

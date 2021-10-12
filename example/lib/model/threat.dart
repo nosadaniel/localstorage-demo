@@ -26,13 +26,13 @@ class CreateNodeAndNodeValue {
   }
 
   //populate :Global:threats with values according threats
-  void populateGlobalThreatsNode(StorageController controller) {
+  void populateGlobalThreatsNode(StorageController? controller) {
     try {
-      threatNode = controller.get(':Global:threats');
+      threatNode = controller!.get(':Global:threats');
     } on StorageException {
       threatNode = NodeImpl("threats", ":Global");
       //create :Global:threats
-      controller.add(threatNode!);
+      controller!.add(threatNode!);
       for (Threat threat in threats) {
         Node threatChildNode = NodeImpl(":Global:threats:${threat.threatId}");
         //create :Global:threats:$threatId
@@ -48,10 +48,10 @@ class CreateNodeAndNodeValue {
   }
 
   //return list of threats
-  List<Threat> getThreats(StorageController controller) {
+  List<Threat> getThreats(StorageController? controller) {
     List<Threat> t = [];
     try {
-      threatNode = controller.get(":Global:threats");
+      threatNode = controller!.get(":Global:threats");
       //log(threatNode!.getChildren().toString());
       threatNode!.getChildren().forEach((key, value) {
         return t.add(Threat(
@@ -60,7 +60,7 @@ class CreateNodeAndNodeValue {
       });
       return t;
     } on StorageException {
-      log("something went error");
+      log(":Global:threats can not be find in the database");
     }
     return <Threat>[];
     //for displaying changes
