@@ -30,7 +30,7 @@ class DemoController extends GetxController {
 
   void _initDatabase() async {
     //create path for database file
-    String dbPath = join(await getDatabasesPath(), 'doggie_database.db');
+    String dbPath = join(await getDatabasesPath(), 'test1_database.db');
     //using dummyMapper
     //controller = GenericController('uiTest1', DummyMapper());
     //using persistent database
