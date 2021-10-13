@@ -47,16 +47,6 @@ class _MyHomePageState extends State<MyHomePage> {
     "80efffaf-98a1-4e0a-8f5e-gr89388353wa": "Web application threats"
   };
 
-  void populateDatabase() {
-    try {
-      createNodeAndNodeValue.addThreatMap(threatMap);
-      createNodeAndNodeValue.populateGlobalThreatsNode(controller!);
-    } catch (e) {
-      log("controller late test: $e");
-      //controller = GenericController('uiTest1', DummyMapper());
-    }
-  }
-
   void getThreatFromDataBase() {
     log(createNodeAndNodeValue.getThreats(controller!).toString());
     setState(() {
@@ -67,18 +57,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void initDatabase() async {
     //create path for database file
-    String dbPath = join(await getDatabasesPath(), 'doggie_database.db');
+    String dbPath = join(await getDatabasesPath(), 'test_database.db');
     //using dummyMapper
     //controller = GenericController('uiTest1', DummyMapper());
     //using persistent database
-    controller = GenericController('uiTest2', SqliteMapper(dbPath));
+    controller = GenericController('uiTest6', SqliteMapper(dbPath));
     log(dbPath.toString());
-    populateDatabase();
   }
 
   @override
   void initState() {
-    initDatabase();
+    try {
+      initDatabase();
+    } catch (e) {
+      log("$e");
+    }
     super.initState();
   }
 

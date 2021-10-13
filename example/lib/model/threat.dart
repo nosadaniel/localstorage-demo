@@ -26,7 +26,7 @@ class CreateNodeAndNodeValue {
   }
 
   //populate :Global:threats with values according threats
-  void populateGlobalThreatsNode(StorageController? controller) {
+  void _populateGlobalThreatsNode(StorageController? controller) {
     try {
       threatNode = controller!.get(':Global:threats');
     } on StorageException {
@@ -60,6 +60,7 @@ class CreateNodeAndNodeValue {
       });
       return t;
     } on StorageException {
+      _populateGlobalThreatsNode(controller);
       log(":Global:threats can not be find in the database");
     }
     return <Threat>[];
