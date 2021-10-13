@@ -1,10 +1,6 @@
-import 'dart:developer';
-
-import 'package:example/model/threat.dart';
+import 'package:example/controllers/demo_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:geiger_localstorage/geiger_localstorage.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:get/get.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,74 +17,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Threats From that Database'),
+      home: Demo(title: 'Threats From that Database'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+class Demo extends StatelessWidget {
+  Demo({Key? key, required this.title}) : super(key: key);
 
   final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  List<Threat> threats = <Threat>[];
-  StorageController? controller;
-
-  CreateNodeAndNodeValue createNodeAndNodeValue = CreateNodeAndNodeValue();
-  Map<String, String> threatMap = {
-    "80efffaf-98a1-4e0a-8f5e-gr89388350ma": "Malware",
-    "80efffaf-98a1-4e0a-8f5e-gr89388351wb": "Web-based threats",
-    "80efffaf-98a1-4e0a-8f5e-gr89388352ph": "phishing",
-    "80efffaf-98a1-4e0a-8f5e-gr89388353wa": "Web application threats"
-  };
-
-  void populateDatabase() {
-    try {
-      createNodeAndNodeValue.addThreatMap(threatMap);
-      createNodeAndNodeValue.populateGlobalThreatsNode(controller!);
-    } catch (e) {
-      log("controller late test: $e");
-      //controller = GenericController('uiTest1', DummyMapper());
-    }
-  }
-
-  void getThreatFromDataBase() {
-    log(createNodeAndNodeValue.getThreats(controller!).toString());
-    setState(() {
-      threats = createNodeAndNodeValue.getThreats(controller!);
-    });
-    log(threats.length.toString());
-  }
-
-  void initDatabase() async {
-    //create path for database file
-    String dbPath = join(await getDatabasesPath(), 'doggie_database.db');
-    //using dummyMapper
-    //controller = GenericController('uiTest1', DummyMapper());
-    //using persistent database
-    controller = GenericController('uiTest2', SqliteMapper(dbPath));
-    log(dbPath.toString());
-    populateDatabase();
-  }
-
-  @override
-  void initState() {
-    initDatabase();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    //close database connection
-    controller!.close();
-    super.dispose();
-  }
-
+  final DemoController _demoController = Get.put(DemoController());
   // build the ui
   @override
   Widget build(BuildContext context) {
@@ -96,31 +34,47 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
       ),
-      body: threats.isEmpty
-          ? const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Center(
-                  child: Text(
-                "Database is Empty, Pressed the add button to populate the Screen",
-                style: TextStyle(color: Colors.red),
-                softWrap: true,
-              )),
-            )
-          : ListView.builder(
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  subtitle: Text(threats[index].name),
-                  title: Text("ID: ${threats[index].threatId}"),
-                );
-              },
-              itemCount: threats.length),
-      floatingActionButton: FloatingActionButton(
-        onPressed: getThreatFromDataBase,
-        tooltip: 'CreateNode',
-        child: const Icon(Icons.add),
-      ),
+      body: Obx(() {
+        return _demoController.threats.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Pressed the add button to populate the Screen",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    ElevatedButton(
+                      onPressed: _demoController.getThreatFromDataBase,
+                      child: const Text("get data"),
+                    ),
+                  ],
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                          itemBuilder: (BuildContext context, int index) {
+                            return Card(
+                              child: ListTile(
+                                subtitle:
+                                    Text(_demoController.threats[index].name),
+                                title: Text(
+                                    "ID: ${_demoController.threats[index].threatId}"),
+                              ),
+                            );
+                          },
+                          itemCount: _demoController.threats.length),
+                    ),
+                  ],
+                ),
+              );
+      }),
     );
   }
 }

@@ -37,6 +37,7 @@ dependencies:
   geiger_localstorage: ^0.5.1
   sqlite3_flutter_libs: ^0.5.1
   sqflite: ^2.0.0+4
+  get: ^4.3.8
 
 dev_dependencies:
   flutter_test:
