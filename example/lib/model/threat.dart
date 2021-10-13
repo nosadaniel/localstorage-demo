@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:geiger_localstorage/geiger_localstorage.dart';
 
 class Threat {
@@ -13,29 +15,25 @@ class Threat {
 }
 
 class CreateNodeAndNodeValue {
-  final List<Threat> _threats = <Threat>[];
+  List<Threat> threats = <Threat>[];
   Node? threatNode;
 
   //pass threatMap to threats List
-  void _addThreatMap(Map<String, String> threatMap) {
+  void addThreatMap(Map<String, String> threatMap) {
     threatMap.forEach((key, value) {
-      _threats.add(Threat(threatId: key, name: value));
+      threats.add(Threat(threatId: key, name: value));
     });
   }
 
   //populate :Global:threats with values according threats
-  void _populateGlobalThreatsNode(
-      StorageController? controller, Map<String, String> threatMap) {
+  void populateGlobalThreatsNode(StorageController? controller) {
     try {
       threatNode = controller!.get(':Global:threats');
     } on StorageException {
       threatNode = NodeImpl("threats", ":Global");
       //create :Global:threats
       controller!.add(threatNode!);
-      //pass threatMap to threats List
-      _addThreatMap(threatMap);
-      // loop through _threats
-      for (Threat threat in _threats) {
+      for (Threat threat in threats) {
         Node threatChildNode = NodeImpl(":Global:threats:${threat.threatId}");
         //create :Global:threats:$threatId
         threatNode!.addChild(threatChildNode);
@@ -50,8 +48,7 @@ class CreateNodeAndNodeValue {
   }
 
   //return list of threats
-  List<Threat> getThreats(
-      StorageController? controller, Map<String, String> threatMap) {
+  List<Threat> getThreats(StorageController? controller) {
     List<Threat> t = [];
     try {
       threatNode = controller!.get(":Global:threats");
@@ -63,8 +60,7 @@ class CreateNodeAndNodeValue {
       });
       return t;
     } on StorageException {
-      //create and populate database if :Global:threats is not create
-      _populateGlobalThreatsNode(controller, threatMap);
+      log(":Global:threats can not be find in the database");
     }
     return <Threat>[];
     //for displaying changes
