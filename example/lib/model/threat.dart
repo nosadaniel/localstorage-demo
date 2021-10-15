@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:geiger_localstorage/geiger_localstorage.dart';
 
 class Threat {
@@ -63,8 +65,9 @@ class CreateNodeAndNodeValue {
       });
       return t;
     } on StorageException {
+      log(":Global:threats does not exist");
       //create and populate database if :Global:threats is not create
-      _populateGlobalThreatsNode(controller, threatMap);
+      //_populateGlobalThreatsNode(controller, threatMap);
     }
     return <Threat>[];
     //for displaying changes

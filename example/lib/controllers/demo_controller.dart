@@ -38,6 +38,7 @@ class DemoController extends GetxController {
       _storageController = GenericController('uiTest2', SqliteMapper(dbPath));
       log(dbPath.toString());
     } catch (e, s) {
+      //Get.defaultDialog(content: Text("error"));
       log("Error: $e \ntrace:$s");
     }
   }
